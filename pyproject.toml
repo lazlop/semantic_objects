@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "template-builder"
+version = "0.1.0"
+description = "A Python package for creating and managing semantic building models using Brick Schema and ASHRAE Standard 223P"
+keywords = ["building", "semantic", "brick", "s223", "ontology", "rdf"]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+dependencies = [
+    "buildingmotif>=0.3.0",
+    "rdflib>=7.1.3",
+    "pyshacl>=0.26.0",
+    "pandas>=2.0.3",
+    "requests>=2.32.4",
+    "ipykernel>=6.29.5",
+    "grafanalib>=0.7.1",
+    "oxrdflib>=0.4.0",
+    "brick-tq-shacl>=0.3.4",
+    "semantic-mpc-interface"
+]
+
+
+[tool.uv.sources]
+semantic-mpc-interface = { git = "https://github.com/lazlop/SemanticModelBuilder.git", branch = "develop" }
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "isort>=5.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/template_builder"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
