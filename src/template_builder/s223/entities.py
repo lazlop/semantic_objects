@@ -4,12 +4,22 @@ from .. import units
 from .values import Area, Azimuth, Tilt
 from .relations import * 
 
+# Should node_uris be generated based on var names? should that or label be required or optionally provided? 
+
 class Space(Node):
     _iri = 'PhysicalSpace'
     area: Area
     relations = [
         (hasProperty, 'area')
         ]
+    # TODO: consider smoothing this and just requiring params for area instead of actually requiring Area, or make generic by requiring kwargs for all annotations
+    def __init__(self, area: Area):
+        self.area = area
+
+
+
+
+# just for testing out what this looks like
 class Space_OptArea(Space):
     area: Area
     relations = [
@@ -24,13 +34,3 @@ class Space_TwoArea(Space):
     relations = [
             (hasProperty, ['area','area2'])
         ]
-    
-class Window(Node):
-    _iri = 'Window'
-    area: Area
-    azimuth: Azimuth
-    tilt: Tilt 
-
-    relations = [
-        (hasProperty, ['area','azimuth','tilt'])
-    ]

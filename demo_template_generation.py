@@ -46,5 +46,9 @@ def main():
     print("\n3. Tilt:")
     print(Tilt.to_yaml())
 
+    print('instantiating space')
+    a = Space(Area(10))
+    print(a)
+
 if __name__ == "__main__":
     main()

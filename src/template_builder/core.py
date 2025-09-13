@@ -1,6 +1,6 @@
 from typing import List, Dict, Tuple, Type, Union, get_origin
 from dataclasses import dataclass, field
-from semantic_mpc_interface.namespaces import * 
+from semantic_mpc_interface.namespaces import PARAM, RDF, bind_prefixes
 import yaml
 from rdflib import Graph
 
@@ -27,32 +27,11 @@ class Resource:
         return cls._ns[cls._iri]
     
     @classmethod
+    # TODO: have to edit this to get other attributes
     def _get_attributes(cls):
         attrs = {k: v for k, v in cls.__dict__.items()
             if not k.startswith('_') and not callable(v)}
         return attrs
-
-
-    # # Legacy function 
-    # def create_triples(annots, attrs, relations):
-    #     triples = []
-    #     for pred, objs in relations:
-    #         if isinstance(objs,list):
-    #             for obj in objs:
-    #                 if obj in annots.keys():
-    #                     triples.append((pred._get_iri(), PARAM[obj]))
-    #                 elif obj in attrs.keys():
-    #                     triples.append((pred._get_iri(), attrs[obj]._get_iri()))
-    #                 else:
-    #                     raise ValueError(f'{obj} not a good value')
-    #         else:
-    #             if objs in annots.keys():
-    #                     triples.append((pred._get_iri(), PARAM[objs]))
-    #             elif objs in attrs.keys():
-    #                 triples.append((pred._get_iri(), attrs[objs]._get_iri()))
-    #             else:
-    #                 raise ValueError(f'{objs} not a good value')
-    #     return triples
 
     @classmethod
     def generate_turtle_body(cls, subject_name="name"):
@@ -198,6 +177,7 @@ class Value(Resource):
     # A Literal
     pass
 
+# Probably don't need a NamedNode class, since can just directly use rdflib URIRefs
 class NamedNode(Resource):
     # A Named Node 
     pass
