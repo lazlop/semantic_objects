@@ -1,6 +1,5 @@
 from .. import core
-from semantic_mpc_interface import S223
-
+from semantic_mpc_interface import S223, QUDT
 
 # Sinse Predicate has no node type, it will be like the "any predicate" for a template
 class Predicate(core.Predicate):
@@ -16,5 +15,6 @@ class hasUnit(Predicate):
 class hasProperty(Predicate):
     _iri = 'hasProperty'
 
-class hasQuantityKind(Predicate):
+class hasQuantityKind(core.Predicate):
+    _ns = QUDT
     _iri = 'hasQuantityKind'

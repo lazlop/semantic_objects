@@ -2,71 +2,18 @@ from typing import List, Dict, Tuple, Type, Union, get_origin
 from dataclasses import dataclass, field
 from semantic_mpc_interface.namespaces import * 
 import yaml
+from rdflib import Graph
 
-def get_namespace_prefixes():
-    """Get standard namespace prefixes for RDF templates"""
-    return {
-        'p': '<urn:___param___#>',
-        'brick': '<https://brickschema.org/schema/Brick#>',
-        's223': '<http://data.ashrae.org/standard223#>',
-        'qudt': '<http://qudt.org/schema/qudt/>',
-        'quantitykind': '<http://qudt.org/vocab/quantitykind/>',
-        'unit': '<http://qudt.org/vocab/unit/>',
-        'hpf': '<urn:hpflex#>'
-    }
+# Define a custom class for folded style text
+class FoldedString(str):
+    pass
 
-def create_turtle_triples(annots, attrs, relations, subject_name="name"):
-    """Create RDF/Turtle triples from relations"""
-    triples = []
-    
-    for pred, objs in relations:
-        if isinstance(objs, list):
-            for obj in objs:
-                if obj in annots.keys():
-                    triples.append(f"        s223:{pred._iri} p:{obj}")
-                elif obj in attrs.keys():
-                    # Handle special cases for different attribute types
-                    attr_value = attrs[obj]
-                    if hasattr(attr_value, '_iri'):
-                        triples.append(f"        s223:{pred._iri} {attr_value}")
-                    else:
-                        triples.append(f"        s223:{pred._iri} {attr_value}")
-                else:
-                    raise ValueError(f'{obj} not a good value')
-        else:
-            if objs in annots.keys():
-                triples.append(f"        s223:{pred._iri} p:{objs}")
-            elif objs in attrs.keys():
-                attr_value = attrs[objs]
-                if hasattr(attr_value, '_iri'):
-                    triples.append(f"        s223:{pred._iri} {attr_value}")
-                else:
-                    triples.append(f"        s223:{pred._iri} {attr_value}")
-            else:
-                raise ValueError(f'{objs} not a good value')
-    
-    return triples
+# Create a custom representer for the folded style
+def folded_str_representer(dumper, data):
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
 
-# Legacy function for backward compatibility
-def create_triples(annots, attrs, relations):
-    triples = []
-    for pred, objs in relations:
-        if isinstance(objs,list):
-            for obj in objs:
-                if obj in annots.keys():
-                    triples.append((pred._get_iri(), PARAM[obj]))
-                elif obj in attrs.keys():
-                    triples.append((pred._get_iri(), attrs[obj]._get_iri()))
-                else:
-                    raise ValueError(f'{obj} not a good value')
-        else:
-            if objs in annots.keys():
-                    triples.append((pred._get_iri(), PARAM[objs]))
-            elif objs in attrs.keys():
-                triples.append((pred._get_iri(), attrs[objs]._get_iri()))
-            else:
-                raise ValueError(f'{objs} not a good value')
-    return triples
+# Register the representer
+yaml.add_representer(FoldedString, folded_str_representer)
 
 @dataclass
 class Resource:
@@ -75,6 +22,8 @@ class Resource:
 
     @classmethod
     def _get_iri(cls):
+        if not hasattr(cls, '_iri'):
+            raise Exception('Class must have _iri attribute')
         return cls._ns[cls._iri]
     
     @classmethod
@@ -83,69 +32,60 @@ class Resource:
             if not k.startswith('_') and not callable(v)}
         return attrs
 
-    @classmethod
-    def template_body_from_anotations(cls):
-        # drafing code for class method
-        if cls.relations == []:
-            raise Exception('No triples to make')
-        relations = cls.get_relations()
-        triples = []
-        triples += create_triples(cls.__annotations__,
-                                  cls._get_attributes(),
-                                  relations)
-        return triples
+
+    # # Legacy function 
+    # def create_triples(annots, attrs, relations):
+    #     triples = []
+    #     for pred, objs in relations:
+    #         if isinstance(objs,list):
+    #             for obj in objs:
+    #                 if obj in annots.keys():
+    #                     triples.append((pred._get_iri(), PARAM[obj]))
+    #                 elif obj in attrs.keys():
+    #                     triples.append((pred._get_iri(), attrs[obj]._get_iri()))
+    #                 else:
+    #                     raise ValueError(f'{obj} not a good value')
+    #         else:
+    #             if objs in annots.keys():
+    #                     triples.append((pred._get_iri(), PARAM[objs]))
+    #             elif objs in attrs.keys():
+    #                 triples.append((pred._get_iri(), attrs[objs]._get_iri()))
+    #             else:
+    #                 raise ValueError(f'{objs} not a good value')
+    #     return triples
 
     @classmethod
     def generate_turtle_body(cls, subject_name="name"):
         """Generate RDF/Turtle body for template"""
-        if not hasattr(cls, '_iri'):
-            raise Exception('Class must have _iri attribute')
         
+        g = Graph()
         relations = cls.get_relations()
-        prefixes = get_namespace_prefixes()
         
         # Generate prefix declarations
-        prefix_lines = []
-        for prefix, uri in prefixes.items():
-            prefix_lines.append(f"    @prefix {prefix}: {uri} .")
+        # TODO: replace this with some thing like in semantic_mpc_interface.namespaces
+        bind_prefixes(g)
         
-        # Generate the main subject declaration
-        main_line = f"    p:{subject_name} a s223:{cls._iri}"
+        g.add((PARAM['name'], RDF.type, cls._get_iri()))
+        
+        # Get all annotations from the class hierarchy
+        all_annotations = {}
+        for base in reversed(cls.__mro__):
+            if hasattr(base, '__annotations__'):
+                all_annotations.update(base.__annotations__)
         
         # Generate property triples
-        property_lines = []
         for pred, objs in relations:
+            if isinstance(objs, str):
+                objs = [objs]
             if isinstance(objs, list):
                 for obj in objs:
-                    if obj in cls.__annotations__.keys():
-                        property_lines.append(f"        s223:{pred._iri} p:{obj}")
+                    if obj in all_annotations.keys():
+                        g.add((PARAM['name'], pred._get_iri(), PARAM[obj]))
                     elif obj in cls._get_attributes().keys():
                         attr_value = cls._get_attributes()[obj]
-                        if hasattr(attr_value, '__name__'):
-                            # Handle namespace references like QK['Area']
-                            property_lines.append(f"        qudt:{pred._iri} {attr_value}")
-                        else:
-                            property_lines.append(f"        s223:{pred._iri} {attr_value}")
-            else:
-                if objs in cls.__annotations__.keys():
-                    property_lines.append(f"        s223:{pred._iri} p:{objs}")
-                elif objs in cls._get_attributes().keys():
-                    attr_value = cls._get_attributes()[objs]
-                    if hasattr(attr_value, '__name__'):
-                        property_lines.append(f"        qudt:{pred._iri} {attr_value}")
-                    else:
-                        property_lines.append(f"        s223:{pred._iri} {attr_value}")
-        
-        # Combine all lines
-        body_lines = prefix_lines + [main_line]
-        if property_lines:
-            body_lines[-1] += " ;"  # Add semicolon to main line
-            body_lines.extend(property_lines[:-1])  # Add all but last property line
-            body_lines.append(property_lines[-1] + " .")  # Add period to last line
-        else:
-            body_lines[-1] += " ."  # Add period to main line
-        
-        return "\n".join(body_lines)
+                        g.add((PARAM['name'], pred._get_iri(), attr_value))
+            
+        return g.serialize(format = 'ttl')
 
     @classmethod
     def get_dependencies(cls):
@@ -166,11 +106,8 @@ class Resource:
         return dependencies
 
     @classmethod
-    def generate_yaml_template(cls, template_name=None):
+    def generate_yaml_template(cls, template_name):
         """Generate complete YAML template"""
-        if template_name is None:
-            template_name = cls.__name__.lower()
-        
         template = {
             template_name: {
                 'body': cls.generate_turtle_body(),
@@ -187,25 +124,44 @@ class Resource:
     @classmethod
     def to_yaml(cls, template_name=None):
         """Convert to YAML string"""
+        if template_name == None:
+            template_name = cls.__name__.lower()
         template = cls.generate_yaml_template(template_name)
-        return yaml.dump(template, default_flow_style=False, sort_keys=False)
+        # return yaml.dump(template, default_flow_style=False, sort_keys=False)
+        template[template_name]['body'] = FoldedString(template[template_name]['body'])
+        return yaml.dump(template, explicit_end=False)
 
     @classmethod
     def validate_relations(cls):
         if not hasattr(cls, 'relations'):
             raise Exception('No relations defined')
-        objects = cls.relations[0][1]
-                
-        if isinstance(objects,str):
-            objects = [objects]
-        if not isinstance(objects,list):
-            raise TypeError(f'{objects=} must be a list or str')
         
-        for obj in list(objects):
-            non_relation_attributes = [k for k in cls._get_attributes().keys() if k != 'relations']
-            if obj not in list(cls.__annotations__.keys()) \
-                + non_relation_attributes:
-                raise ValueError(f'{obj} must be an existing attribute or annotation')          
+        # Get all relations for this class
+        all_relations = []
+        for base in reversed(cls.__mro__):
+            if hasattr(base, 'relations'):
+                relations = getattr(base, 'relations')
+                if relations != []:
+                    all_relations += relations
+        
+        # NOTE: not totally sure if I want to allow this behavior, or if I just want to check the current class
+        # Get all annotations from the class hierarchy
+        all_annotations = {}
+        for base in reversed(cls.__mro__):
+            if hasattr(base, '__annotations__'):
+                all_annotations.update(base.__annotations__)
+        
+        # Validate each relation
+        for pred, objects in all_relations:
+            if isinstance(objects, str):
+                objects = [objects]
+            if not isinstance(objects, list):
+                raise TypeError(f'{objects=} must be a list or str')
+            
+            for obj in objects:
+                non_relation_attributes = [k for k in cls._get_attributes().keys() if k != 'relations']
+                if obj not in list(all_annotations.keys()) + non_relation_attributes:
+                    raise ValueError(f'{obj} must be an existing attribute or annotation')
             
     @classmethod
     def get_relations(cls):
@@ -214,12 +170,20 @@ class Resource:
         """
         cls.validate_relations()
         all_relations = []
+        seen_relations = set()
+        
         for base in reversed(cls.__mro__):
             if hasattr(base, 'relations'):
                 relations = getattr(base, 'relations')
                 if relations == []:
                     continue
-                all_relations += relations  
+                for relation in relations:
+                    # Create a hashable representation of the relation
+                    relation_key = (relation[0]._iri, tuple(relation[1]) if isinstance(relation[1], list) else relation[1])
+                    if relation_key not in seen_relations:
+                        all_relations.append(relation)
+                        seen_relations.add(relation_key)
+        
         return all_relations
     
 class Predicate(Resource):

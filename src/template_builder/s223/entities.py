@@ -11,6 +11,10 @@ class Space(Node):
         (hasProperty, 'area')
         ]
 class Space_OptArea(Space):
+    area: Area
+    relations = [
+        (hasProperty, 'area')
+        ]
     _optional = ['area']
     
 class Space_TwoArea(Space):
