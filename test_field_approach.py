@@ -1,38 +1,38 @@
 #!/usr/bin/env python3
 
-from src.template_builder.s223.entities import FieldSpace, FieldSpaceOptArea, FieldWindow
+from src.template_builder.s223.entities import Space, SpaceOptArea, Window
 
-def test_field_space():
-    """Test the new field-based Space class"""
-    print("Testing FieldSpace:")
-    print("Relations:", FieldSpace.get_relations())
-    print("Dependencies:", FieldSpace.get_dependencies())
-    print("Optional fields:", FieldSpace.get_optional_fields())
+def test__space():
+    """Test the new -based Space class"""
+    print("Testing Space:")
+    print("Relations:", Space.get_relations())
+    print("Dependencies:", Space.get_dependencies())
+    print("Optional s:", Space.get_optional_fields())
     print("YAML template:")
-    print(FieldSpace.to_yaml("space"))
+    print(Space.to_yaml("space"))
     print()
 
-def test_field_space_opt_area():
-    """Test the new field-based Space with optional area"""
-    print("Testing FieldSpaceOptArea:")
-    print("Relations:", FieldSpaceOptArea.get_relations())
-    print("Dependencies:", FieldSpaceOptArea.get_dependencies())
-    print("Optional fields:", FieldSpaceOptArea.get_optional_fields())
+def test__space_opt_area():
+    """Test the new -based Space with optional area"""
+    print("Testing SpaceOptArea:")
+    print("Relations:", SpaceOptArea.get_relations())
+    print("Dependencies:", SpaceOptArea.get_dependencies())
+    print("Optional s:", SpaceOptArea.get_optional_fields())
     print("YAML template:")
-    print(FieldSpaceOptArea.to_yaml("space-optarea"))
+    print(SpaceOptArea.to_yaml("space-optarea"))
     print()
 
-def test_field_window():
-    """Test the new field-based Window class"""
-    print("Testing FieldWindow:")
-    print("Relations:", FieldWindow.get_relations())
-    print("Dependencies:", FieldWindow.get_dependencies())
-    print("Optional fields:", FieldWindow.get_optional_fields())
+def test__window():
+    """Test the new -based Window class"""
+    print("Testing Window:")
+    print("Relations:", Window.get_relations())
+    print("Dependencies:", Window.get_dependencies())
+    print("Optional s:", Window.get_optional_fields())
     print("YAML template:")
-    print(FieldWindow.to_yaml("window"))
+    print(Window.to_yaml("window"))
     print()
 
 if __name__ == "__main__":
-    test_field_space()
-    test_field_space_opt_area()
-    test_field_window()
+    test__space()
+    test__space_opt_area()
+    test__window()

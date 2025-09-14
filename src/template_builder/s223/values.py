@@ -47,8 +47,8 @@ class QuantifiableObervableProperty(Node):
         if unit == None:
             self.unit = DEFAULT_UNIT_MAP[self.qk][DEFAULT_UNIT_SYSTEM]
     
-    def __repr__(self):
-        return f"QOP(value={self.value}, unit='{self.unit}, qk='{self.qk}')"
+    # def __repr__(self):
+    #     return f"QOP(value={self.value}, unit='{self.unit}, qk='{self.qk}')"
 
 
 class Area(QuantifiableObervableProperty):

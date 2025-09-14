@@ -75,8 +75,9 @@ class Resource:
         if hasattr(cls, '__dataclass_fields__'):
             for field_name, field_obj in cls.__dataclass_fields__.items():
                 annotation_type = field_obj.type
-                # Skip if field is marked as optional in metadata
-                if field_obj.metadata.get('optional', False):
+                # Skip if field has init=False and templatize=False
+                if (field_obj.init == False and 
+                    field_obj.metadata.get('templatize', True) == False):
                     continue
                     
                 # Get the base type name for the dependency
@@ -113,7 +114,12 @@ class Resource:
         # Check if this is a dataclass with fields
         if hasattr(cls, '__dataclass_fields__'):
             for field_name, field_obj in cls.__dataclass_fields__.items():
+                # Fields with explicit optional metadata
                 if field_obj.metadata.get('optional', False):
+                    optional_fields.append(field_name)
+                # Fields with init=False are optional (unless templatize=False)
+                elif (field_obj.init == False and 
+                      field_obj.metadata.get('templatize', True) != False):
                     optional_fields.append(field_name)
         
         # Also check for legacy _optional attribute
@@ -233,6 +239,11 @@ class Resource:
                 for field_name, field_obj in base.__dataclass_fields__.items():
                     relation = field_obj.metadata.get('relation')
                     if relation:
+                        # Skip fields with init=False and templatize=False
+                        if (field_obj.init == False and 
+                            field_obj.metadata.get('templatize', True) == False):
+                            continue
+                        
                         # Create a hashable representation of the relation
                         relation_key = (relation._iri, field_name)
                         if relation_key not in seen_relations:
