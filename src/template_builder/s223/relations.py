@@ -15,6 +15,12 @@ class hasUnit(Predicate):
 class hasProperty(Predicate):
     _iri = 'hasProperty'
 
+class contains(Predicate):
+    _iri = 'contains'
+
+class encloses(Predicate):
+    _iri = 'contains'
+
 class hasQuantityKind(core.Predicate):
     _ns = QUDT
     _iri = 'hasQuantityKind'

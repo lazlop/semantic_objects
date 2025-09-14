@@ -7,8 +7,9 @@ from . import relations
 @dataclass
 class Node(core.Node):
     _ns = S223
-    relations = []
-
+    definition = [
+        (A, [SH.NodeShape, S223.Class]),
+    ]
     # TODO: Fix for production, helpful debugging repr for now
     def __repr__(self):
         # attr_strs = [f"{attr}={getattr(self, attr, None)}" for attr in attributes.keys() if attr != 'name']
