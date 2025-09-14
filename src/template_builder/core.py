@@ -1,5 +1,5 @@
 from typing import List, Dict, Tuple, Type, Union, get_origin
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from semantic_mpc_interface.namespaces import PARAM, RDF, bind_prefixes
 import yaml
 from rdflib import Graph
@@ -68,21 +68,59 @@ class Resource:
 
     @classmethod
     def get_dependencies(cls):
-        """Get template dependencies based on annotations"""
+        """Get template dependencies based on annotations and field metadata"""
         dependencies = []
-        for annotation_name, annotation_type in cls.__annotations__.items():
-            # Get the base type name for the dependency
-            if hasattr(annotation_type, '__name__'):
-                template_name = annotation_type.__name__.lower()
-            else:
-                template_name = str(annotation_type).lower()
-            
-            dependencies.append({
-                'template': template_name,
-                'args': {'name': annotation_name}
-            })
+        
+        # Check if this is a dataclass with fields
+        if hasattr(cls, '__dataclass_fields__'):
+            for field_name, field_obj in cls.__dataclass_fields__.items():
+                annotation_type = field_obj.type
+                # Skip if field is marked as optional in metadata
+                if field_obj.metadata.get('optional', False):
+                    continue
+                    
+                # Get the base type name for the dependency
+                if hasattr(annotation_type, '__name__'):
+                    template_name = annotation_type.__name__.lower()
+                else:
+                    template_name = str(annotation_type).lower()
+                
+                dependencies.append({
+                    'template': template_name,
+                    'args': {'name': field_name}
+                })
+        else:
+            # Fallback to annotations for non-dataclass classes
+            for annotation_name, annotation_type in cls.__annotations__.items():
+                # Get the base type name for the dependency
+                if hasattr(annotation_type, '__name__'):
+                    template_name = annotation_type.__name__.lower()
+                else:
+                    template_name = str(annotation_type).lower()
+                
+                dependencies.append({
+                    'template': template_name,
+                    'args': {'name': annotation_name}
+                })
         
         return dependencies
+
+    @classmethod
+    def get_optional_fields(cls):
+        """Get list of optional field names from field metadata"""
+        optional_fields = []
+        
+        # Check if this is a dataclass with fields
+        if hasattr(cls, '__dataclass_fields__'):
+            for field_name, field_obj in cls.__dataclass_fields__.items():
+                if field_obj.metadata.get('optional', False):
+                    optional_fields.append(field_name)
+        
+        # Also check for legacy _optional attribute
+        if hasattr(cls, '_optional'):
+            optional_fields.extend(cls._optional)
+        
+        return optional_fields
 
     @classmethod
     def generate_yaml_template(cls, template_name):
@@ -95,8 +133,13 @@ class Resource:
         }
         
         # Add optional fields if they exist
-        if hasattr(cls, '_optional'):
-            template[template_name]['optional'] = cls._optional
+        optional_fields = cls.get_optional_fields()
+        if optional_fields:
+            # If only one optional field, use scalar format like in the YAML example
+            if len(optional_fields) == 1:
+                template[template_name]['optional'] = optional_fields[0]
+            else:
+                template[template_name]['optional'] = optional_fields
         
         return template
 
@@ -111,46 +154,67 @@ class Resource:
         return yaml.dump(template, explicit_end=False)
 
     @classmethod
+    def get_field_relations(cls):
+        """Extract relations from field metadata"""
+        field_relations = []
+        
+        if hasattr(cls, '__dataclass_fields__'):
+            for field_name, field_obj in cls.__dataclass_fields__.items():
+                relation = field_obj.metadata.get('relation')
+                if relation:
+                    field_relations.append((relation, field_name))
+        
+        return field_relations
+
+    @classmethod
     def validate_relations(cls):
-        if not hasattr(cls, 'relations'):
+        # Check if we have either legacy relations or field-based relations
+        has_legacy_relations = hasattr(cls, 'relations') and cls.relations != []
+        has_field_relations = bool(cls.get_field_relations())
+        
+        if not has_legacy_relations and not has_field_relations:
             raise Exception('No relations defined')
         
-        # Get all relations for this class
-        all_relations = []
-        for base in reversed(cls.__mro__):
-            if hasattr(base, 'relations'):
-                relations = getattr(base, 'relations')
-                if relations != []:
-                    all_relations += relations
-        
-        # NOTE: not totally sure if I want to allow this behavior, or if I just want to check the current class
-        # Get all annotations from the class hierarchy
-        all_annotations = {}
-        for base in reversed(cls.__mro__):
-            if hasattr(base, '__annotations__'):
-                all_annotations.update(base.__annotations__)
-        
-        # Validate each relation
-        for pred, objects in all_relations:
-            if isinstance(objects, str):
-                objects = [objects]
-            if not isinstance(objects, list):
-                raise TypeError(f'{objects=} must be a list or str')
+        # Validate legacy relations if they exist
+        if has_legacy_relations:
+            # Get all relations for this class
+            all_relations = []
+            for base in reversed(cls.__mro__):
+                if hasattr(base, 'relations'):
+                    relations = getattr(base, 'relations')
+                    if relations != []:
+                        all_relations += relations
             
-            for obj in objects:
-                non_relation_attributes = [k for k in cls._get_attributes().keys() if k != 'relations']
-                if obj not in list(all_annotations.keys()) + non_relation_attributes:
-                    raise ValueError(f'{obj} must be an existing attribute or annotation')
+            # NOTE: not totally sure if I want to allow this behavior, or if I just want to check the current class
+            # Get all annotations from the class hierarchy
+            all_annotations = {}
+            for base in reversed(cls.__mro__):
+                if hasattr(base, '__annotations__'):
+                    all_annotations.update(base.__annotations__)
+            
+            # Validate each relation
+            for pred, objects in all_relations:
+                if isinstance(objects, str):
+                    objects = [objects]
+                if not isinstance(objects, list):
+                    raise TypeError(f'{objects=} must be a list or str')
+                
+                for obj in objects:
+                    non_relation_attributes = [k for k in cls._get_attributes().keys() if k != 'relations']
+                    if obj not in list(all_annotations.keys()) + non_relation_attributes:
+                        raise ValueError(f'{obj} must be an existing attribute or annotation')
             
     @classmethod
     def get_relations(cls):
         """
         Accumulate relations from all bases up the MRO (excluding 'object').
+        Supports both legacy relations and field-based relations.
         """
         cls.validate_relations()
         all_relations = []
         seen_relations = set()
         
+        # Get legacy relations from class attributes
         for base in reversed(cls.__mro__):
             if hasattr(base, 'relations'):
                 relations = getattr(base, 'relations')
@@ -162,6 +226,18 @@ class Resource:
                     if relation_key not in seen_relations:
                         all_relations.append(relation)
                         seen_relations.add(relation_key)
+        
+        # Get field-based relations from dataclass fields
+        for base in reversed(cls.__mro__):
+            if hasattr(base, '__dataclass_fields__'):
+                for field_name, field_obj in base.__dataclass_fields__.items():
+                    relation = field_obj.metadata.get('relation')
+                    if relation:
+                        # Create a hashable representation of the relation
+                        relation_key = (relation._iri, field_name)
+                        if relation_key not in seen_relations:
+                            all_relations.append((relation, field_name))
+                            seen_relations.add(relation_key)
         
         return all_relations
     
