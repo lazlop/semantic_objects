@@ -4,6 +4,44 @@ from semantic_mpc_interface.namespaces import PARAM, RDF, bind_prefixes
 import yaml
 from rdflib import Graph
 
+# a relation that can be used
+def valid_field(relation, label=None, comment=None):
+    return field(
+        default=None,
+        init=False,
+        metadata={
+            'relation': relation,
+            'templatize': False,
+            'label': label,
+            'comment': comment
+        }
+    )
+
+# a relation that is optional, and will be templatized
+def optional_field(relation, label=None, comment=None):
+    return field(
+        default=None,
+        init=False,
+        metadata={
+            'relation': relation,
+            'label': label,
+            'comment': comment
+        }
+    )
+
+# a field that is required
+# TODO: maybe add cardinality constraints
+def required_field(relation, min = 1, max = None, label=None, comment=None):
+    return field(
+        metadata={
+            'relation': relation,
+            'min': min,
+            'max': max,
+            'label': label,
+            'comment': comment
+        }
+    )
+
 # Define a custom class for folded style text
 class FoldedString(str):
     pass
