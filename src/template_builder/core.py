@@ -1,10 +1,10 @@
 from typing import List, Dict, Tuple, Type, Union, get_origin
 from dataclasses import dataclass, field, fields
-from semantic_mpc_interface.namespaces import PARAM, RDF, bind_prefixes
+from semantic_mpc_interface.namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
 import yaml
-from rdflib import Graph
+from rdflib import Graph, Literal, BNode
 
-# a relation that can be used
+# a relation that CAN be used (fulfilling closed world requirement)
 def valid_field(relation, label=None, comment=None):
     return field(
         default=None,
@@ -17,7 +17,7 @@ def valid_field(relation, label=None, comment=None):
         }
     )
 
-# a relation that is optional, and will be templatized
+# a relation that is optional, and will be templatized (optional in bmotif template, used to query semantic data into objects)
 def optional_field(relation, label=None, comment=None):
     return field(
         default=None,
@@ -29,7 +29,7 @@ def optional_field(relation, label=None, comment=None):
         }
     )
 
-# a field that is required
+# a field that is required (A SHACL qualified value shape requirement)
 # TODO: maybe add cardinality constraints
 def required_field(relation, min = 1, max = None, label=None, comment=None):
     return field(
@@ -56,13 +56,11 @@ yaml.add_representer(FoldedString, folded_str_representer)
 @dataclass
 class Resource:
 
-    relations = []
-
     @classmethod
     def _get_iri(cls):
-        if not hasattr(cls, '_iri'):
-            raise Exception('Class must have _iri attribute')
-        return cls._ns[cls._iri]
+        if not hasattr(cls, '_local_name'):
+            raise Exception('Class must have _local_name attribute')
+        return cls._ns[cls._local_name]
     
     @classmethod
     # TODO: have to edit this to get other attributes
@@ -196,80 +194,15 @@ class Resource:
         # return yaml.dump(template, default_flow_style=False, sort_keys=False)
         template[template_name]['body'] = FoldedString(template[template_name]['body'])
         return yaml.dump(template, explicit_end=False)
-
-    @classmethod
-    def get_field_relations(cls):
-        """Extract relations from field metadata"""
-        field_relations = []
-        
-        if hasattr(cls, '__dataclass_fields__'):
-            for field_name, field_obj in cls.__dataclass_fields__.items():
-                relation = field_obj.metadata.get('relation')
-                if relation:
-                    field_relations.append((relation, field_name))
-        
-        return field_relations
-
-    @classmethod
-    def validate_relations(cls):
-        # Check if we have either legacy relations or field-based relations
-        has_legacy_relations = hasattr(cls, 'relations') and cls.relations != []
-        has_field_relations = bool(cls.get_field_relations())
-        
-        if not has_legacy_relations and not has_field_relations:
-            raise Exception('No relations defined')
-        
-        # Validate legacy relations if they exist
-        if has_legacy_relations:
-            # Get all relations for this class
-            all_relations = []
-            for base in reversed(cls.__mro__):
-                if hasattr(base, 'relations'):
-                    relations = getattr(base, 'relations')
-                    if relations != []:
-                        all_relations += relations
-            
-            # NOTE: not totally sure if I want to allow this behavior, or if I just want to check the current class
-            # Get all annotations from the class hierarchy
-            all_annotations = {}
-            for base in reversed(cls.__mro__):
-                if hasattr(base, '__annotations__'):
-                    all_annotations.update(base.__annotations__)
-            
-            # Validate each relation
-            for pred, objects in all_relations:
-                if isinstance(objects, str):
-                    objects = [objects]
-                if not isinstance(objects, list):
-                    raise TypeError(f'{objects=} must be a list or str')
-                
-                for obj in objects:
-                    non_relation_attributes = [k for k in cls._get_attributes().keys() if k != 'relations']
-                    if obj not in list(all_annotations.keys()) + non_relation_attributes:
-                        raise ValueError(f'{obj} must be an existing attribute or annotation')
-            
+                    
     @classmethod
     def get_relations(cls):
         """
         Accumulate relations from all bases up the MRO (excluding 'object').
-        Supports both legacy relations and field-based relations.
         """
-        cls.validate_relations()
+        # could validate that there are relations to get here
         all_relations = []
         seen_relations = set()
-        
-        # Get legacy relations from class attributes
-        for base in reversed(cls.__mro__):
-            if hasattr(base, 'relations'):
-                relations = getattr(base, 'relations')
-                if relations == []:
-                    continue
-                for relation in relations:
-                    # Create a hashable representation of the relation
-                    relation_key = (relation[0]._iri, tuple(relation[1]) if isinstance(relation[1], list) else relation[1])
-                    if relation_key not in seen_relations:
-                        all_relations.append(relation)
-                        seen_relations.add(relation_key)
         
         # Get field-based relations from dataclass fields
         for base in reversed(cls.__mro__):
@@ -283,12 +216,115 @@ class Resource:
                             continue
                         
                         # Create a hashable representation of the relation
-                        relation_key = (relation._iri, field_name)
+                        relation_key = (relation._local_name, field_name)
                         if relation_key not in seen_relations:
                             all_relations.append((relation, field_name))
                             seen_relations.add(relation_key)
         
         return all_relations
+
+    @classmethod
+    def generate_rdf_class_definition(cls):
+        """Generate RDF class definition with SHACL constraints like the example"""
+        g = Graph()
+        bind_prefixes(g)
+        
+        # Get class IRI
+        class_iri = cls._get_iri()
+        
+        # Add basic class declarations
+        g.add((class_iri, RDF.type, cls._ns.Class))
+        g.add((class_iri, RDF.type, SH.NodeShape))
+        
+        # Add comment if available
+        if hasattr(cls, 'comment'):
+            g.add((class_iri, RDFS.comment, Literal(cls.comment)))
+        
+        # Add label if available
+        if hasattr(cls, 'label'):
+            g.add((class_iri, RDFS.label, Literal(cls.label)))
+        
+        # Add subclass relationship - look for meaningful parent classes
+        for base in cls.__mro__[1:]:  # Skip self
+            if (hasattr(base, '_local_name') and hasattr(base, '_ns') and 
+                base != Resource and base._local_name != cls._local_name and
+                base.__name__ not in ['Node', 'Value', 'Predicate', 'NamedNode']):
+                parent_iri = base._ns[base._local_name]
+                g.add((class_iri, RDFS.subClassOf, parent_iri))
+                break  # Only add the immediate parent
+        
+        # If no meaningful parent found, add subClassOf Concept for s223 classes
+        if hasattr(cls, '_ns') and 's223' in str(cls._ns):
+            # Check if we already added a subclass relationship
+            has_subclass = any(g.triples((class_iri, RDFS.subClassOf, None)))
+            if not has_subclass:
+                g.add((class_iri, RDFS.subClassOf, cls._ns.Concept))
+        
+        # Add SHACL property constraints for dataclass fields
+        if hasattr(cls, '__dataclass_fields__'):
+            processed_relations = set()  # Track processed relations to avoid duplicates
+            
+            for field_name, field_obj in cls.__dataclass_fields__.items():
+                relation = field_obj.metadata.get('relation')
+                if relation:
+                    # Create unique key for this relation to avoid duplicates
+                    relation_key = relation._local_name
+                    if relation_key in processed_relations:
+                        continue
+                    processed_relations.add(relation_key)
+                    
+                    # Create blank node for property constraint
+                    prop_node = BNode()
+                    g.add((class_iri, SH.property, prop_node))
+                    g.add((prop_node, SH.path, relation._get_iri()))
+                    
+                    # Add comment from field metadata or generate one
+                    field_comment = field_obj.metadata.get('comment')
+                    target_class_name = None
+                    
+                    # Handle Self type annotation
+                    if hasattr(field_obj, 'type'):
+                        type_str = str(field_obj.type)
+                        if field_obj.type == cls or type_str == 'Self' or 'Self' in type_str:
+                            target_class_name = cls.__name__
+                        elif hasattr(field_obj.type, '__name__'):
+                            target_class_name = field_obj.type.__name__
+                        else:
+                            target_class_name = str(field_obj.type)
+                    
+                    if not field_comment and target_class_name:
+                        field_comment = f"If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    
+                    if field_comment:
+                        g.add((prop_node, RDFS.comment, Literal(field_comment)))
+                    
+                    # Add target class constraint based on field type annotation
+                    if hasattr(field_obj, 'type') and hasattr(field_obj.type, '_get_iri'):
+                        target_class = field_obj.type._get_iri()
+                        g.add((prop_node, SH['class'], target_class))
+                        
+                        # Generate SHACL message
+                        relation_name = relation._local_name
+                        message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                        g.add((prop_node, SH.message, Literal(message)))
+                    elif field_obj.type == cls or 'Self' in str(field_obj.type):
+                        # Handle Self reference
+                        g.add((prop_node, SH['class'], class_iri))
+                        
+                        # Generate SHACL message for Self reference
+                        relation_name = relation._local_name
+                        message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
+                        g.add((prop_node, SH.message, Literal(message)))
+                    
+                    # Add cardinality constraints if specified
+                    min_count = field_obj.metadata.get('min')
+                    max_count = field_obj.metadata.get('max')
+                    if min_count is not None:
+                        g.add((prop_node, SH.minCount, Literal(min_count)))
+                    if max_count is not None:
+                        g.add((prop_node, SH.maxCount, Literal(max_count)))
+        
+        return g.serialize(format='turtle')
     
 class Predicate(Resource):
     # currently just used for typecheck later 

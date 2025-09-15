@@ -9,15 +9,15 @@ from functools import partial
 # Should node_uris be generated based on var names? should that or label be required or optionally provided?
 
 class DomainSpace(Node):
-    _iri = 'DomainSpace'
+    _local_name = 'DomainSpace'
     label = "Domain Space"
 
 @dataclass
 class PhysicalSpace(Node):
-    _iri = 'PhysicalSpace'
+    _local_name = 'PhysicalSpace'
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
-    # should probably be optional[list[self]], since multiple spaces can be contained, but I want to minimize typing if possible
+    # should probably actually be optional[list[self]], since multiple spaces can be contained, but I want to minimize typing if possible
     contains: Self = valid_field(contains)
     encloses: DomainSpace = valid_field(encloses)
 
@@ -41,7 +41,7 @@ class SpaceOptArea(PhysicalSpace):
 @dataclass
 class Window(Node):
     """Window with multiple properties using field-based relations"""
-    _iri = 'Window'
+    _local_name = 'Window'
     area: Area = required_field(hasProperty)
     azimuth: Azimuth = required_field(hasProperty)
     tilt: Tilt = required_field(hasProperty)

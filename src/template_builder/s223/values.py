@@ -36,7 +36,7 @@ DEFAULT_UNIT_MAP = {
 
 @dataclass
 class QuantifiableObervableProperty(Node):
-    _iri = 'QuantifiableObservableProperty'
+    _local_name = 'QuantifiableObservableProperty'
     qk: URIRef
     # TODO: maybe also just make unit a URIRef? Make simple wrappers for URIRefs? 
 
@@ -63,7 +63,7 @@ class Area(QuantifiableObervableProperty):
     ]
 
 class Azimuth(QuantifiableObervableProperty):
-    _iri = 'Azimuth'
+    _local_name = 'Azimuth'
     value: Value
     unit: Unit
     qk = QK['Azimuth']
@@ -74,7 +74,7 @@ class Azimuth(QuantifiableObervableProperty):
     ]
 
 class Tilt(QuantifiableObervableProperty):
-    _iri = 'Tilt'
+    _local_name = 'Tilt'
     value: Value
     unit: Unit
     qk = QK['Tilt']

@@ -7,20 +7,20 @@ class Predicate(core.Predicate):
 
 class hasValue(Predicate):
     # can validate predicates against classes optionally 
-    _iri = 'hasValue'
+    _local_name = 'hasValue'
 
 class hasUnit(Predicate):
-    _iri = 'hasUnit'
+    _local_name = 'hasUnit'
 
 class hasProperty(Predicate):
-    _iri = 'hasProperty'
+    _local_name = 'hasProperty'
 
 class contains(Predicate):
-    _iri = 'contains'
+    _local_name = 'contains'
 
 class encloses(Predicate):
-    _iri = 'contains'
+    _local_name = 'encloses'
 
 class hasQuantityKind(core.Predicate):
     _ns = QUDT
-    _iri = 'hasQuantityKind'
+    _local_name = 'hasQuantityKind'
