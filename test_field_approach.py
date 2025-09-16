@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from src.template_builder.s223.entities import Space, SpaceOptArea, Window
+from src.template_builder.watr.entities import Tank
 
 def test__space():
     """Test the new -based Space class"""
@@ -32,7 +33,18 @@ def test__window():
     print(Window.to_yaml("window"))
     print()
 
+def test_tank():
+    """Test the new -based Window class"""
+    print("Testing Window:")
+    print("Relations:", Tank.get_relations())
+    print("Dependencies:", Tank.get_dependencies())
+    print("Optional s:", Tank.get_optional_fields())
+    print("YAML template:")
+    print(Tank.to_yaml("window"))
+    print()
+
 if __name__ == "__main__":
     test__space()
     test__space_opt_area()
     test__window()
+    test_tank()

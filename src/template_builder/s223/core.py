@@ -1,16 +1,16 @@
 from .. import core 
 from typing import List, Dict, Tuple, Type, Union,get_origin
 from dataclasses import dataclass, field
-from semantic_mpc_interface.namespaces import * 
+from semantic_mpc_interface.namespaces import S223, SH, A
 from . import relations
 
 @dataclass
 class Node(core.Node):
     _ns = S223
-    definition = [
-        (A, [SH.NodeShape, S223.Class]),
-    ]
-    # TODO: Fix for production, helpful debugging repr for now
+    _type = S223.Class
+    _other_types = [SH.NodeShape]
+
+    # TODO: may want to replace dataclass repr using this or field-based method
     # def __repr__(self):
     #     # attr_strs = [f"{attr}={getattr(self, attr, None)}" for attr in attributes.keys() if attr != 'name']
     #     # counts = []

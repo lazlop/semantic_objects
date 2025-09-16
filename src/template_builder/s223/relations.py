@@ -24,3 +24,9 @@ class encloses(Predicate):
 class hasQuantityKind(core.Predicate):
     _ns = QUDT
     _local_name = 'hasQuantityKind'
+
+class hasConnectionPoint(Predicate):
+    _local_name = 'hasConnectionPoint'
+
+class hasMedium(Predicate):
+    _local_name = 'hasMedium'

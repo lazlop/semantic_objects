@@ -30,13 +30,14 @@ def optional_field(relation, label=None, comment=None):
     )
 
 # a field that is required (A SHACL qualified value shape requirement)
-# TODO: maybe add cardinality constraints
-def required_field(relation, min = 1, max = None, label=None, comment=None):
+# TODO: Consider how to handle qualified vs nonqualified constraints
+def required_field(relation, min = 1, max = None, qualified = True, label=None, comment=None):
     return field(
         metadata={
             'relation': relation,
             'min': min,
             'max': max,
+            'qualified': qualified,
             'label': label,
             'comment': comment
         }
@@ -232,9 +233,11 @@ class Resource:
         # Get class IRI
         class_iri = cls._get_iri()
         
+        # TODO: Class definitions should come from node
         # Add basic class declarations
-        g.add((class_iri, RDF.type, cls._ns.Class))
-        g.add((class_iri, RDF.type, SH.NodeShape))
+        g.add((class_iri, RDF.type, cls._type))
+        for type in cls._other_types:
+            g.add((class_iri, RDF.type, type))
         
         # Add comment if available
         if hasattr(cls, 'comment'):

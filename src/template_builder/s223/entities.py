@@ -5,8 +5,9 @@ from .values import Area, Azimuth, Tilt
 from .relations import * 
 from typing import Optional, Self
 from dataclasses import dataclass, field
-from functools import partial
+
 # Should node_uris be generated based on var names? should that or label be required or optionally provided?
+# For rdfs subclasses, should instance also be declared instances of the thing we are subclassing
 
 class DomainSpace(Node):
     _local_name = 'DomainSpace'
@@ -17,9 +18,9 @@ class PhysicalSpace(Node):
     _local_name = 'PhysicalSpace'
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
-    # should probably actually be optional[list[self]], since multiple spaces can be contained, but I want to minimize typing if possible
     contains: Self = valid_field(contains)
     encloses: DomainSpace = valid_field(encloses)
+    # should probably actually be optional[list[self]], since multiple spaces can be contained, but I want to minimize typing if possible
 
 @dataclass
 class Space(PhysicalSpace):
@@ -45,3 +46,16 @@ class Window(Node):
     area: Area = required_field(hasProperty)
     azimuth: Azimuth = required_field(hasProperty)
     tilt: Tilt = required_field(hasProperty)
+
+@dataclass
+class DomainAndPhysicalSpace(PhysicalSpace, DomainSpace):
+    """Space with optional area using field metadata"""
+    _local_name = 'DomainAndPhysicalSpace'
+
+class Inlet(Node):
+    _local_name = 'InletConnectionPoint'
+    label = "Inlet"
+
+class Outlet(Node):
+    _local_name = 'OutletConnectionPoint'
+    label = "Outlet"
