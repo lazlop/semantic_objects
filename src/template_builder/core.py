@@ -42,6 +42,50 @@ def required_field(relation, min = 1, max = None, qualified = True, label=None, 
             'comment': comment
         }
     )
+# a field for triples with literal objects and named nodes 
+def triple_field(relation, object, about_class = True, about_instances = False):
+    # Handle mutable defaults (like lists) by using default_factory
+    if isinstance(object, list):
+        return field(
+            default_factory=lambda: object.copy(),
+            init=False,
+            metadata={
+                'relation': relation,
+                'default_value': object,  # Store the original value for RDF generation
+                'about_class': about_class,
+                'about_instances': about_instances
+            }
+        )
+    else:
+        return field(
+            default=object,
+            init=False,
+            metadata={
+                'relation': relation,
+                'about_class': about_class,
+                'about_instances': about_instances
+            }
+        )
+    
+# TODO: metadata may want to include field type
+def subclass_field(object):
+    if isinstance(object, list):
+        return field(
+            default_factory=lambda: object.copy(),
+            init=False,
+            metadata={
+                'parent_class': object,
+            }
+        )
+    else:
+        return field(
+            default=object,
+            init=False,
+            metadata={
+                'parent_class': object
+            }
+        )
+
 
 # Define a custom class for folded style text
 class FoldedString(str):
@@ -235,15 +279,48 @@ class Resource:
         
         # TODO: Class definitions should come from node
         # Add basic class declarations
-        g.add((class_iri, RDF.type, cls._type))
-        for type in cls._other_types:
-            g.add((class_iri, RDF.type, type))
+        if hasattr(cls, '_type'):
+            g.add((class_iri, RDF.type, cls._type))
+        if hasattr(cls, '_other_types'):
+            for type in cls._other_types:
+                g.add((class_iri, RDF.type, type))
+
+        # Process triple_field definitions from dataclass fields
+        if hasattr(cls, '__dataclass_fields__'):
+            for field_name, field_obj in cls.__dataclass_fields__.items():
+                relation = field_obj.metadata.get('relation')
+                if relation:
+                    # Check for triple_field - either has default value or default_value in metadata
+                    obj_value = None
+                    # Check if field has a valid default (not MISSING)
+                    from dataclasses import MISSING
+                    if field_obj.default is not MISSING and field_obj.default is not None:
+                        obj_value = field_obj.default
+                    elif 'default_value' in field_obj.metadata:
+                        obj_value = field_obj.metadata['default_value']
+                    
+                    if obj_value is not None:
+                        # This is a triple_field - add the triple to the graph
+                        # Get the relation IRI
+                        relation_iri = relation._get_iri() if hasattr(relation, '_get_iri') else relation
+                        
+                        # Handle different types of objects
+                        if isinstance(obj_value, str):
+                            # String literal
+                            g.add((class_iri, relation_iri, Literal(obj_value)))
+                        elif isinstance(obj_value, list):
+                            # List of values (like types)
+                            for item in obj_value:
+                                g.add((class_iri, relation_iri, item))
+                        else:
+                            # Other types (URIRef, etc.)
+                            g.add((class_iri, relation_iri, obj_value))
         
-        # Add comment if available
+        # Add comment if available as class attribute (fallback)
         if hasattr(cls, 'comment'):
             g.add((class_iri, RDFS.comment, Literal(cls.comment)))
         
-        # Add label if available
+        # Add label if available as class attribute (fallback)
         if hasattr(cls, 'label'):
             g.add((class_iri, RDFS.label, Literal(cls.label)))
         
@@ -271,7 +348,12 @@ class Resource:
                 relation = field_obj.metadata.get('relation')
                 if relation:
                     # Create unique key for this relation to avoid duplicates
-                    relation_key = relation._local_name
+                    if hasattr(relation, '_local_name'):
+                        relation_key = relation._local_name
+                    else:
+                        # Handle URIRef objects (like RDFS.label)
+                        relation_key = str(relation)
+                    
                     if relation_key in processed_relations:
                         continue
                     processed_relations.add(relation_key)
@@ -279,7 +361,9 @@ class Resource:
                     # Create blank node for property constraint
                     prop_node = BNode()
                     g.add((class_iri, SH.property, prop_node))
-                    g.add((prop_node, SH.path, relation._get_iri()))
+                    # Get the relation IRI
+                    relation_iri = relation._get_iri() if hasattr(relation, '_get_iri') else relation
+                    g.add((prop_node, SH.path, relation_iri))
                     
                     # Add comment from field metadata or generate one
                     field_comment = field_obj.metadata.get('comment')
@@ -296,7 +380,8 @@ class Resource:
                             target_class_name = str(field_obj.type)
                     
                     if not field_comment and target_class_name:
-                        field_comment = f"If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                        relation_name = relation._local_name if hasattr(relation, '_local_name') else str(relation)
+                        field_comment = f"If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                     
                     if field_comment:
                         g.add((prop_node, RDFS.comment, Literal(field_comment)))
@@ -307,7 +392,7 @@ class Resource:
                         g.add((prop_node, SH['class'], target_class))
                         
                         # Generate SHACL message
-                        relation_name = relation._local_name
+                        relation_name = relation._local_name if hasattr(relation, '_local_name') else str(relation)
                         message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                         g.add((prop_node, SH.message, Literal(message)))
                     elif field_obj.type == cls or 'Self' in str(field_obj.type):
@@ -315,7 +400,7 @@ class Resource:
                         g.add((prop_node, SH['class'], class_iri))
                         
                         # Generate SHACL message for Self reference
-                        relation_name = relation._local_name
+                        relation_name = relation._local_name if hasattr(relation, '_local_name') else str(relation)
                         message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
                         g.add((prop_node, SH.message, Literal(message)))
                     

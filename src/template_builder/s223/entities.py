@@ -24,7 +24,7 @@ class PhysicalSpace(Node):
 
 @dataclass
 class Space(PhysicalSpace):
-    area: Area = required_field(hasProperty)
+    area: Area = required_field()
 
     
 @dataclass
