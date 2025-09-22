@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Test the new RDF generation method
-from src.template_builder.s223.entities import PhysicalSpace
+from src.semantic_objects.s223.entities import PhysicalSpace
 
 def test_rdf_generation():
     print("Testing RDF class definition generation for PhysicalSpace:")

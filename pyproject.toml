@@ -37,7 +37,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/template_builder"]
+packages = ["src/semantic_objects"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src" = ""

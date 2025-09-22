@@ -3,7 +3,7 @@
 import sys
 sys.path.append('src')
 
-from template_builder.watr.entities import Tank, MyCoolAnaerobicPFR
+from semantic_objects.watr.entities import Tank, MyCoolAnaerobicPFR
 
 def test_triple_fields():
     print("Testing Tank RDF generation with triple_fields:")
