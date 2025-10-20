@@ -356,10 +356,15 @@ class Resource:
                 g.add((class_iri, RDFS.subClassOf, cls._ns.Concept))
         
         # Add SHACL property constraints for dataclass fields
+        processed_relations = set()  # Track processed relations to avoid duplicates
+        
         if hasattr(cls, '__dataclass_fields__'):
-            processed_relations = set()  # Track processed relations to avoid duplicates
-            
             for field_name, field_obj in cls.__dataclass_fields__.items():
+                # Skip fields marked with templatize=False (old valid_field usage)
+                if (field_obj.init == False and 
+                    field_obj.metadata.get('templatize', True) == False):
+                    continue
+                
                 # Infer or get the relation
                 try:
                     relation = cls._infer_relation_for_field(field_name, field_obj)
@@ -425,11 +430,122 @@ class Resource:
                     if max_count is not None:
                         g.add((prop_node, SH.maxCount, Literal(max_count)))
         
+        # Add SHACL property constraints from relation _applies_to declarations
+        # Find the relations module for this class's ontology
+        relations_module = None
+        module_parts = None
+        for base in cls.__mro__:
+            if hasattr(base, '__module__'):
+                module = sys.modules.get(base.__module__)
+                if module:
+                    # Try to find a relations module in the same package
+                    module_parts = base.__module__.split('.')
+                    if len(module_parts) >= 2:
+                        relations_module_name = '.'.join(module_parts[:-1]) + '.relations'
+                        if relations_module_name in sys.modules:
+                            relations_module = sys.modules[relations_module_name]
+                            break
+        
+        if relations_module and module_parts:
+            # Scan all Predicate subclasses in the relations module
+            for name in dir(relations_module):
+                try:
+                    obj = getattr(relations_module, name)
+                except (AttributeError, ImportError):
+                    continue
+                
+                # Check if it's a class with _applies_to
+                # Use inspect.isclass instead of isinstance(obj, type) to avoid potential issues
+                import inspect
+                if not inspect.isclass(obj):
+                    continue
+                    
+                if not (hasattr(obj, '_applies_to') and
+                        hasattr(obj, '_local_name') and
+                        hasattr(obj, '_get_iri')):
+                    continue
+                
+                # Check if this relation applies to the current class
+                for source_class_name, target_class_name in obj._applies_to:
+                    # Check if current class matches source (by name or inheritance)
+                    matches_source = False
+                    if cls.__name__ == source_class_name:
+                        matches_source = True
+                    else:
+                        # Check inheritance
+                        for base in cls.__mro__:
+                            if hasattr(base, '__name__') and base.__name__ == source_class_name:
+                                matches_source = True
+                                break
+                    
+                    if matches_source:
+                        # Create unique key for this relation to avoid duplicates
+                        relation_key = obj._local_name
+                        if relation_key in processed_relations:
+                            continue
+                        processed_relations.add(relation_key)
+                        
+                        # Create blank node for property constraint
+                        prop_node = BNode()
+                        g.add((class_iri, SH.property, prop_node))
+                        g.add((prop_node, SH.path, obj._get_iri()))
+                        
+                        # Generate comment
+                        field_comment = f"If the relation `{obj._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                        g.add((prop_node, RDFS.comment, Literal(field_comment)))
+                        
+                        # Try to find the target class to add sh:class constraint
+                        # Look in the entities module
+                        entities_module_name = '.'.join(module_parts[:-1]) + '.entities'
+                        if entities_module_name in sys.modules:
+                            entities_module = sys.modules[entities_module_name]
+                            if hasattr(entities_module, target_class_name):
+                                target_class_obj = getattr(entities_module, target_class_name)
+                                if hasattr(target_class_obj, '_get_iri'):
+                                    target_class_iri = target_class_obj._get_iri()
+                                    g.add((prop_node, SH['class'], target_class_iri))
+                                    
+                                    # Generate SHACL message
+                                    message = f"s223: If the relation `{obj._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                                    g.add((prop_node, SH.message, Literal(message)))
+        
         return g.serialize(format='turtle')
     
 class Predicate(Resource):
     # currently just used for typecheck later 
     pass 
+
+def build_relations_registry(relations_module):
+    """
+    Build a DEFAULT_RELATIONS registry from relation classes with _applies_to metadata.
+    
+    Scans all Predicate subclasses in the provided module and builds a dictionary
+    mapping (source_class, target_class) tuples to relation classes based on their
+    _applies_to attribute.
+    
+    Args:
+        relations_module: The module containing Predicate subclasses
+        
+    Returns:
+        Dictionary mapping (source_class, target_class) -> relation class
+    """
+    registry = {}
+    
+    # Iterate through all items in the module
+    for name in dir(relations_module):
+        obj = getattr(relations_module, name)
+        
+        # Check if it's a Predicate subclass (not Predicate itself)
+        if (isinstance(obj, type) and 
+            issubclass(obj, Predicate) and 
+            obj is not Predicate and
+            hasattr(obj, '_applies_to')):
+            
+            # Add each (source, target) pair to the registry
+            for source_class, target_class in obj._applies_to:
+                registry[(source_class, target_class)] = obj
+    
+    return registry
 
 class Node(Resource):
     # A Node with a URI Ref

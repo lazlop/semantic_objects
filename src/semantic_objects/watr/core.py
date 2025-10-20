@@ -3,25 +3,15 @@ from typing import List, Dict, Tuple, Type, Union,get_origin
 from dataclasses import dataclass, field
 from ..namespaces import S223, SH, A, WATR, RDFS
 from .relations import hasProcess
-from ..core import valid_field, required_field, optional_field
+from ..core import required_field, optional_field
 from ..s223 import relations as s223_relations
+from . import relations
 
-# Default relation mappings for watr ontology
-# Maps (source_class_name, target_class_name) -> relation
-DEFAULT_RELATIONS = {
-    # Equipment -> ConnectionPoint types use hasConnectionPoint
-    ('Equipment', 'FluidInlet'): s223_relations.hasConnectionPoint,
-    ('Equipment', 'FluidOutlet'): s223_relations.hasConnectionPoint,
-    ('Equipment', 'InletConnectionPoint'): s223_relations.hasConnectionPoint,
-    ('Equipment', 'OutletConnectionPoint'): s223_relations.hasConnectionPoint,
-    # ConnectionPoint -> Fluid uses hasMedium
-    ('InletConnectionPoint', 'Fluid'): s223_relations.hasMedium,
-    ('OutletConnectionPoint', 'Fluid'): s223_relations.hasMedium,
-    ('FluidInlet', 'Fluid'): s223_relations.hasMedium,
-    ('FluidOutlet', 'Fluid'): s223_relations.hasMedium,
-    # UnitProcess -> Process uses hasProcess
-    ('UnitProcess', 'Process'): hasProcess,
-}
+# Build DEFAULT_RELATIONS from relation class metadata
+# This includes both watr-specific relations and s223 relations used by watr
+DEFAULT_RELATIONS = {}
+DEFAULT_RELATIONS.update(core.build_relations_registry(s223_relations))
+DEFAULT_RELATIONS.update(core.build_relations_registry(relations))
 
 
 # TODO: Consider how we want rdfs:subClassOf to work (use python inheritance for subclass?), 

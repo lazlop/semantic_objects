@@ -106,7 +106,7 @@ def test_yaml_generation():
     print("Testing YAML generation with inferred relations...")
     
     try:
-        yaml_output = Space.to_yaml()
+        yaml_output = Space.to_yaml_str()
         print("Space YAML output:")
         print(yaml_output)
         print("✓ YAML generation successful!")

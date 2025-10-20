@@ -8,3 +8,6 @@ class Predicate(core.Predicate):
 
 class hasProcess(Predicate):
     _local_name = 'hasProcess'
+    _applies_to = [
+        ('UnitProcess', 'Process'),
+    ]

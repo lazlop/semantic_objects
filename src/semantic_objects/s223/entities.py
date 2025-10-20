@@ -18,8 +18,6 @@ class PhysicalSpace(Node):
     _local_name = 'PhysicalSpace'
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
-    contains: Self = valid_field()
-    encloses: DomainSpace = valid_field()
 
 @dataclass
 class Space(PhysicalSpace):

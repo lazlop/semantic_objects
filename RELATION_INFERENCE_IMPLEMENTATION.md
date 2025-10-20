@@ -6,38 +6,97 @@ This document describes the implementation of automatic relation inference for t
 
 ## Implementation Details
 
-### 1. DEFAULT_RELATIONS Registry
+### 1. Relation Metadata with `_applies_to`
 
-Each ontology module (s223, watr) now has a `DEFAULT_RELATIONS` dictionary that maps `(source_class_name, target_class_name)` tuples to relation objects.
+Relations now define their applicability directly in the relation class using the `_applies_to` attribute. This attribute contains a list of `(source_class_name, target_class_name)` tuples that specify which class pairs the relation applies to.
 
-**Example from `src/semantic_objects/s223/core.py`:**
+**Example from `src/semantic_objects/s223/relations.py`:**
 ```python
-DEFAULT_RELATIONS = {
-    # Node -> QuantifiableObervableProperty uses hasProperty
-    ('Node', 'QuantifiableObervableProperty'): relations.hasProperty,
-    # PhysicalSpace -> PhysicalSpace uses contains
-    ('PhysicalSpace', 'PhysicalSpace'): relations.contains,
-    # PhysicalSpace -> DomainSpace uses encloses
-    ('PhysicalSpace', 'DomainSpace'): relations.encloses,
-    # Node -> ConnectionPoint types use hasConnectionPoint
-    ('Node', 'InletConnectionPoint'): relations.hasConnectionPoint,
-    ('Node', 'OutletConnectionPoint'): relations.hasConnectionPoint,
-    ('Node', 'ConnectionPoint'): relations.hasConnectionPoint,
-}
+class hasProperty(Predicate):
+    _local_name = 'hasProperty'
+    _applies_to = [
+        ('Node', 'QuantifiableObervableProperty'),
+    ]
+
+class contains(Predicate):
+    _local_name = 'contains'
+    _applies_to = [
+        ('PhysicalSpace', 'PhysicalSpace'),
+    ]
+
+class hasConnectionPoint(Predicate):
+    _local_name = 'hasConnectionPoint'
+    _applies_to = [
+        ('Node', 'ConnectionPoint'),
+        ('Equipment', 'FluidInlet'),
+        ('Equipment', 'FluidOutlet'),
+        ('Equipment', 'InletConnectionPoint'),
+        ('Equipment', 'OutletConnectionPoint'),
+    ]
 ```
 
-**Example from `src/semantic_objects/watr/core.py`:**
+**Example from `src/semantic_objects/watr/relations.py`:**
 ```python
-DEFAULT_RELATIONS = {
-    # Equipment -> ConnectionPoint types use hasConnectionPoint
-    ('Equipment', 'FluidInlet'): s223_relations.hasConnectionPoint,
-    ('Equipment', 'FluidOutlet'): s223_relations.hasConnectionPoint,
-    # ConnectionPoint -> Fluid uses hasMedium
-    ('InletConnectionPoint', 'Fluid'): s223_relations.hasMedium,
-    ('OutletConnectionPoint', 'Fluid'): s223_relations.hasMedium,
-    # UnitProcess -> Process uses hasProcess
-    ('UnitProcess', 'Process'): hasProcess,
-}
+class hasProcess(Predicate):
+    _local_name = 'hasProcess'
+    _applies_to = [
+        ('UnitProcess', 'Process'),
+    ]
+```
+
+### 2. Registry Builder Function
+
+The `build_relations_registry()` function in `src/semantic_objects/core.py` automatically builds the `DEFAULT_RELATIONS` dictionary by scanning relation classes:
+
+```python
+def build_relations_registry(relations_module):
+    """
+    Build a DEFAULT_RELATIONS registry from relation classes with _applies_to metadata.
+    
+    Scans all Predicate subclasses in the provided module and builds a dictionary
+    mapping (source_class, target_class) tuples to relation classes based on their
+    _applies_to attribute.
+    """
+    registry = {}
+    
+    for name in dir(relations_module):
+        obj = getattr(relations_module, name)
+        
+        if (isinstance(obj, type) and 
+            issubclass(obj, Predicate) and 
+            obj is not Predicate and
+            hasattr(obj, '_applies_to')):
+            
+            for source_class, target_class in obj._applies_to:
+                registry[(source_class, target_class)] = obj
+    
+    return registry
+```
+
+### 3. Automatic Registry Building
+
+Each ontology module now builds its `DEFAULT_RELATIONS` automatically:
+
+**In `src/semantic_objects/s223/core.py`:**
+```python
+from .. import core 
+from . import relations
+
+# Build DEFAULT_RELATIONS from relation class metadata
+DEFAULT_RELATIONS = core.build_relations_registry(relations)
+```
+
+**In `src/semantic_objects/watr/core.py`:**
+```python
+from .. import core 
+from ..s223 import relations as s223_relations
+from . import relations
+
+# Build DEFAULT_RELATIONS from relation class metadata
+# This includes both watr-specific relations and s223 relations used by watr
+DEFAULT_RELATIONS = {}
+DEFAULT_RELATIONS.update(core.build_relations_registry(s223_relations))
+DEFAULT_RELATIONS.update(core.build_relations_registry(relations))
 ```
 
 ### 2. Relation Inference Method
@@ -93,18 +152,33 @@ The relation is automatically inferred based on:
 
 ## Adding New Relation Mappings
 
-To add support for new class/relation combinations:
+To add support for new class/relation combinations, add the `_applies_to` attribute to the relation class:
 
 1. Identify the source and target class names
-2. Add an entry to the appropriate DEFAULT_RELATIONS dictionary
+2. Add or update the `_applies_to` attribute in the relation class definition
 3. Use the most general classes that make sense (e.g., use `Node` instead of specific subclasses when the relation applies broadly)
+4. The registry will be automatically rebuilt when the module is imported
 
-Example:
+**Example - Adding a new relation:**
 ```python
-DEFAULT_RELATIONS = {
-    # ... existing mappings ...
-    ('Equipment', 'Sensor'): relations.hasSensor,
-}
+class hasSensor(Predicate):
+    _local_name = 'hasSensor'
+    _applies_to = [
+        ('Equipment', 'Sensor'),
+    ]
+```
+
+**Example - Adding more applicability to an existing relation:**
+```python
+class hasConnectionPoint(Predicate):
+    _local_name = 'hasConnectionPoint'
+    _applies_to = [
+        ('Node', 'ConnectionPoint'),
+        ('Equipment', 'FluidInlet'),
+        ('Equipment', 'FluidOutlet'),
+        # Add new mapping:
+        ('Equipment', 'Sensor'),
+    ]
 ```
 
 ## Testing

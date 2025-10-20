@@ -14,12 +14,21 @@ class hasUnit(Predicate):
 
 class hasProperty(Predicate):
     _local_name = 'hasProperty'
+    _applies_to = [
+        ('Node', 'QuantifiableObervableProperty'),
+    ]
 
 class contains(Predicate):
     _local_name = 'contains'
+    _applies_to = [
+        ('PhysicalSpace', 'PhysicalSpace'),
+    ]
 
 class encloses(Predicate):
     _local_name = 'encloses'
+    _applies_to = [
+        ('PhysicalSpace', 'DomainSpace'),
+    ]
 
 class hasQuantityKind(core.Predicate):
     _ns = QUDT
@@ -27,6 +36,19 @@ class hasQuantityKind(core.Predicate):
 
 class hasConnectionPoint(Predicate):
     _local_name = 'hasConnectionPoint'
+    _applies_to = [
+        ('Node', 'ConnectionPoint'),
+        ('Equipment', 'FluidInlet'),
+        ('Equipment', 'FluidOutlet'),
+        ('Equipment', 'InletConnectionPoint'),
+        ('Equipment', 'OutletConnectionPoint'),
+    ]
 
 class hasMedium(Predicate):
     _local_name = 'hasMedium'
+    _applies_to = [
+        ('InletConnectionPoint', 'Fluid'),
+        ('OutletConnectionPoint', 'Fluid'),
+        ('FluidInlet', 'Fluid'),
+        ('FluidOutlet', 'Fluid'),
+    ]
