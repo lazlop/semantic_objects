@@ -10,7 +10,7 @@ This document describes the implementation of automatic relation inference for t
 
 Each ontology module (s223, watr) now has a `DEFAULT_RELATIONS` dictionary that maps `(source_class_name, target_class_name)` tuples to relation objects.
 
-**Example from `src/template_builder/s223/core.py`:**
+**Example from `src/semantic_objects/s223/core.py`:**
 ```python
 DEFAULT_RELATIONS = {
     # Node -> QuantifiableObervableProperty uses hasProperty
@@ -26,7 +26,7 @@ DEFAULT_RELATIONS = {
 }
 ```
 
-**Example from `src/template_builder/watr/core.py`:**
+**Example from `src/semantic_objects/watr/core.py`:**
 ```python
 DEFAULT_RELATIONS = {
     # Equipment -> ConnectionPoint types use hasConnectionPoint
@@ -42,7 +42,7 @@ DEFAULT_RELATIONS = {
 
 ### 2. Relation Inference Method
 
-Added `_infer_relation_for_field()` method to the `Resource` class in `src/template_builder/core.py`:
+Added `_infer_relation_for_field()` method to the `Resource` class in `src/semantic_objects/core.py`:
 
 - **Explicit relations take precedence**: If a relation is explicitly provided in the field metadata, it is used
 - **Hierarchical lookup**: Walks up both the source class and target class hierarchies to find a matching relation

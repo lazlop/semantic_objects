@@ -21,8 +21,8 @@ class Tank(Equipment):
     label = "Tank"
     comment = "A tank for storing liquid"
     # should probably actually be optional[list[self]], since multiple spaces can be contained, but I want to minimize typing if possible
-    inlet: FluidInlet = required_field(hasConnectionPoint)
-    outlet: FluidOutlet = required_field(hasConnectionPoint)
+    inlet: FluidInlet = required_field()
+    outlet: FluidOutlet = required_field()
 
 
 @dataclass

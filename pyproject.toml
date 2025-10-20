@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "template-builder"
+name = "semantic-objects"
 version = "0.1.0"
 description = "A Python package for creating and managing semantic building models using Brick Schema and ASHRAE Standard 223P"
 keywords = ["building", "semantic", "brick", "s223", "ontology", "rdf"]
@@ -37,7 +37,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/template_builder"]
+packages = ["src/semantic_objects"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src" = ""

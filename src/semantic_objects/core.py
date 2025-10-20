@@ -6,7 +6,7 @@ import sys
 from rdflib import Graph, Literal, BNode
 
 # a relation that CAN be used (fulfilling closed world requirement)
-def valid_field(relation, label=None, comment=None):
+def valid_field(relation = None, label=None, comment=None):
     return field(
         default=None,
         init=False,
@@ -19,7 +19,7 @@ def valid_field(relation, label=None, comment=None):
     )
 
 # a relation that is optional, and will be templatized (optional in bmotif template, used to query semantic data into objects)
-def optional_field(relation, label=None, comment=None):
+def optional_field(relation= None, label=None, comment=None):
     return field(
         default=None,
         init=False,
@@ -35,7 +35,6 @@ def optional_field(relation, label=None, comment=None):
 def required_field(relation = None, min = 1, max = None, qualified = True, label=None, comment=None):
     # If the relation is none, it will use a default relation from the types of each thing.
     return field(
-        default=None,
         metadata={
             'relation': relation,
             'min': min,
@@ -169,8 +168,11 @@ class Resource:
         return optional_fields
 
     @classmethod
-    def generate_yaml_template(cls, template_name):
+    def generate_yaml_template(cls, template_name = None):
         """Generate complete YAML template"""
+        if template_name == None:
+            template_name = cls.__name__.lower()
+            
         template = {
             template_name: {
                 'body': cls.generate_turtle_body(),
@@ -190,7 +192,7 @@ class Resource:
         return template
 
     @classmethod
-    def to_yaml(cls, template_name=None):
+    def to_yaml_str(cls, template_name=None):
         """Convert to YAML string"""
         if template_name == None:
             template_name = cls.__name__.lower()

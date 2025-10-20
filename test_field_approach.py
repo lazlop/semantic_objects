@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from src.template_builder.s223.entities import Space, SpaceOptArea, Window
-from src.template_builder.watr.entities import Tank
+from src.semantic_objects.s223.entities import Space, SpaceOptArea, Window
+from src.semantic_objects.watr.entities import Tank
 
 def test__space():
     """Test the new -based Space class"""

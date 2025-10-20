@@ -14,8 +14,6 @@ DEFAULT_RELATIONS = {
     # PhysicalSpace -> DomainSpace uses encloses
     ('PhysicalSpace', 'DomainSpace'): relations.encloses,
     # Node -> ConnectionPoint types use hasConnectionPoint
-    ('Node', 'InletConnectionPoint'): relations.hasConnectionPoint,
-    ('Node', 'OutletConnectionPoint'): relations.hasConnectionPoint,
     ('Node', 'ConnectionPoint'): relations.hasConnectionPoint,
 }
 

@@ -2,13 +2,13 @@
 """
 Demo script showing how to generate YAML templates from s223 resource classes.
 
-This demonstrates the enhanced template_builder functionality that allows
+This demonstrates the enhanced semantic_objects functionality that allows
 s223 resources to generate YAML templates similar to the examples in the
 templates/ directory.
 """
 
-from src.template_builder.s223.entities import Space, Space_OptArea, Window
-from src.template_builder.s223.values import Area, Azimuth, Tilt
+from src.semantic_objects.s223.entities import Space, Space_OptArea, Window
+from src.semantic_objects.s223.values import Area, Azimuth, Tilt
 
 def main():
     print("=" * 60)

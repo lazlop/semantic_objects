@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import yaml
-from src.template_builder.s223.entities import FieldSpace, FieldSpaceOptArea, FieldWindow
+from src.semantic_objects.s223.entities import FieldSpace, FieldSpaceOptArea, FieldWindow
 
 def load_original_templates():
     """Load the original templates from templates/entities.yml"""
