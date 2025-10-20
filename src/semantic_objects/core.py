@@ -317,8 +317,14 @@ class Resource:
         return all_relations
 
     @classmethod
-    def generate_rdf_class_definition(cls):
-        """Generate RDF class definition with SHACL constraints like the example"""
+    def generate_rdf_class_definition(cls, include_hierarchy=True):
+        """
+        Generate RDF class definition with SHACL constraints.
+        
+        Args:
+            include_hierarchy: If True, include relations from parent classes in the hierarchy.
+                             If False, only include relations declared directly on this class.
+        """
         g = Graph()
         bind_prefixes(g)
         
@@ -359,7 +365,26 @@ class Resource:
         processed_relations = set()  # Track processed relations to avoid duplicates
         
         if hasattr(cls, '__dataclass_fields__'):
-            for field_name, field_obj in cls.__dataclass_fields__.items():
+            # Determine which fields to process based on include_hierarchy
+            if include_hierarchy:
+                # Process all fields including inherited ones
+                fields_to_process = cls.__dataclass_fields__.items()
+            else:
+                # Only process fields declared directly on this class
+                # Get fields from parent classes to exclude them
+                parent_fields = set()
+                for base in cls.__mro__[1:]:  # Skip self
+                    if hasattr(base, '__dataclass_fields__'):
+                        parent_fields.update(base.__dataclass_fields__.keys())
+                
+                # Filter to only fields declared on this class
+                fields_to_process = [
+                    (name, field_obj) 
+                    for name, field_obj in cls.__dataclass_fields__.items()
+                    if name not in parent_fields
+                ]
+            
+            for field_name, field_obj in fields_to_process:
                 # Skip fields marked with templatize=False (old valid_field usage)
                 if (field_obj.init == False and 
                     field_obj.metadata.get('templatize', True) == False):
@@ -471,8 +496,8 @@ class Resource:
                     matches_source = False
                     if cls.__name__ == source_class_name:
                         matches_source = True
-                    else:
-                        # Check inheritance
+                    elif include_hierarchy:
+                        # Only check inheritance if include_hierarchy is True
                         for base in cls.__mro__:
                             if hasattr(base, '__name__') and base.__name__ == source_class_name:
                                 matches_source = True

@@ -38,17 +38,10 @@ class hasConnectionPoint(Predicate):
     _local_name = 'hasConnectionPoint'
     _applies_to = [
         ('Node', 'ConnectionPoint'),
-        ('Equipment', 'FluidInlet'),
-        ('Equipment', 'FluidOutlet'),
-        ('Equipment', 'InletConnectionPoint'),
-        ('Equipment', 'OutletConnectionPoint'),
     ]
 
 class hasMedium(Predicate):
     _local_name = 'hasMedium'
     _applies_to = [
-        ('InletConnectionPoint', 'Fluid'),
-        ('OutletConnectionPoint', 'Fluid'),
-        ('FluidInlet', 'Fluid'),
-        ('FluidOutlet', 'Fluid'),
+        ('ConnectionPoint', 'Fluid'),
     ]
