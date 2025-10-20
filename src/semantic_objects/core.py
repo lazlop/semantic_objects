@@ -317,7 +317,7 @@ class Resource:
         return all_relations
 
     @classmethod
-    def generate_rdf_class_definition(cls, include_hierarchy=True):
+    def generate_rdf_class_definition(cls, include_hierarchy=False):
         """
         Generate RDF class definition with SHACL constraints.
         
