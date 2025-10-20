@@ -4,6 +4,24 @@ from dataclasses import dataclass, field
 from ..namespaces import S223, SH, A, WATR, RDFS
 from .relations import hasProcess
 from ..core import valid_field, required_field, optional_field
+from ..s223 import relations as s223_relations
+
+# Default relation mappings for watr ontology
+# Maps (source_class_name, target_class_name) -> relation
+DEFAULT_RELATIONS = {
+    # Equipment -> ConnectionPoint types use hasConnectionPoint
+    ('Equipment', 'FluidInlet'): s223_relations.hasConnectionPoint,
+    ('Equipment', 'FluidOutlet'): s223_relations.hasConnectionPoint,
+    ('Equipment', 'InletConnectionPoint'): s223_relations.hasConnectionPoint,
+    ('Equipment', 'OutletConnectionPoint'): s223_relations.hasConnectionPoint,
+    # ConnectionPoint -> Fluid uses hasMedium
+    ('InletConnectionPoint', 'Fluid'): s223_relations.hasMedium,
+    ('OutletConnectionPoint', 'Fluid'): s223_relations.hasMedium,
+    ('FluidInlet', 'Fluid'): s223_relations.hasMedium,
+    ('FluidOutlet', 'Fluid'): s223_relations.hasMedium,
+    # UnitProcess -> Process uses hasProcess
+    ('UnitProcess', 'Process'): hasProcess,
+}
 
 
 # TODO: Consider how we want rdfs:subClassOf to work (use python inheritance for subclass?), 
@@ -54,4 +72,3 @@ class UnitProcess(Class):
     ]
     process: Process = required_field(hasProcess, min = 1, qualified = False,
                 comment = 'a Unit Process must be associated with a water treatment process')
-

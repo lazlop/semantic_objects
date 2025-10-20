@@ -4,6 +4,21 @@ from dataclasses import dataclass, field
 from semantic_mpc_interface.namespaces import S223, SH, A
 from . import relations
 
+# Default relation mappings for s223 ontology
+# Maps (source_class_name, target_class_name) -> relation
+DEFAULT_RELATIONS = {
+    # Node -> QuantifiableObervableProperty uses hasProperty (note: typo in class name)
+    ('Node', 'QuantifiableObervableProperty'): relations.hasProperty,
+    # PhysicalSpace -> PhysicalSpace uses contains
+    ('PhysicalSpace', 'PhysicalSpace'): relations.contains,
+    # PhysicalSpace -> DomainSpace uses encloses
+    ('PhysicalSpace', 'DomainSpace'): relations.encloses,
+    # Node -> ConnectionPoint types use hasConnectionPoint
+    ('Node', 'InletConnectionPoint'): relations.hasConnectionPoint,
+    ('Node', 'OutletConnectionPoint'): relations.hasConnectionPoint,
+    ('Node', 'ConnectionPoint'): relations.hasConnectionPoint,
+}
+
 @dataclass
 class Node(core.Node):
     _ns = S223

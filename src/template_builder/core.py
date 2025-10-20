@@ -1,7 +1,8 @@
-from typing import List, Dict, Tuple, Type, Union, get_origin
+from typing import List, Dict, Tuple, Type, Union, get_origin, get_args
 from dataclasses import dataclass, field, fields
 from semantic_mpc_interface.namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
 import yaml
+import sys
 from rdflib import Graph, Literal, BNode
 
 # a relation that CAN be used (fulfilling closed world requirement)
@@ -31,8 +32,10 @@ def optional_field(relation, label=None, comment=None):
 
 # a field that is required (A SHACL qualified value shape requirement)
 # TODO: Consider how to handle qualified vs nonqualified constraints
-def required_field(relation, min = 1, max = None, qualified = True, label=None, comment=None):
+def required_field(relation = None, min = 1, max = None, qualified = True, label=None, comment=None):
+    # If the relation is none, it will use a default relation from the types of each thing.
     return field(
+        default=None,
         metadata={
             'relation': relation,
             'min': min,
@@ -195,11 +198,92 @@ class Resource:
         # return yaml.dump(template, default_flow_style=False, sort_keys=False)
         template[template_name]['body'] = FoldedString(template[template_name]['body'])
         return yaml.dump(template, explicit_end=False)
+
+    @classmethod
+    def _infer_relation_for_field(cls, field_name, field_obj):
+        """
+        Infer the relation for a field based on class type hierarchies.
+        
+        Looks up the relation in the ontology-specific DEFAULT_RELATIONS registry
+        by checking (source_class, target_class) pairs, walking up both hierarchies.
+        
+        Args:
+            field_name: Name of the field
+            field_obj: The dataclass field object
+            
+        Returns:
+            The inferred relation object
+            
+        Raises:
+            ValueError: If no default relation can be found
+        """
+        # If relation is explicitly provided, use it
+        if field_obj.metadata.get('relation') is not None:
+            return field_obj.metadata['relation']
+        
+        # Get the target type from field annotation
+        target_type = field_obj.type
+        
+        # Handle Optional, List, etc. - extract the actual type
+        origin = get_origin(target_type)
+        if origin is not None:
+            # For Optional[X], List[X], etc., get X
+            args = get_args(target_type)
+            if args:
+                target_type = args[0]
+        
+        # Handle Self reference
+        if target_type == cls or str(target_type) == 'Self':
+            target_type = cls
+        
+        # Find the ontology-specific DEFAULT_RELATIONS registry
+        # Walk up the MRO to find a module that has DEFAULT_RELATIONS
+        default_relations = None
+        for base in cls.__mro__:
+            if hasattr(base, '__module__'):
+                module = sys.modules.get(base.__module__)
+                if module and hasattr(module, 'DEFAULT_RELATIONS'):
+                    default_relations = module.DEFAULT_RELATIONS
+                    break
+        
+        if default_relations is None:
+            raise ValueError(
+                f"No DEFAULT_RELATIONS registry found for {cls.__name__}.{field_name}. "
+                f"Please add a DEFAULT_RELATIONS dictionary to the ontology module."
+            )
+        
+        # Try to find a matching relation by walking up both class hierarchies
+        for source_class in cls.__mro__:
+            if not hasattr(source_class, '__name__'):
+                continue
+            source_name = source_class.__name__
+            
+            # Walk up target class hierarchy
+            target_mro = target_type.__mro__ if hasattr(target_type, '__mro__') else [target_type]
+            for target_class in target_mro:
+                if not hasattr(target_class, '__name__'):
+                    continue
+                target_name = target_class.__name__
+                
+                # Check if this pair exists in the registry
+                key = (source_name, target_name)
+                if key in default_relations:
+                    return default_relations[key]
+        
+        # No matching relation found
+        target_type_name = target_type.__name__ if hasattr(target_type, '__name__') else str(target_type)
+        raise ValueError(
+            f"No default relation found for {cls.__name__}.{field_name} "
+            f"(source: {cls.__name__}, target: {target_type_name}). "
+            f"Please either specify the relation explicitly in the field definition, "
+            f"or add a mapping to DEFAULT_RELATIONS in the ontology module."
+        )
                     
     @classmethod
     def get_relations(cls):
         """
         Accumulate relations from all bases up the MRO (excluding 'object').
+        Infers relations when not explicitly provided.
         """
         # could validate that there are relations to get here
         all_relations = []
@@ -209,13 +293,19 @@ class Resource:
         for base in reversed(cls.__mro__):
             if hasattr(base, '__dataclass_fields__'):
                 for field_name, field_obj in base.__dataclass_fields__.items():
-                    relation = field_obj.metadata.get('relation')
+                    # Skip fields with init=False and templatize=False
+                    if (field_obj.init == False and 
+                        field_obj.metadata.get('templatize', True) == False):
+                        continue
+                    
+                    # Infer or get the relation
+                    try:
+                        relation = cls._infer_relation_for_field(field_name, field_obj)
+                    except ValueError:
+                        # If no relation can be inferred and none is provided, skip
+                        continue
+                    
                     if relation:
-                        # Skip fields with init=False and templatize=False
-                        if (field_obj.init == False and 
-                            field_obj.metadata.get('templatize', True) == False):
-                            continue
-                        
                         # Create a hashable representation of the relation
                         relation_key = (relation._local_name, field_name)
                         if relation_key not in seen_relations:
@@ -268,7 +358,13 @@ class Resource:
             processed_relations = set()  # Track processed relations to avoid duplicates
             
             for field_name, field_obj in cls.__dataclass_fields__.items():
-                relation = field_obj.metadata.get('relation')
+                # Infer or get the relation
+                try:
+                    relation = cls._infer_relation_for_field(field_name, field_obj)
+                except ValueError:
+                    # If no relation can be inferred and none is provided, skip
+                    continue
+                
                 if relation:
                     # Create unique key for this relation to avoid duplicates
                     relation_key = relation._local_name
