@@ -284,6 +284,59 @@ class Resource:
         return all_relations
 
     @classmethod
+    def _create_qualified_value_shape(cls, g, prop_node, field_obj, field_name, class_iri):
+        """
+        Create a qualified value shape for a field, following the pattern from _generate_shapes.
+        
+        Args:
+            g: The RDF graph
+            prop_node: The property shape node
+            field_obj: The dataclass field object
+            field_name: Name of the field
+            class_iri: IRI of the class being defined
+        """
+        # Create qualified value shape node
+        qual_val_shape = BNode()
+        
+        # Determine target type
+        target_type = field_obj.type
+        origin = get_origin(target_type)
+        if origin is not None:
+            args = get_args(target_type)
+            if args:
+                target_type = args[0]
+        
+        # Handle Self reference
+        if target_type == cls or str(target_type) == 'Self':
+            target_type = cls
+        
+        # Add qualified value shape based on field type
+        add_qual_val_shape = True
+        
+        # Check if this is a literal type
+        if isinstance(field_obj.default, Literal) if hasattr(field_obj, 'default') else False:
+            g.add((qual_val_shape, SH.hasValue, field_obj.default))
+        # Check if target is a Resource subclass (entity/class type)
+        elif hasattr(target_type, '_get_iri'):
+            g.add((qual_val_shape, SH['class'], target_type._get_iri()))
+        # For other types, use hasValue if a default is provided
+        elif hasattr(field_obj, 'default') and field_obj.default is not None:
+            g.add((qual_val_shape, SH.hasValue, field_obj.default))
+        else:
+            # No qualified value shape needed for parameters without constraints
+            add_qual_val_shape = False
+        
+        if add_qual_val_shape:
+            # Add label for the qualified value shape
+            label = field_obj.metadata.get('label', field_name)
+            g.add((qual_val_shape, RDFS.label, Literal(label)))
+            
+            # Link qualified value shape to property
+            g.add((prop_node, SH.qualifiedMinCount, Literal(1)))
+            g.add((prop_node, SH.qualifiedValueShape, qual_val_shape))
+            g.add((qual_val_shape, RDF.type, SH.NodeShape))
+    
+    @classmethod
     def generate_rdf_class_definition(cls, include_hierarchy=False):
         """
         Generate RDF class definition with SHACL constraints.
@@ -328,7 +381,9 @@ class Resource:
             if not has_subclass:
                 g.add((class_iri, RDFS.subClassOf, cls._ns.Concept))
         
-        # Add SHACL property constraints for dataclass fields
+        # Track property shapes and counts (following _generate_shapes pattern)
+        shape_path_name_dct = {}  # Maps relation IRI to property shape node
+        prop_counts = {}  # Track count of each property
         processed_relations = set()  # Track processed relations to avoid duplicates
         
         if hasattr(cls, '__dataclass_fields__'):
@@ -352,9 +407,26 @@ class Resource:
                 ]
             
             print('FIELDS TO PROCESS:', [f[0] for f in fields_to_process])
+            
+            # First pass: count properties and create property shapes
             for field_name, field_obj in fields_to_process:
                 # Infer or get the relation
                 relation = cls._infer_relation_for_field(field_name, field_obj)
+                if relation is None:
+                    continue
+                
+                relation_iri = relation._get_iri()
+                
+                # Track property counts
+                if relation_iri in prop_counts:
+                    prop_counts[relation_iri] += 1
+                else:
+                    prop_counts[relation_iri] = 1
+                
+                # Only create property shape once per relation
+                if relation_iri in shape_path_name_dct:
+                    continue
+                
                 # Create unique key for this relation to avoid duplicates
                 relation_key = relation._local_name
                 if relation_key in processed_relations:
@@ -364,7 +436,11 @@ class Resource:
                 # Create blank node for property constraint
                 prop_node = BNode()
                 g.add((class_iri, SH.property, prop_node))
-                g.add((prop_node, SH.path, relation._get_iri()))
+                g.add((prop_node, RDF.type, SH.PropertyShape))
+                g.add((prop_node, SH.path, relation_iri))
+                
+                # Store in dictionary for later reference
+                shape_path_name_dct[relation_iri] = prop_node
                 
                 # Add comment from field metadata or generate one
                 field_comment = field_obj.metadata.get('comment')
@@ -393,7 +469,7 @@ class Resource:
                     
                     # Generate SHACL message
                     relation_name = relation._local_name
-                    message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    message = f"s223: If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                     g.add((prop_node, SH.message, Literal(message)))
                 elif field_obj.type == cls or 'Self' in str(field_obj.type):
                     # Handle Self reference
@@ -401,16 +477,49 @@ class Resource:
                     
                     # Generate SHACL message for Self reference
                     relation_name = relation._local_name
-                    message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
+                    message = f"s223: If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
                     g.add((prop_node, SH.message, Literal(message)))
+            
+            # Second pass: create qualified value shapes for each field
+            for field_name, field_obj in fields_to_process:
+                # Infer or get the relation
+                relation = cls._infer_relation_for_field(field_name, field_obj)
+                if relation is None:
+                    continue
                 
-                # Add cardinality constraints if specified
-                min_count = field_obj.metadata.get('min')
-                max_count = field_obj.metadata.get('max')
-                if min_count is not None:
-                    g.add((prop_node, SH.minCount, Literal(min_count)))
-                if max_count is not None:
-                    g.add((prop_node, SH.maxCount, Literal(max_count)))
+                relation_iri = relation._get_iri()
+                
+                # Get the property shape node
+                if relation_iri not in shape_path_name_dct:
+                    continue
+                
+                prop_node = shape_path_name_dct[relation_iri]
+                
+                # Create qualified value shape (following _generate_shapes pattern)
+                if field_obj.metadata.get('qualified', True):
+                    cls._create_qualified_value_shape(g, prop_node, field_obj, field_name, class_iri)
+            
+            # Add minCount/maxCount based on property counts and field metadata
+            for relation_iri, count in prop_counts.items():
+                if relation_iri in shape_path_name_dct:
+                    prop_node = shape_path_name_dct[relation_iri]
+                    
+                    # Use the count as minCount (following _generate_shapes pattern)
+                    # This represents the total number of times this relation appears
+                    g.add((prop_node, SH.minCount, Literal(count)))
+                    
+                    # Check if any field specifies a maxCount
+                    max_count = None
+                    for field_name, field_obj in fields_to_process:
+                        relation = cls._infer_relation_for_field(field_name, field_obj)
+                        if relation and relation._get_iri() == relation_iri:
+                            field_max = field_obj.metadata.get('max')
+                            if field_max is not None:
+                                max_count = field_max
+                                break
+                    
+                    if max_count is not None:
+                        g.add((prop_node, SH.maxCount, Literal(max_count)))
         
         # Add SHACL property constraints from _valid_relations declarations
         # Determine which classes to process based on include_hierarchy
@@ -437,10 +546,13 @@ class Resource:
                     continue
                 processed_relations.add(relation_key)
                 
+                relation_iri = relation._get_iri()
+                
                 # Create blank node for property constraint
                 prop_node = BNode()
                 g.add((class_iri, SH.property, prop_node))
-                g.add((prop_node, SH.path, relation._get_iri()))
+                g.add((prop_node, RDF.type, SH.PropertyShape))
+                g.add((prop_node, SH.path, relation_iri))
                 
                 # Determine target class name for comments and messages
                 if target_class is None:  # Handle None type
