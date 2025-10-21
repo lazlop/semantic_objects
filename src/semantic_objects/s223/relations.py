@@ -1,7 +1,9 @@
 from .. import core
 from semantic_mpc_interface import S223, QUDT
 
-# Sinse Predicate has no node type, it will be like the "any predicate" for a template
+# NOTE: not totally happy with declaring domains and ranges this way. Probably better to do it in the entities. I think this is ok for now. 
+# Advantage of doing it here: makes entities less of a mixture between object and graph. 
+# Disadvantage: Using Strings to specify domains and ranges, rather than classes. Registry concept probbaly not as good as just declaring the valid relatoins in the entities
 class Predicate(core.Predicate):
     _ns = S223
 

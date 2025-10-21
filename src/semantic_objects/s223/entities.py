@@ -22,7 +22,6 @@ class PhysicalSpace(Node):
 @dataclass
 class Space(PhysicalSpace):
     area: Area = required_field()  # relation will be inferred as hasProperty
-
     
 @dataclass
 class Space_TwoArea(Space):

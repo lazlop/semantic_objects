@@ -5,19 +5,6 @@ import yaml
 import sys
 from rdflib import Graph, Literal, BNode
 
-# a relation that CAN be used (fulfilling closed world requirement)
-def valid_field(relation = None, label=None, comment=None):
-    return field(
-        default=None,
-        init=False,
-        metadata={
-            'relation': relation,
-            'templatize': False,
-            'label': label,
-            'comment': comment
-        }
-    )
-
 # a relation that is optional, and will be templatized (optional in bmotif template, used to query semantic data into objects)
 def optional_field(relation= None, label=None, comment=None):
     return field(
