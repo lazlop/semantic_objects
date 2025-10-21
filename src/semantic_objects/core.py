@@ -351,76 +351,66 @@ class Resource:
                     if name not in parent_fields
                 ]
             
+            print('FIELDS TO PROCESS:', [f[0] for f in fields_to_process])
             for field_name, field_obj in fields_to_process:
-                # Skip fields marked with templatize=False (old valid_field usage)
-                if (field_obj.init == False and 
-                    field_obj.metadata.get('templatize', True) == False):
-                    continue
-                
                 # Infer or get the relation
-                try:
-                    relation = cls._infer_relation_for_field(field_name, field_obj)
-                except ValueError:
-                    # If no relation can be inferred and none is provided, skip
+                relation = cls._infer_relation_for_field(field_name, field_obj)
+                # Create unique key for this relation to avoid duplicates
+                relation_key = relation._local_name
+                if relation_key in processed_relations:
                     continue
+                processed_relations.add(relation_key)
                 
-                if relation:
-                    # Create unique key for this relation to avoid duplicates
-                    relation_key = relation._local_name
-                    if relation_key in processed_relations:
-                        continue
-                    processed_relations.add(relation_key)
+                # Create blank node for property constraint
+                prop_node = BNode()
+                g.add((class_iri, SH.property, prop_node))
+                g.add((prop_node, SH.path, relation._get_iri()))
+                
+                # Add comment from field metadata or generate one
+                field_comment = field_obj.metadata.get('comment')
+                target_class_name = None
+                
+                # Handle Self type annotation
+                if hasattr(field_obj, 'type'):
+                    type_str = str(field_obj.type)
+                    if field_obj.type == cls or type_str == 'Self' or 'Self' in type_str:
+                        target_class_name = cls.__name__
+                    elif hasattr(field_obj.type, '__name__'):
+                        target_class_name = field_obj.type.__name__
+                    else:
+                        target_class_name = str(field_obj.type)
+                
+                if not field_comment and target_class_name:
+                    field_comment = f"If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                
+                if field_comment:
+                    g.add((prop_node, RDFS.comment, Literal(field_comment)))
+                
+                # Add target class constraint based on field type annotation
+                if hasattr(field_obj, 'type') and hasattr(field_obj.type, '_get_iri'):
+                    target_class = field_obj.type._get_iri()
+                    g.add((prop_node, SH['class'], target_class))
                     
-                    # Create blank node for property constraint
-                    prop_node = BNode()
-                    g.add((class_iri, SH.property, prop_node))
-                    g.add((prop_node, SH.path, relation._get_iri()))
+                    # Generate SHACL message
+                    relation_name = relation._local_name
+                    message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    g.add((prop_node, SH.message, Literal(message)))
+                elif field_obj.type == cls or 'Self' in str(field_obj.type):
+                    # Handle Self reference
+                    g.add((prop_node, SH['class'], class_iri))
                     
-                    # Add comment from field metadata or generate one
-                    field_comment = field_obj.metadata.get('comment')
-                    target_class_name = None
-                    
-                    # Handle Self type annotation
-                    if hasattr(field_obj, 'type'):
-                        type_str = str(field_obj.type)
-                        if field_obj.type == cls or type_str == 'Self' or 'Self' in type_str:
-                            target_class_name = cls.__name__
-                        elif hasattr(field_obj.type, '__name__'):
-                            target_class_name = field_obj.type.__name__
-                        else:
-                            target_class_name = str(field_obj.type)
-                    
-                    if not field_comment and target_class_name:
-                        field_comment = f"If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
-                    
-                    if field_comment:
-                        g.add((prop_node, RDFS.comment, Literal(field_comment)))
-                    
-                    # Add target class constraint based on field type annotation
-                    if hasattr(field_obj, 'type') and hasattr(field_obj.type, '_get_iri'):
-                        target_class = field_obj.type._get_iri()
-                        g.add((prop_node, SH['class'], target_class))
-                        
-                        # Generate SHACL message
-                        relation_name = relation._local_name
-                        message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
-                        g.add((prop_node, SH.message, Literal(message)))
-                    elif field_obj.type == cls or 'Self' in str(field_obj.type):
-                        # Handle Self reference
-                        g.add((prop_node, SH['class'], class_iri))
-                        
-                        # Generate SHACL message for Self reference
-                        relation_name = relation._local_name
-                        message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
-                        g.add((prop_node, SH.message, Literal(message)))
-                    
-                    # Add cardinality constraints if specified
-                    min_count = field_obj.metadata.get('min')
-                    max_count = field_obj.metadata.get('max')
-                    if min_count is not None:
-                        g.add((prop_node, SH.minCount, Literal(min_count)))
-                    if max_count is not None:
-                        g.add((prop_node, SH.maxCount, Literal(max_count)))
+                    # Generate SHACL message for Self reference
+                    relation_name = relation._local_name
+                    message = f"s223: If the relation `{relation_name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
+                    g.add((prop_node, SH.message, Literal(message)))
+                
+                # Add cardinality constraints if specified
+                min_count = field_obj.metadata.get('min')
+                max_count = field_obj.metadata.get('max')
+                if min_count is not None:
+                    g.add((prop_node, SH.minCount, Literal(min_count)))
+                if max_count is not None:
+                    g.add((prop_node, SH.maxCount, Literal(max_count)))
         
         # Add SHACL property constraints from _valid_relations declarations
         # Determine which classes to process based on include_hierarchy
