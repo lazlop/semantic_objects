@@ -1,13 +1,17 @@
 from ..core import * 
 from .core import Node
 from .. import units
-from .values import Area, Azimuth, Tilt
+from .values import Area, Azimuth, Tilt, QuantifiableObervableProperty
 from .relations import * 
 from typing import Optional, Self
 from dataclasses import dataclass, field
+from . import relations
+# Build DEFAULT_RELATIONS from relation class metadata
+DEFAULT_RELATIONS = core.build_relations_registry(relations)
 
 class Entity(Node):
-    pass
+    _valid_relations = [
+        (hasProperty, QuantifiableObervableProperty)]
 
 @dataclass
 class DomainSpace(Entity):
@@ -19,6 +23,10 @@ class PhysicalSpace(Entity):
     _local_name = 'PhysicalSpace'
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
+    _valid_relations = [
+        (contains, Self),
+        (encloses, DomainSpace)
+    ]
 
 @dataclass
 class Space(PhysicalSpace):
@@ -28,3 +36,5 @@ class Window(Entity):
     """Window with multiple properties using field-based relations"""
     _local_name = 'Window'
     area: Area = required_field()
+    azimuth: Azimuth = required_field()
+    tilt: Tilt = required_field()

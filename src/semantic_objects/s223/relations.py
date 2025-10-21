@@ -16,15 +16,9 @@ class hasUnit(Predicate):
 
 class hasProperty(Predicate):
     _local_name = 'hasProperty'
-    _applies_to = [
-        ('Node', 'QuantifiableObervableProperty'),
-    ]
 
 class contains(Predicate):
     _local_name = 'contains'
-    _applies_to = [
-        ('PhysicalSpace', 'PhysicalSpace'),
-    ]
 
 class encloses(Predicate):
     _local_name = 'encloses'

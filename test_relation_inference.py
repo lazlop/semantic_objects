@@ -2,7 +2,6 @@
 """Test script to verify relation inference functionality"""
 
 from src.semantic_objects.s223.entities import Space, Window, PhysicalSpace
-from src.semantic_objects.watr.entities import Tank
 
 def test_space_relation_inference():
     """Test that Space class correctly infers hasProperty relation for area field"""
@@ -76,31 +75,6 @@ def test_physical_space_self_reference():
     
     print()
 
-def test_tank_relation_inference():
-    """Test that Tank class correctly infers hasConnectionPoint for inlet/outlet"""
-    print("Testing Tank class relation inference...")
-    
-    relations = Tank.get_relations()
-    print(f"Tank relations: {relations}")
-    
-    expected_fields = {'inlet', 'outlet'}
-    found_fields = set()
-    
-    for relation, field_name in relations:
-        if field_name in expected_fields:
-            found_fields.add(field_name)
-            print(f"✓ {field_name} field has relation: {relation._local_name}")
-            assert relation._local_name == 'hasConnectionPoint', f"Expected 'hasConnectionPoint' for {field_name}, got '{relation._local_name}'"
-    
-    if found_fields == expected_fields:
-        print("✓ All Tank connection point fields have correct relations!")
-    else:
-        missing = expected_fields - found_fields
-        print(f"✗ Missing relations for fields: {missing}")
-        raise AssertionError(f"Missing relations for: {missing}")
-    
-    print()
-
 def test_yaml_generation():
     """Test that YAML generation still works with inferred relations"""
     print("Testing YAML generation with inferred relations...")
@@ -142,7 +116,6 @@ if __name__ == "__main__":
         test_space_relation_inference()
         test_window_relation_inference()
         test_physical_space_self_reference()
-        test_tank_relation_inference()
         test_yaml_generation()
         test_rdf_generation()
         

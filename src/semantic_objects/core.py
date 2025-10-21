@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Type, Union, get_origin, get_args
+from typing import List, Dict, Tuple, Type, Union, get_origin, get_args, Self
 from dataclasses import dataclass, field, fields
 from semantic_mpc_interface.namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
 import yaml
@@ -442,84 +442,56 @@ class Resource:
                     if max_count is not None:
                         g.add((prop_node, SH.maxCount, Literal(max_count)))
         
-        # Add SHACL property constraints from relation _applies_to declarations
-        # Find the relations module for this class's ontology
-        relations_module = None
-        module_parts = None
-        for base in cls.__mro__:
-            if hasattr(base, '__module__'):
-                module = sys.modules.get(base.__module__)
-                if module:
-                    # Try to find a relations module in the same package
-                    module_parts = base.__module__.split('.')
-                    if len(module_parts) >= 2:
-                        relations_module_name = '.'.join(module_parts[:-1]) + '.relations'
-                        if relations_module_name in sys.modules:
-                            relations_module = sys.modules[relations_module_name]
-                            break
+        # Add SHACL property constraints from _valid_relations declarations
+        # Determine which classes to process based on include_hierarchy
+        if include_hierarchy:
+            # Process all classes in the hierarchy
+            classes_to_process = cls.__mro__
+        else:
+            # Only process the current class
+            classes_to_process = [cls]
         
-        if relations_module and module_parts:
-            # Scan all Predicate subclasses in the relations module
-            for name in dir(relations_module):
-                try:
-                    obj = getattr(relations_module, name)
-                except (AttributeError, ImportError):
+        for base_class in classes_to_process:
+            # Skip base classes that don't have _valid_relations
+            if not hasattr(base_class, '_valid_relations'):
+                continue
+            
+            # Process each relation in _valid_relations
+            for relation, target_class in base_class._valid_relations:
+                # Create unique key for this relation to avoid duplicates
+                relation_key = relation._local_name
+                if relation_key in processed_relations:
                     continue
+                processed_relations.add(relation_key)
                 
-                # Check if it's a class with _applies_to
-                # Use inspect.isclass instead of isinstance(obj, type) to avoid potential issues
-                import inspect
-                if not inspect.isclass(obj):
-                    continue
-                    
-                if not (hasattr(obj, '_applies_to') and
-                        hasattr(obj, '_local_name') and
-                        hasattr(obj, '_get_iri')):
-                    continue
+                # Create blank node for property constraint
+                prop_node = BNode()
+                g.add((class_iri, SH.property, prop_node))
+                g.add((prop_node, SH.path, relation._get_iri()))
                 
-                # Check if this relation applies to the current class
-                for source_class_name, target_class_name in obj._applies_to:
-                    # Check if current class matches source (by name or inheritance)
-                    matches_source = False
-                    if cls.__name__ == source_class_name:
-                        matches_source = True
-                    elif include_hierarchy:
-                        # Only check inheritance if include_hierarchy is True
-                        for base in cls.__mro__:
-                            if hasattr(base, '__name__') and base.__name__ == source_class_name:
-                                matches_source = True
-                                break
+                # Determine target class name for comments and messages
+                if target_class is None:  # Handle None type
+                    target_class_name = "None"
+                elif target_class is Self or str(target_class) == 'Self':
+                    target_class_name = cls.__name__
+                    target_class = cls
+                elif hasattr(target_class, '__name__'):
+                    target_class_name = target_class.__name__
+                else:
+                    target_class_name = str(target_class)
+                
+                # Generate comment
+                field_comment = f"If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                g.add((prop_node, RDFS.comment, Literal(field_comment)))
+                
+                # Add sh:class constraint if target class has _get_iri
+                if hasattr(target_class, '_get_iri'):
+                    target_class_iri = target_class._get_iri()
+                    g.add((prop_node, SH['class'], target_class_iri))
                     
-                    if matches_source:
-                        # Create unique key for this relation to avoid duplicates
-                        relation_key = obj._local_name
-                        if relation_key in processed_relations:
-                            continue
-                        processed_relations.add(relation_key)
-                        
-                        # Create blank node for property constraint
-                        prop_node = BNode()
-                        g.add((class_iri, SH.property, prop_node))
-                        g.add((prop_node, SH.path, obj._get_iri()))
-                        
-                        # Generate comment
-                        field_comment = f"If the relation `{obj._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
-                        g.add((prop_node, RDFS.comment, Literal(field_comment)))
-                        
-                        # Try to find the target class to add sh:class constraint
-                        # Look in the entities module
-                        entities_module_name = '.'.join(module_parts[:-1]) + '.entities'
-                        if entities_module_name in sys.modules:
-                            entities_module = sys.modules[entities_module_name]
-                            if hasattr(entities_module, target_class_name):
-                                target_class_obj = getattr(entities_module, target_class_name)
-                                if hasattr(target_class_obj, '_get_iri'):
-                                    target_class_iri = target_class_obj._get_iri()
-                                    g.add((prop_node, SH['class'], target_class_iri))
-                                    
-                                    # Generate SHACL message
-                                    message = f"s223: If the relation `{obj._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
-                                    g.add((prop_node, SH.message, Literal(message)))
+                    # Generate SHACL message
+                    message = f"s223: If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    g.add((prop_node, SH.message, Literal(message)))
         
         return g.serialize(format='turtle')
     
