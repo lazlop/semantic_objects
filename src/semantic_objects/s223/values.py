@@ -33,51 +33,23 @@ DEFAULT_UNIT_MAP = {
         "IP": UNIT["PSI"]
     },
 }
+@dataclass 
+class Property(Node):
+    _local_name = 'Property'
 
 @dataclass
-class QuantifiableObervableProperty(Node):
+class QuantifiableObervableProperty(Property):
     _local_name = 'QuantifiableObservableProperty'
-    qk: URIRef
-    # TODO: maybe also just make unit a URIRef? Make simple wrappers for URIRefs? 
-
-    # TODO: need to add a bit more to this class
-    # QK: Always just doing URIRef? Should this be a class too? 
+    qk: URIRef = required_field(qualified=False)
     def __init__(self, value, unit: Optional[Unit] = None):
         self.value = value
         if unit == None:
             self.unit = DEFAULT_UNIT_MAP[self.qk][DEFAULT_UNIT_SYSTEM]
-    
-    # def __repr__(self):
-    #     return f"QOP(value={self.value}, unit='{self.unit}, qk='{self.qk}')"
-
-
 class Area(QuantifiableObervableProperty):
     # predicates and objects
-    value: Value 
-    unit: Unit
+    value: Value = required_field()
+    unit: Unit = required_field()
     qk = QK['Area']
-    relations = [
-        (hasValue, 'value'),
-        (hasUnit, 'unit'),
-        (hasQuantityKind, 'qk')
-    ]
-
-class Azimuth(QuantifiableObervableProperty):
-    _local_name = 'Azimuth'
-    value: Value
-    unit: Unit
-    qk = QK['Azimuth']
-    relations = [
-        (hasValue, 'value'),
-        (hasUnit, 'unit'),
-        (hasQuantityKind, 'qk')
-    ]
-
-class Tilt(QuantifiableObervableProperty):
-    _local_name = 'Tilt'
-    value: Value
-    unit: Unit
-    qk = QK['Tilt']
     relations = [
         (hasValue, 'value'),
         (hasUnit, 'unit'),
