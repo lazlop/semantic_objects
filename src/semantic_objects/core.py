@@ -193,8 +193,8 @@ class Resource:
         """
         Infer the relation for a field based on class type hierarchies.
         
-        Looks up the relation in the ontology-specific DEFAULT_RELATIONS registry
-        by checking (source_class, target_class) pairs, walking up both hierarchies.
+        Looks up the relation by checking (source_class, target_class) pairs
+        in _valid_relations declarations, walking up both hierarchies.
         
         Args:
             field_name: Name of the field
@@ -204,7 +204,7 @@ class Resource:
             The inferred relation object
             
         Raises:
-            ValueError: If no default relation can be found
+            ValueError: If no relation can be found
         """
         # If relation is explicitly provided, use it
         if field_obj.metadata.get('relation') is not None:
@@ -225,48 +225,28 @@ class Resource:
         if target_type == cls or str(target_type) == 'Self':
             target_type = cls
         
-        # Find the ontology-specific DEFAULT_RELATIONS registry
-        # Walk up the MRO to find a module that has DEFAULT_RELATIONS
-        default_relations = None
-        for base in cls.__mro__:
-            if hasattr(base, '__module__'):
-                module = sys.modules.get(base.__module__)
-                if module and hasattr(module, 'DEFAULT_RELATIONS'):
-                    default_relations = module.DEFAULT_RELATIONS
-                    break
-        
-        if default_relations is None:
-            raise ValueError(
-                f"No DEFAULT_RELATIONS registry found for {cls.__name__}.{field_name}. "
-                f"Please add a DEFAULT_RELATIONS dictionary to the ontology module."
-            )
-        
         # Try to find a matching relation by walking up both class hierarchies
+        # Check _valid_relations in the source class hierarchy
         for source_class in cls.__mro__:
-            if not hasattr(source_class, '__name__'):
+            if not hasattr(source_class, '_valid_relations'):
                 continue
-            source_name = source_class.__name__
             
             # Walk up target class hierarchy
             target_mro = target_type.__mro__ if hasattr(target_type, '__mro__') else [target_type]
             for target_class in target_mro:
-                if not hasattr(target_class, '__name__'):
-                    continue
-                target_name = target_class.__name__
-                
-                # Check if this pair exists in the registry
-                key = (source_name, target_name)
-                if key in default_relations:
-                    return default_relations[key]
+                # Check each relation in _valid_relations
+                for relation, valid_target in source_class._valid_relations:
+                    # Handle Self reference in _valid_relations
+                    if valid_target is Self or str(valid_target) == 'Self':
+                        valid_target = source_class
+                    
+                    # Check if target class matches
+                    if valid_target == target_class or (hasattr(valid_target, '__name__') and hasattr(target_class, '__name__') and valid_target.__name__ == target_class.__name__):
+                        return relation
         
-        # No matching relation found
-        target_type_name = target_type.__name__ if hasattr(target_type, '__name__') else str(target_type)
-        raise ValueError(
-            f"No default relation found for {cls.__name__}.{field_name} "
-            f"(source: {cls.__name__}, target: {target_type_name}). "
-            f"Please either specify the relation explicitly in the field definition, "
-            f"or add a mapping to DEFAULT_RELATIONS in the ontology module."
-        )
+        # No matching relation found - return None to allow field to be skipped
+        # return None
+        return 
                     
     @classmethod
     def get_relations(cls):
@@ -448,8 +428,11 @@ class Resource:
             # Process all classes in the hierarchy
             classes_to_process = cls.__mro__
         else:
-            # Only process the current class
-            classes_to_process = [cls]
+            # Only process _valid_relations declared directly on this class
+            # Check if this specific class (not inherited) has _valid_relations
+            classes_to_process = []
+            if '_valid_relations' in cls.__dict__:
+                classes_to_process = [cls]
         
         for base_class in classes_to_process:
             # Skip base classes that don't have _valid_relations
@@ -497,39 +480,7 @@ class Resource:
     
 class Predicate(Resource):
     # currently just used for typecheck later 
-    pass 
-
-def build_relations_registry(relations_module):
-    """
-    Build a DEFAULT_RELATIONS registry from relation classes with _applies_to metadata.
-    
-    Scans all Predicate subclasses in the provided module and builds a dictionary
-    mapping (source_class, target_class) tuples to relation classes based on their
-    _applies_to attribute.
-    
-    Args:
-        relations_module: The module containing Predicate subclasses
-        
-    Returns:
-        Dictionary mapping (source_class, target_class) -> relation class
-    """
-    registry = {}
-    
-    # Iterate through all items in the module
-    for name in dir(relations_module):
-        obj = getattr(relations_module, name)
-        
-        # Check if it's a Predicate subclass (not Predicate itself)
-        if (isinstance(obj, type) and 
-            issubclass(obj, Predicate) and 
-            obj is not Predicate and
-            hasattr(obj, '_applies_to')):
-            
-            # Add each (source, target) pair to the registry
-            for source_class, target_class in obj._applies_to:
-                registry[(source_class, target_class)] = obj
-    
-    return registry
+    pass
 
 class Node(Resource):
     # A Node with a URI Ref

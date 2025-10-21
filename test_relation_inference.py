@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test script to verify relation inference functionality"""
 
-from src.semantic_objects.s223.entities import Space, Window, PhysicalSpace
+from src.semantic_objects.s223.entities import Space, Window, PhysicalSpace, Space_TwoArea
 
 def test_space_relation_inference():
     """Test that Space class correctly infers hasProperty relation for area field"""
@@ -84,6 +84,10 @@ def test_yaml_generation():
         print("Space YAML output:")
         print(yaml_output)
         print("✓ YAML generation successful!")
+        yaml_output = Space_TwoArea.to_yaml_str()
+        print("Space2Area YAML output:")
+        print(yaml_output)
+        print("✓ YAML generation successful!")
     except Exception as e:
         print(f"✗ YAML generation failed: {e}")
         raise
@@ -95,11 +99,15 @@ def test_rdf_generation():
     print("Testing RDF class definition generation with inferred relations...")
     
     try:
-        rdf_output = Space.generate_rdf_class_definition()
+        rdf_output = Space.generate_rdf_class_definition(include_hierarchy=True)
         print("Space RDF class definition (first 500 chars):")
-        print(rdf_output[:500])
-        print("...")
+        print(rdf_output)
+        # print(rdf_output[:500])
+        # print("...")
         print("✓ RDF generation successful!")
+        rdf_output = Space_TwoArea.generate_rdf_class_definition(include_hierarchy=False)
+        print("SpaceTwoArea RDF class definition")
+        print(rdf_output)
     except Exception as e:
         print(f"✗ RDF generation failed: {e}")
         raise

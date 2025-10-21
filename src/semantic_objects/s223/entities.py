@@ -5,13 +5,11 @@ from .values import Area, Azimuth, Tilt, QuantifiableObervableProperty
 from .relations import * 
 from typing import Optional, Self
 from dataclasses import dataclass, field
-from . import relations
-# Build DEFAULT_RELATIONS from relation class metadata
-DEFAULT_RELATIONS = core.build_relations_registry(relations)
 
 class Entity(Node):
     _valid_relations = [
-        (hasProperty, QuantifiableObervableProperty)]
+        (hasProperty, QuantifiableObervableProperty),
+    ]
 
 @dataclass
 class DomainSpace(Entity):
@@ -31,6 +29,13 @@ class PhysicalSpace(Entity):
 @dataclass
 class Space(PhysicalSpace):
     area: Area = required_field() 
+
+@dataclass
+class Space_TwoArea(Space):
+    """Space with two area fields for testing hierarchy"""
+    _local_name = 'Space'
+    area2: Area = required_field()
+
 @dataclass
 class Window(Entity):
     """Window with multiple properties using field-based relations"""

@@ -22,9 +22,6 @@ class contains(Predicate):
 
 class encloses(Predicate):
     _local_name = 'encloses'
-    _applies_to = [
-        ('PhysicalSpace', 'DomainSpace'),
-    ]
 
 class hasQuantityKind(core.Predicate):
     _ns = QUDT
@@ -32,12 +29,6 @@ class hasQuantityKind(core.Predicate):
 
 class hasConnectionPoint(Predicate):
     _local_name = 'hasConnectionPoint'
-    _applies_to = [
-        ('Node', 'ConnectionPoint'),
-    ]
 
 class hasMedium(Predicate):
     _local_name = 'hasMedium'
-    _applies_to = [
-        ('ConnectionPoint', 'Fluid'),
-    ]
