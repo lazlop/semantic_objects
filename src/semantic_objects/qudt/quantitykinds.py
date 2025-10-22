@@ -1,20 +1,19 @@
-from ..core import NamedNode
-from dataclasses import dataclass
+from ..core import NamedNode, semantic_object
 from ..namespaces import QK
 
-@dataclass
+@semantic_object
 class QuantityKind(NamedNode):
-    _local_name = 'QuantityKind'
+    _type = 'QuantityKind'
     _ns = QK
 
-@dataclass
+@semantic_object
 class Area(QuantityKind):
-    _local_name = 'Area'
+    _type = 'Area'
 
-@dataclass
+@semantic_object
 class Azimuth(QuantityKind):
-    _local_name = 'Azimuth'
+    _type = 'Azimuth'
 
-@dataclass
+@semantic_object
 class Tilt(QuantityKind):
-    _local_name = 'Tilt'
+    _type = 'Tilt'

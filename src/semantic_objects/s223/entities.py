@@ -6,19 +6,23 @@ from .relations import *
 from typing import Optional, Self
 from dataclasses import dataclass, field
 
+# TODO: Consider how I'm using localname vs class name. Not consistent 
+# If aligning with semanticMPC, class name will be used for template and classes, local_name would be the class type
+# 
+@semantic_object
 class Entity(Node, core.Entity):
     _valid_relations = [
         (hasProperty, QuantifiableObervableProperty),
     ]
 
-@dataclass
+@semantic_object
 class DomainSpace(Entity):
-    _local_name = 'DomainSpace'
+    _type = 'DomainSpace'
     label = "Domain Space"
 
-@dataclass
+@semantic_object
 class PhysicalSpace(Entity):
-    _local_name = 'PhysicalSpace'
+    _type = 'PhysicalSpace'
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
     _valid_relations = [
@@ -26,20 +30,19 @@ class PhysicalSpace(Entity):
         (encloses, DomainSpace)
     ]
 
-@dataclass
+@semantic_object
 class Space(PhysicalSpace):
     area: Area = required_field() 
 
-@dataclass
+@semantic_object
 class Space_TwoArea(Space):
     """Space with two area fields for testing hierarchy"""
-    _local_name = 'Space'
     area2: Area = required_field()
 
-@dataclass
+@semantic_object
 class Window(Entity):
     """Window with multiple properties using field-based relations"""
-    _local_name = 'Window'
+    _type = 'Window'
     area: Area = required_field()
     azimuth: Azimuth = required_field()
     tilt: Tilt = required_field()

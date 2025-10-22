@@ -9,37 +9,37 @@ class Predicate(core.Predicate):
 
 class hasValue(Predicate):
     # can validate predicates against classes optionally 
-    _local_name = 'hasValue'
+    _type = 'hasValue'
 
 class hasUnit(Predicate):
-    _local_name = 'hasUnit'
+    _type = 'hasUnit'
 
 class hasProperty(Predicate):
-    _local_name = 'hasProperty'
+    _type = 'hasProperty'
 
 class contains(Predicate):
-    _local_name = 'contains'
+    _type = 'contains'
 
 class encloses(Predicate):
-    _local_name = 'encloses'
+    _type = 'encloses'
 
 class hasQuantityKind(core.Predicate):
     _ns = QUDT
-    _local_name = 'hasQuantityKind'
+    _type = 'hasQuantityKind'
 
 class hasConnectionPoint(Predicate):
-    _local_name = 'hasConnectionPoint'
+    _type = 'hasConnectionPoint'
 
 class hasMedium(Predicate):
-    _local_name = 'hasMedium'
+    _type = 'hasMedium'
 
 class connectedTo(Predicate):
-    _local_name = 'connectedTo'
+    _type = 'connectedTo'
     label = "connected to"
     comment = "Indicates that two entities are connected in some way."
 
 class hasWindow(Predicate):
-    _local_name = 'hasWindow'
+    _type = 'hasWindow'
     label = "has window"
     comment = "Indicates that a DomainSpace has a Window. This is a subproperty of connectedTo."
     _subproperty_of = connectedTo

@@ -6,7 +6,6 @@ from typing import Optional
 from semantic_mpc_interface.namespaces import QK, UNIT
 from rdflib import URIRef
 from ..qudt import quantitykinds
-from dataclasses import dataclass, Field
 
 
 # IP or SI
@@ -35,16 +34,16 @@ DEFAULT_UNIT_MAP = {
         "IP": UNIT["PSI"]
     },
 }
-@dataclass 
+@semantic_object
 class Property(Node, Value):
-    _local_name = 'Property'
+    _type = 'Property'
     _valid_relations = [(hasQuantityKind, quantitykinds.QuantityKind),
                         (hasValue, Value),
                         (hasUnit, Unit)]
 
-@dataclass
+@semantic_object
 class QuantifiableObervableProperty(Property):
-    _local_name = 'QuantifiableObservableProperty'
+    _type = 'QuantifiableObservableProperty'
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
     value: Value = required_field()
     unit: Unit = required_field()
@@ -52,40 +51,15 @@ class QuantifiableObervableProperty(Property):
         self.value = value
         if unit == None:
             self.unit = DEFAULT_UNIT_MAP[self.qk][DEFAULT_UNIT_SYSTEM]
-
-# should probably be part of global behavior for rewritten 
-def auto_fixed_fields(cls):
-    """Automatically converts any redefined parent fields into fixed fields"""
-    # Get parent class fields and their types
-    parent_fields = {}
-    for base in cls.__mro__[1:]:
-        if hasattr(base, '__dataclass_fields__'):
-            parent_fields.update(base.__dataclass_fields__)
-    
-    # Ensure cls has __annotations__
-    if not hasattr(cls, '__annotations__'):
-        cls.__annotations__ = {}
-    
-    # Check which ones are redefined in this class
-    for field_name, parent_field in parent_fields.items():
-        if field_name in cls.__dict__ and not isinstance(getattr(cls, field_name), type(field)):
-            fixed_value = cls.__dict__[field_name]
-            # Copy the type annotation from parent
-            cls.__annotations__[field_name] = parent_field.type
-            # Set as fixed field
-            setattr(cls, field_name, field(default=fixed_value, init=False))
-    
-    return dataclass(cls)
-
-@auto_fixed_fields
+@semantic_object
 class Area(QuantifiableObervableProperty):
-    _local_name = 'Area'
+    _type = 'Area'
     qk = quantitykinds.Area
-
+@semantic_object
 class Azimuth(QuantifiableObervableProperty):
-    _local_name = 'Azimuth'
+    _type = 'Azimuth'
     qk = quantitykinds.Azimuth
-
+@semantic_object
 class Tilt(QuantifiableObervableProperty):
-    _local_name = 'Tilt'
+    _type = 'Tilt'
     qk = quantitykinds.Tilt

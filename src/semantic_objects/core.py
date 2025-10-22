@@ -72,6 +72,28 @@ def required_field(relation = None, min = 1, max = None, qualified = True, label
             'comment': comment
         }
     )
+def semantic_object(cls):
+    """Automatically converts any redefined parent fields into fixed fields"""
+    # Get parent class fields and their types
+    parent_fields = {}
+    for base in cls.__mro__[1:]:
+        if hasattr(base, '__dataclass_fields__'):
+            parent_fields.update(base.__dataclass_fields__)
+    
+    # Ensure cls has __annotations__
+    if not hasattr(cls, '__annotations__'):
+        cls.__annotations__ = {}
+    
+    # Check which ones are redefined in this class
+    for field_name, parent_field in parent_fields.items():
+        if field_name in cls.__dict__ and not isinstance(getattr(cls, field_name), type(field)):
+            fixed_value = cls.__dict__[field_name]
+            # Copy the type annotation from parent
+            cls.__annotations__[field_name] = parent_field.type
+            # Set as fixed field
+            setattr(cls, field_name, field(default=fixed_value, init=False))
+    
+    return dataclass(cls)
 
 # Define a custom class for folded style text
 class FoldedString(str):
@@ -84,14 +106,14 @@ def folded_str_representer(dumper, data):
 # Register the representer
 yaml.add_representer(FoldedString, folded_str_representer)
 
-@dataclass
+@semantic_object
 class Resource:
 
     @classmethod
     def _get_iri(cls):
-        if not hasattr(cls, '_local_name'):
-            raise Exception('Class must have _local_name attribute')
-        return cls._ns[cls._local_name]
+        if not hasattr(cls, '_type'):
+            raise Exception('Class must have _type attribute')
+        return cls._ns[cls._type]
     
     @classmethod
     # TODO: have to edit this to get other attributes
@@ -148,7 +170,10 @@ class Resource:
                 if (field_obj.init == False and 
                     field_obj.metadata.get('templatize', True) == False):
                     continue
-                
+
+                if not isinstance(field_obj.default,_MISSING_TYPE):
+                    continue
+
                 dependencies.append({
                     'template': annotation_type.__name__,
                     'args': {'name': field_name}
@@ -167,14 +192,6 @@ class Resource:
                 # Fields with explicit optional metadata
                 if field_obj.metadata.get('optional', False):
                     optional_fields.append(field_name)
-                # Fields with init=False are optional (unless templatize=False)
-                elif (field_obj.init == False and 
-                      field_obj.metadata.get('templatize', True) != False):
-                    optional_fields.append(field_name)
-        
-        # Also check for legacy _optional attribute
-        if hasattr(cls, '_optional'):
-            optional_fields.extend(cls._optional)
         
         return optional_fields
 
@@ -286,7 +303,7 @@ class Resource:
                         continue
                     relation = cls._infer_relation_for_field(field_name, field_obj)
                     
-                    relation_key = (relation._local_name, field_name)
+                    relation_key = (relation._type, field_name)
                     if relation_key not in seen_relations:
                         all_relations.append((relation, field_name))
                         seen_relations.add(relation_key)
@@ -347,6 +364,7 @@ class Resource:
             g.add((prop_node, SH.qualifiedValueShape, qual_val_shape))
             g.add((qual_val_shape, RDF.type, SH.NodeShape))
     
+    # TODO: Address hardcoded type Class
     @classmethod
     def generate_rdf_class_definition(cls, include_hierarchy=False):
         """
@@ -361,7 +379,7 @@ class Resource:
         
         # Get class IRI
         class_iri = cls._get_iri()
-        g.add((class_iri, RDF.type, cls._type))
+        g.add((class_iri, RDF.type, cls._ns['Class']))
         for type in cls._other_types:
             g.add((class_iri, RDF.type, type))
         
@@ -375,10 +393,10 @@ class Resource:
         
         # Add subclass relationship - look for meaningful parent classes
         for base in cls.__mro__[1:]:  # Skip self
-            if (hasattr(base, '_local_name') and hasattr(base, '_ns') and 
-                base != Resource and base._local_name != cls._local_name and
+            if (hasattr(base, '_type') and hasattr(base, '_ns') and 
+                base != Resource and base._type != cls._type and
                 base.__name__ not in ['Node', 'Value', 'Predicate', 'NamedNode']):
-                parent_iri = base._ns[base._local_name]
+                parent_iri = base._ns[base._type]
                 g.add((class_iri, RDFS.subClassOf, parent_iri))
                 break  # Only add the immediate parent
         
@@ -386,7 +404,8 @@ class Resource:
         shape_path_name_dct = {}  # Maps relation IRI to property shape node
         prop_counts = {}  # Track count of each property
         processed_relations = set()  # Track processed relations to avoid duplicates
-        
+
+        # TODO: This ipmlementation is half finished, and repetitive with semantic_mpc_interface
         if hasattr(cls, '__dataclass_fields__'):
             # Determine which fields to process based on include_hierarchy
             if include_hierarchy:
@@ -427,7 +446,7 @@ class Resource:
                     continue
                 
                 # Create unique key for this relation to avoid duplicates
-                relation_key = relation._local_name
+                relation_key = relation._type
                 if relation_key in processed_relations:
                     continue
                 processed_relations.add(relation_key)
@@ -456,7 +475,7 @@ class Resource:
                         target_class_name = str(field_obj.type)
                 
                 if not field_comment and target_class_name:
-                    field_comment = f"If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    field_comment = f"If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                 
                 if field_comment:
                     g.add((prop_node, RDFS.comment, Literal(field_comment)))
@@ -467,16 +486,16 @@ class Resource:
                     g.add((prop_node, SH['class'], target_class))
                     
                     # Generate SHACL message
-                    relation_name = relation._local_name
-                    message = f"s223: If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    relation_name = relation._type
+                    message = f"s223: If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                     g.add((prop_node, SH.message, Literal(message)))
                 elif field_obj.type == cls or 'Self' in str(field_obj.type):
                     # Handle Self reference
                     g.add((prop_node, SH['class'], class_iri))
                     
                     # Generate SHACL message for Self reference
-                    relation_name = relation._local_name
-                    message = f"s223: If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
+                    relation_name = relation._type
+                    message = f"s223: If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
                     g.add((prop_node, SH.message, Literal(message)))
             
             # Second pass: create qualified value shapes for each field
@@ -540,7 +559,7 @@ class Resource:
             # Process each relation in _valid_relations
             for relation, target_class in base_class._valid_relations:
                 # Create unique key for this relation to avoid duplicates
-                relation_key = relation._local_name
+                relation_key = relation._type
                 if relation_key in processed_relations:
                     continue
                 processed_relations.add(relation_key)
@@ -565,7 +584,7 @@ class Resource:
                     target_class_name = str(target_class)
                 
                 # Generate comment
-                field_comment = f"If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                field_comment = f"If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                 g.add((prop_node, RDFS.comment, Literal(field_comment)))
                 
                 # Add sh:class constraint if target class has _get_iri
@@ -574,16 +593,37 @@ class Resource:
                     g.add((prop_node, SH['class'], target_class_iri))
                     
                     # Generate SHACL message
-                    message = f"s223: If the relation `{relation._local_name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    message = f"s223: If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                     g.add((prop_node, SH.message, Literal(message)))
         
         return g.serialize(format='turtle')
     
 class Predicate(Resource):
-    # currently just used for typecheck later
+    # TODO: Predicate is partially implemented
     _subproperty_of = None  # Can be set to another Predicate class
     _domain = None  # Can be set to a Node class
     _range = None  # Can be set to a Node class
+    
+    @classmethod
+    def generate_turtle_body(cls, subject_name="name", target_name = "target"):
+        """Generate RDF/Turtle body for template"""
+        
+        g = Graph()
+        bind_prefixes(g)
+        
+        prop_iri = cls._get_iri()
+        
+        g.add((PARAM[subject_name], prop_iri, PARAM[target_name]))
+
+        if cls._domain is not None:
+            domain_iri = cls._domain._get_iri()
+            g.add((prop_iri, RDFS.domain, domain_iri))
+        
+        # Add range constraint if specified
+        if cls._range is not None:
+            range_iri = cls._range._get_iri()
+            g.add((prop_iri, RDFS.range, range_iri))
+        return g.serialize(format = 'ttl')
     
     @classmethod
     def generate_rdf_property_definition(cls):
