@@ -34,12 +34,17 @@ DEFAULT_UNIT_MAP = {
         "IP": UNIT["PSI"]
     },
 }
+
 @semantic_object
-class Property(Node, Value):
+class ExternalReference(Node):
+    _type = 'ExternalReference'
+    
+@semantic_object
+class Property(Node, Property):
     _type = 'Property'
     _valid_relations = [(hasQuantityKind, quantitykinds.QuantityKind),
                         (hasValue, Value),
-                        (hasValue, Num),
+                        (hasExternalReference, ExternalReference),
                         (hasUnit, Unit)]
 
 # TODO: need to come up with a better solution for value and unit 
@@ -47,12 +52,19 @@ class Property(Node, Value):
 class QuantifiableObervableProperty(Property):
     _type = 'QuantifiableObservableProperty'
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
-    value: Num = required_field()
+    value: Value = required_field()
     unit: Unit = required_field()
     def __init__(self, value, unit: Optional[Unit] = None):
         self.value = value
         if unit == None:
             self.unit = DEFAULT_UNIT_MAP[self.qk][DEFAULT_UNIT_SYSTEM]
+@semantic_object
+class QOP_Ref_or_Val(QuantifiableObervableProperty):
+    value: Value = optional_field()
+    value_ref: ExternalReference = optional_field()
+@semantic_object
+class Area_ext(QOP_Ref_or_Val):
+    qk = quantitykinds.Area
 @semantic_object
 class Area(QuantifiableObervableProperty):
     qk = quantitykinds.Area

@@ -47,3 +47,6 @@ class hasWindow(Predicate):
     comment = "Indicates that a DomainSpace has a Window. This is a subproperty of connectedTo."
     _subproperty_of = connectedTo
     # Domain and range will be set dynamically to avoid circular imports
+@semantic_object
+class hasExternalReference(Predicate):
+    _type = 'hasExternalReference'

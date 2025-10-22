@@ -14,6 +14,7 @@ def export_templates(dclass_lst: List[Type], dir_path_str: str, overwrite = True
     class_lsts = get_related_classes(dclass_lst)
     dir = Path(dir_path_str)
     dir.mkdir(parents=True, exist_ok=True)
+    # TODO: After addressing in semantic_mpc_interface, values will become properties
     files =  [dir / 'relations.yml', dir / 'entities.yml', dir / 'values.yml']
     for file, lst in zip(files, class_lsts):
         if file.exists() and not overwrite:
@@ -52,7 +53,7 @@ def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstra
                     raise RecursionError("Max depth reached")
             
     predicate_lst, entity_lst, value_lst = [], [], []
-    for lst, parent in [(predicate_lst, Predicate), (entity_lst, Entity), (value_lst, Value)]:
+    for lst, parent in [(predicate_lst, Predicate), (entity_lst, Entity), (value_lst, Property)]:
         for klass in all_classes:
             if not include_abstract and klass.abstract:
                 continue
@@ -460,7 +461,7 @@ class Resource:
         for base in cls.__mro__[1:]:  # Skip self
             if (hasattr(base, '_type') and hasattr(base, '_ns') and 
                 base != Resource and base._type != cls._type and
-                base.__name__ not in ['Node', 'Value', 'Predicate', 'NamedNode']):
+                base.__name__ not in ['Node', 'Value', 'Property', 'Predicate', 'NamedNode']):
                 parent_iri = base._ns[base._type]
                 g.add((class_iri, RDFS.subClassOf, parent_iri))
                 break  # Only add the immediate parent
@@ -737,7 +738,7 @@ class Entity(Resource):
 
 # TODO: Probably want to change Value to property and have Value be something that is a number or an external reference
 # for now, want value to be num I think
-class Value(Resource):
+class Property(Resource):
     # A Literal
     pass
 
@@ -745,7 +746,6 @@ class Value(Resource):
 class NamedNode(Resource):
     # A Named Node 
     pass
-
-class Num(NamedNode):
+class Value(NamedNode):
     # A Literal
     pass
