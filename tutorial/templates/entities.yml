@@ -1,0 +1,20 @@
+Window:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+    P:name a s223:Window ;
+        s223:hasProperty P:area,
+            P:azimuth,
+            P:tilt .
+
+  dependencies:
+  - args:
+      name: area
+    template: Area
+  - args:
+      name: azimuth
+    template: Azimuth
+  - args:
+      name: tilt
+    template: Tilt
