@@ -3,9 +3,24 @@ from dataclasses import dataclass, field, fields, _MISSING_TYPE
 from semantic_mpc_interface.namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
 import yaml
 import sys
+from pathlib import Path
 from rdflib import Graph, Literal, BNode
 
 # TODO: Clean up implementation
+
+def export_templates(dclass_lst: List[Type], dir_path_str: str, overwrite = True):
+    class_lsts = get_related_classes(dclass_lst)
+    dir = Path(dir_path_str)
+    dir.mkdir(parents=True, exist_ok=True)
+    files =  [dir / 'relations.yaml', dir / 'entities.yaml', dir / 'values.yaml']
+    for file, lst in zip(files, class_lsts):
+        if file.exists() and not overwrite:
+            continue
+        file.unlink()
+        file.touch()
+        for klass in lst:
+            klass.to_yaml(file_path = file)
+            
 def get_related_classes(dclass: Union[Type, List[Type]], get_recursive = True):
     if isinstance(dclass, list):
         return _get_related_classes_lst(dclass, get_recursive)
@@ -254,13 +269,16 @@ class Resource:
         return template
 
     @classmethod
-    def to_yaml_str(cls, template_name=None):
+    def to_yaml(cls, template_name=None, file_path: Path = None,):
         """Convert to YAML string"""
         if template_name == None:
             template_name = cls.__name__
         template = cls.generate_yaml_template(template_name)
         # return yaml.dump(template, default_flow_style=False, sort_keys=False)
         template[template_name]['body'] = FoldedString(template[template_name]['body'])
+        if file_path is not None:
+            with open(file_path, 'a') as f:
+                yaml.dump(template, f, explicit_end=False)
         return yaml.dump(template, explicit_end=False)
 
     @classmethod

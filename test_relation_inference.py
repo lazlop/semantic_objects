@@ -80,15 +80,15 @@ def test_yaml_generation():
     print("Testing YAML generation with inferred relations...")
     
     try:
-        yaml_output = Space.to_yaml_str()
+        yaml_output = Space.to_yaml()
         print("Space YAML output:")
         print(yaml_output)
         print("✓ YAML generation successful!")
-        yaml_output = Space_TwoArea.to_yaml_str()
+        yaml_output = Space_TwoArea.to_yaml()
         print("Space2Area YAML output:")
         print(yaml_output)
         print("✓ YAML generation successful!")
-        yaml_output = Area.to_yaml_str()
+        yaml_output = Area.to_yaml()
         print("Area YAML output:")
         print(yaml_output)
         print("✓ YAML generation successful!")

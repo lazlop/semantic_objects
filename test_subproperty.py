@@ -52,7 +52,7 @@ def test_template_generation():
     """Test that DomainSpace can generate templates with hasWindow relation"""
     
     # Generate YAML template for DomainSpace
-    yaml_output = DomainSpace.to_yaml_str('has-window')
+    yaml_output = DomainSpace.to_yaml('has-window')
     print("\n=== YAML Template for has-window ===")
     print(yaml_output)
     
