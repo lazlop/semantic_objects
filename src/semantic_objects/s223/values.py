@@ -47,17 +47,21 @@ class Property(Node, Property):
                         (hasExternalReference, ExternalReference),
                         (hasUnit, Unit)]
 
-# TODO: need to come up with a better solution for value and unit 
 @semantic_object
 class QuantifiableObervableProperty(Property):
     _type = 'QuantifiableObservableProperty'
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
-    value: Value = required_field()
     unit: Unit = required_field()
+
+    # want to handle value differently. 
     def __init__(self, value, unit: Optional[Unit] = None):
         self.value = value
         if unit == None:
             self.unit = DEFAULT_UNIT_MAP[self.qk][DEFAULT_UNIT_SYSTEM]
+
+@semantic_object
+class QOP_Value(QuantifiableObervableProperty):
+    value: Value = required_field()
 @semantic_object
 class QOP_Ref_or_Val(QuantifiableObervableProperty):
     value: Value = optional_field()
@@ -66,11 +70,11 @@ class QOP_Ref_or_Val(QuantifiableObervableProperty):
 class Area_ext(QOP_Ref_or_Val):
     qk = quantitykinds.Area
 @semantic_object
-class Area(QuantifiableObervableProperty):
+class Area(QOP_Value):
     qk = quantitykinds.Area
 @semantic_object
-class Azimuth(QuantifiableObervableProperty):
+class Azimuth(QOP_Value):
     qk = quantitykinds.Azimuth
 @semantic_object
-class Tilt(QuantifiableObervableProperty):
+class Tilt(QOP_Value):
     qk = quantitykinds.Tilt

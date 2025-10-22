@@ -1,16 +1,3 @@
-Azimuth:
-  body: |+
-    @prefix P: <urn:___param___#> .
-    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
-    @prefix qudt: <http://qudt.org/schema/qudt/> .
-    @prefix s223: <http://data.ashrae.org/standard223#> .
-
-    P:name a s223:QuantifiableObservableProperty ;
-        s223:hasUnit P:unit ;
-        s223:hasValue P:value ;
-        qudt:hasQuantityKind quantitykind:Azimuth .
-
-  dependencies: []
 Tilt:
   body: |+
     @prefix P: <urn:___param___#> .
@@ -35,5 +22,18 @@ Area:
         s223:hasUnit P:unit ;
         s223:hasValue P:value ;
         qudt:hasQuantityKind quantitykind:Area .
+
+  dependencies: []
+Azimuth:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+    @prefix qudt: <http://qudt.org/schema/qudt/> .
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+    P:name a s223:QuantifiableObservableProperty ;
+        s223:hasUnit P:unit ;
+        s223:hasValue P:value ;
+        qudt:hasQuantityKind quantitykind:Azimuth .
 
   dependencies: []
