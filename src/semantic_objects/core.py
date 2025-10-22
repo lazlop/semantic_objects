@@ -8,16 +8,18 @@ from rdflib import Graph, Literal, BNode
 
 # TODO: Clean up implementation
 
+# BIG TODO: Decide what Value means, do we want values to be like points/properties, do we want them to be numerical values. 
+
 def export_templates(dclass_lst: List[Type], dir_path_str: str, overwrite = True):
     class_lsts = get_related_classes(dclass_lst)
     dir = Path(dir_path_str)
     dir.mkdir(parents=True, exist_ok=True)
-    files =  [dir / 'relations.yaml', dir / 'entities.yaml', dir / 'values.yaml']
+    files =  [dir / 'relations.yml', dir / 'entities.yml', dir / 'values.yml']
     for file, lst in zip(files, class_lsts):
         if file.exists() and not overwrite:
             continue
-        file.unlink()
-        file.touch()
+        if file.exists():
+            file.unlink()
         for klass in lst:
             klass.to_yaml(file_path = file)
             
@@ -206,6 +208,7 @@ class Resource:
             
         return g.serialize(format = 'ttl')
 
+    # TODO: Decide if this is how we want to handle named node dependencies
     @classmethod
     def get_dependencies(cls):
         """Get template dependencies based on annotations and field metadata"""
@@ -218,6 +221,9 @@ class Resource:
                 # Skip if field has init=False and templatize=False
                 if (field_obj.init == False and 
                     field_obj.metadata.get('templatize', True) == False):
+                    continue
+
+                if issubclass(annotation_type, NamedNode):
                     continue
 
                 if not isinstance(field_obj.default,_MISSING_TYPE):
@@ -256,7 +262,14 @@ class Resource:
                 'dependencies': cls.get_dependencies()
             }
         }
-        
+        # NOTE: Only adding dependencies if they exist
+        # template = {}
+        # template[template_name] = {}
+        # template[template_name]['body'] = cls.generate_turtle_body()
+        # dependencies = cls.get_dependencies()
+        # if dependencies != []:
+        #     template[template_name]['dependencies'] = dependencies
+
         # Add optional fields if they exist
         optional_fields = cls.get_optional_fields()
         if optional_fields:
@@ -721,6 +734,9 @@ class Node(Resource):
 class Entity(Resource):
     # A Node with a URI Ref
     pass
+
+# TODO: Probably want to change Value to property and have Value be something that is a number or an external reference
+# for now, want value to be num I think
 class Value(Resource):
     # A Literal
     pass
@@ -728,4 +744,8 @@ class Value(Resource):
 # Probably don't need a NamedNode class, since can just directly use rdflib URIRefs
 class NamedNode(Resource):
     # A Named Node 
+    pass
+
+class Num(NamedNode):
+    # A Literal
     pass

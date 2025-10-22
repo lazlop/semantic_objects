@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 
 # TODO: Consider making such classes abstract
 @semantic_object
-class Entity(Node, core.Entity):
+class Entity(Node, Entity):
     _valid_relations = [
         (hasProperty, QuantifiableObervableProperty),
     ]

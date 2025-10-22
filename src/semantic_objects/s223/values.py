@@ -39,13 +39,15 @@ class Property(Node, Value):
     _type = 'Property'
     _valid_relations = [(hasQuantityKind, quantitykinds.QuantityKind),
                         (hasValue, Value),
+                        (hasValue, Num),
                         (hasUnit, Unit)]
 
+# TODO: need to come up with a better solution for value and unit 
 @semantic_object
 class QuantifiableObervableProperty(Property):
     _type = 'QuantifiableObservableProperty'
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
-    value: Value = required_field()
+    value: Num = required_field()
     unit: Unit = required_field()
     def __init__(self, value, unit: Optional[Unit] = None):
         self.value = value

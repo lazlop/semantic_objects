@@ -1,22 +1,3 @@
-Tilt:
-  body: |+
-    @prefix P: <urn:___param___#> .
-    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
-    @prefix qudt: <http://qudt.org/schema/qudt/> .
-    @prefix s223: <http://data.ashrae.org/standard223#> .
-
-    P:name a s223:QuantifiableObservableProperty ;
-        s223:hasUnit P:unit ;
-        s223:hasValue P:value ;
-        qudt:hasQuantityKind quantitykind:Tilt .
-
-  dependencies:
-  - args:
-      name: value
-    template: Value
-  - args:
-      name: unit
-    template: Unit
 Area:
   body: |+
     @prefix P: <urn:___param___#> .
@@ -29,13 +10,7 @@ Area:
         s223:hasValue P:value ;
         qudt:hasQuantityKind quantitykind:Area .
 
-  dependencies:
-  - args:
-      name: value
-    template: Value
-  - args:
-      name: unit
-    template: Unit
+  dependencies: []
 Azimuth:
   body: |+
     @prefix P: <urn:___param___#> .
@@ -48,13 +23,7 @@ Azimuth:
         s223:hasValue P:value ;
         qudt:hasQuantityKind quantitykind:Azimuth .
 
-  dependencies:
-  - args:
-      name: value
-    template: Value
-  - args:
-      name: unit
-    template: Unit
+  dependencies: []
 Tilt:
   body: |+
     @prefix P: <urn:___param___#> .
@@ -67,10 +36,4 @@ Tilt:
         s223:hasValue P:value ;
         qudt:hasQuantityKind quantitykind:Tilt .
 
-  dependencies:
-  - args:
-      name: value
-    template: Value
-  - args:
-      name: unit
-    template: Unit
+  dependencies: []
