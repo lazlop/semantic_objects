@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test script to verify relation inference functionality"""
 
-from src.semantic_objects.s223.entities import Space, Window, PhysicalSpace, Space_TwoArea
+from src.semantic_objects.s223.entities import Space, Window, PhysicalSpace, Space_TwoArea, Area
 
 def test_space_relation_inference():
     """Test that Space class correctly infers hasProperty relation for area field"""
@@ -86,6 +86,10 @@ def test_yaml_generation():
         print("✓ YAML generation successful!")
         yaml_output = Space_TwoArea.to_yaml_str()
         print("Space2Area YAML output:")
+        print(yaml_output)
+        print("✓ YAML generation successful!")
+        yaml_output = Area.to_yaml_str()
+        print("Area YAML output:")
         print(yaml_output)
         print("✓ YAML generation successful!")
     except Exception as e:

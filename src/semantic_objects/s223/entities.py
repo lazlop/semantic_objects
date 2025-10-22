@@ -6,7 +6,7 @@ from .relations import *
 from typing import Optional, Self
 from dataclasses import dataclass, field
 
-class Entity(Node):
+class Entity(Node, core.Entity):
     _valid_relations = [
         (hasProperty, QuantifiableObervableProperty),
     ]
@@ -43,3 +43,7 @@ class Window(Entity):
     area: Area = required_field()
     azimuth: Azimuth = required_field()
     tilt: Tilt = required_field()
+
+DomainSpace._valid_relations = [
+    (hasWindow, Window),
+]

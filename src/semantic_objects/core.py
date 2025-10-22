@@ -1,10 +1,51 @@
 from typing import List, Dict, Tuple, Type, Union, get_origin, get_args, Self
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field, fields, _MISSING_TYPE
 from semantic_mpc_interface.namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
 import yaml
 import sys
 from rdflib import Graph, Literal, BNode
 
+def get_related_classes(dclass, get_recursive = True):
+    relations = [relation for relation, field_name in dclass.get_relations()]
+    entities_and_values = [field.type for entity, field in dclass.__dataclass_fields__.items()]
+    all_classes = [dclass] + relations + entities_and_values
+    all_classes = list(set(all_classes))
+
+    if get_recursive:
+        new_classes = all_classes.copy()
+        next_new_classes = []
+        for i in range(100):
+            for klass in new_classes:
+                relations = [relation for relation, field_name in klass.get_relations()]
+                entities_and_values = [field.type for entity, field in klass.__dataclass_fields__.items()]
+                if klass not in all_classes:
+                    next_new_classes.append(klass)
+            if next_new_classes == []:
+                break
+            all_classes.extend(next_new_classes)
+            new_classes = next_new_classes.copy()
+            next_new_classes = []
+            if i == 99:
+                raise RecursionError("Max depth reached")
+
+    return all_classes
+    
+
+# TODO: probably want to create a value parent class if I want to keep using that concept
+def get_all_classes(module_lst):
+    predicate_lst, entity_lst, value_lst = [], [], []
+    for module in module_lst:
+        for k, v in module.__dict__.items():
+            if not isinstance(v, type):
+                continue
+            for lst, parent in [(predicate_lst, Predicate), (entity_lst, Entity), (value_lst, Value)]:
+                if issubclass(v, parent):
+                    temps = get_related_classes(v)
+                    for t in temps:
+                        if t not in lst:
+                            lst.append(t)
+           
+    return predicate_lst, entity_lst, value_lst
 # a relation that is optional, and will be templatized (optional in bmotif template, used to query semantic data into objects)
 def optional_field(relation= None, label=None, comment=None):
     return field(
@@ -72,23 +113,25 @@ class Resource:
         
         g.add((PARAM['name'], RDF.type, cls._get_iri()))
         
-        # Get all annotations from the class hierarchy
-        all_annotations = {}
-        for base in reversed(cls.__mro__):
-            if hasattr(base, '__annotations__'):
-                all_annotations.update(base.__annotations__)
-        
-        # Generate property triples
-        for pred, objs in relations:
-            if isinstance(objs, str):
-                objs = [objs]
-            if isinstance(objs, list):
-                for obj in objs:
-                    if obj in all_annotations.keys():
-                        g.add((PARAM['name'], pred._get_iri(), PARAM[obj]))
-                    elif obj in cls._get_attributes().keys():
-                        attr_value = cls._get_attributes()[obj]
-                        g.add((PARAM['name'], pred._get_iri(), attr_value))
+        # TODO: May also want to get the class variables, or consider making all class variables fields
+        # currently things have to be written as fields in order to be templated 
+        seen_fields = set()
+        for base in cls.__mro__:
+            if hasattr(base, '__dataclass_fields__'):
+                for field_name, field_obj in base.__dataclass_fields__.items():
+                    # Skip fields with init=False and templatize=False
+                    if (field_obj.init == False and 
+                        field_obj.metadata.get('templatize', True) == False):
+                        continue
+                    if field_name in seen_fields:
+                        continue
+                    seen_fields.add(field_name)
+                    relation = cls._infer_relation_for_field(field_name, field_obj)
+                    if not isinstance(field_obj.default,_MISSING_TYPE):
+                        g.add((PARAM['name'], relation._get_iri(), field_obj.default._get_iri()))
+                    else:
+                        # Following lead from how we get args, not exactly aligned with Semantic_MPC_Interface
+                        g.add((PARAM['name'], relation._get_iri(), PARAM[field_name]))
             
         return g.serialize(format = 'ttl')
 
@@ -105,29 +148,10 @@ class Resource:
                 if (field_obj.init == False and 
                     field_obj.metadata.get('templatize', True) == False):
                     continue
-                    
-                # Get the base type name for the dependency
-                if hasattr(annotation_type, '__name__'):
-                    template_name = annotation_type.__name__.lower()
-                else:
-                    template_name = str(annotation_type).lower()
                 
                 dependencies.append({
-                    'template': template_name,
+                    'template': annotation_type.__name__,
                     'args': {'name': field_name}
-                })
-        else:
-            # Fallback to annotations for non-dataclass classes
-            for annotation_name, annotation_type in cls.__annotations__.items():
-                # Get the base type name for the dependency
-                if hasattr(annotation_type, '__name__'):
-                    template_name = annotation_type.__name__.lower()
-                else:
-                    template_name = str(annotation_type).lower()
-                
-                dependencies.append({
-                    'template': template_name,
-                    'args': {'name': annotation_name}
                 })
         
         return dependencies
@@ -158,7 +182,7 @@ class Resource:
     def generate_yaml_template(cls, template_name = None):
         """Generate complete YAML template"""
         if template_name == None:
-            template_name = cls.__name__.lower()
+            template_name = cls.__name__
             
         template = {
             template_name: {
@@ -182,7 +206,7 @@ class Resource:
     def to_yaml_str(cls, template_name=None):
         """Convert to YAML string"""
         if template_name == None:
-            template_name = cls.__name__.lower()
+            template_name = cls.__name__
         template = cls.generate_yaml_template(template_name)
         # return yaml.dump(template, default_flow_style=False, sort_keys=False)
         template[template_name]['body'] = FoldedString(template[template_name]['body'])
@@ -213,7 +237,7 @@ class Resource:
         # Get the target type from field annotation
         target_type = field_obj.type
         
-        # Handle Optional, List, etc. - extract the actual type
+        # TODO: Look back into handling lists/optional, like looking in Optional, List, etc. - extract the actual type
         origin = get_origin(target_type)
         if origin is not None:
             # For Optional[X], List[X], etc., get X
@@ -226,11 +250,9 @@ class Resource:
             target_type = cls
         
         # Try to find a matching relation by walking up both class hierarchies
-        # Check _valid_relations in the source class hierarchy
         for source_class in cls.__mro__:
             if not hasattr(source_class, '_valid_relations'):
                 continue
-            
             # Walk up target class hierarchy
             target_mro = target_type.__mro__ if hasattr(target_type, '__mro__') else [target_type]
             for target_class in target_mro:
@@ -239,14 +261,10 @@ class Resource:
                     # Handle Self reference in _valid_relations
                     if valid_target is Self or str(valid_target) == 'Self':
                         valid_target = source_class
-                    
                     # Check if target class matches
                     if valid_target == target_class or (hasattr(valid_target, '__name__') and hasattr(target_class, '__name__') and valid_target.__name__ == target_class.__name__):
                         return relation
-        
-        # No matching relation found - return None to allow field to be skipped
-        # return None
-        return 
+        raise ValueError(f"No relation found for field '{field_name}' with type '{target_type}' on {cls}, set it manually")
                     
     @classmethod
     def get_relations(cls):
@@ -266,25 +284,18 @@ class Resource:
                     if (field_obj.init == False and 
                         field_obj.metadata.get('templatize', True) == False):
                         continue
+                    relation = cls._infer_relation_for_field(field_name, field_obj)
                     
-                    # Infer or get the relation
-                    try:
-                        relation = cls._infer_relation_for_field(field_name, field_obj)
-                    except ValueError:
-                        # If no relation can be inferred and none is provided, skip
-                        continue
-                    
-                    if relation:
-                        # Create a hashable representation of the relation
-                        relation_key = (relation._local_name, field_name)
-                        if relation_key not in seen_relations:
-                            all_relations.append((relation, field_name))
-                            seen_relations.add(relation_key)
+                    relation_key = (relation._local_name, field_name)
+                    if relation_key not in seen_relations:
+                        all_relations.append((relation, field_name))
+                        seen_relations.add(relation_key)
         
         return all_relations
 
     @classmethod
     def _create_qualified_value_shape(cls, g, prop_node, field_obj, field_name, class_iri):
+        # TODO: THIS IMPLEMENTATION IS UNFINISHED
         """
         Create a qualified value shape for a field, following the pattern from _generate_shapes.
         
@@ -350,9 +361,6 @@ class Resource:
         
         # Get class IRI
         class_iri = cls._get_iri()
-        
-        # TODO: Class definitions should come from node
-        # Add basic class declarations
         g.add((class_iri, RDF.type, cls._type))
         for type in cls._other_types:
             g.add((class_iri, RDF.type, type))
@@ -373,13 +381,6 @@ class Resource:
                 parent_iri = base._ns[base._local_name]
                 g.add((class_iri, RDFS.subClassOf, parent_iri))
                 break  # Only add the immediate parent
-        
-        # If no meaningful parent found, add subClassOf Concept for s223 classes
-        if hasattr(cls, '_ns') and 's223' in str(cls._ns):
-            # Check if we already added a subclass relationship
-            has_subclass = any(g.triples((class_iri, RDFS.subClassOf, None)))
-            if not has_subclass:
-                g.add((class_iri, RDFS.subClassOf, cls._ns.Concept))
         
         # Track property shapes and counts (following _generate_shapes pattern)
         shape_path_name_dct = {}  # Maps relation IRI to property shape node
@@ -405,8 +406,6 @@ class Resource:
                     for name, field_obj in cls.__dataclass_fields__.items()
                     if name not in parent_fields
                 ]
-            
-            print('FIELDS TO PROCESS:', [f[0] for f in fields_to_process])
             
             # First pass: count properties and create property shapes
             for field_name, field_obj in fields_to_process:
@@ -581,13 +580,55 @@ class Resource:
         return g.serialize(format='turtle')
     
 class Predicate(Resource):
-    # currently just used for typecheck later 
-    pass
+    # currently just used for typecheck later
+    _subproperty_of = None  # Can be set to another Predicate class
+    _domain = None  # Can be set to a Node class
+    _range = None  # Can be set to a Node class
+    
+    @classmethod
+    def generate_rdf_property_definition(cls):
+        """Generate RDF property definition with subproperty and domain/range constraints"""
+        g = Graph()
+        bind_prefixes(g)
+        
+        # Get property IRI
+        prop_iri = cls._get_iri()
+        
+        # Add basic property declaration
+        g.add((prop_iri, RDF.type, RDF.Property))
+        
+        # Add label if available
+        if hasattr(cls, 'label'):
+            g.add((prop_iri, RDFS.label, Literal(cls.label)))
+        
+        # Add comment if available
+        if hasattr(cls, 'comment'):
+            g.add((prop_iri, RDFS.comment, Literal(cls.comment)))
+        
+        # Add subPropertyOf if specified
+        if cls._subproperty_of is not None:
+            parent_iri = cls._subproperty_of._get_iri()
+            g.add((prop_iri, RDFS.subPropertyOf, parent_iri))
+        
+        # Add domain constraint if specified
+        if cls._domain is not None:
+            domain_iri = cls._domain._get_iri()
+            g.add((prop_iri, RDFS.domain, domain_iri))
+        
+        # Add range constraint if specified
+        if cls._range is not None:
+            range_iri = cls._range._get_iri()
+            g.add((prop_iri, RDFS.range, range_iri))
+        
+        return g.serialize(format='turtle')
 
 class Node(Resource):
     # A Node with a URI Ref
     pass
 
+class Entity(Resource):
+    # A Node with a URI Ref
+    pass
 class Value(Resource):
     # A Literal
     pass

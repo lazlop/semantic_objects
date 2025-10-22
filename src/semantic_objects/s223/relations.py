@@ -32,3 +32,15 @@ class hasConnectionPoint(Predicate):
 
 class hasMedium(Predicate):
     _local_name = 'hasMedium'
+
+class connectedTo(Predicate):
+    _local_name = 'connectedTo'
+    label = "connected to"
+    comment = "Indicates that two entities are connected in some way."
+
+class hasWindow(Predicate):
+    _local_name = 'hasWindow'
+    label = "has window"
+    comment = "Indicates that a DomainSpace has a Window. This is a subproperty of connectedTo."
+    _subproperty_of = connectedTo
+    # Domain and range will be set dynamically to avoid circular imports
