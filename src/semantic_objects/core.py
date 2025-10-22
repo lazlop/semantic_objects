@@ -5,7 +5,14 @@ import yaml
 import sys
 from rdflib import Graph, Literal, BNode
 
-def get_related_classes(dclass, get_recursive = True):
+# TODO: Clean up implementation
+def get_related_classes(dclass: Union[Type, List[Type]], get_recursive = True):
+    if isinstance(dclass, list):
+        return _get_related_classes_lst(dclass, get_recursive)
+    else:
+        return _get_related_classes_type(dclass, get_recursive)
+    
+def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstract = False):
     relations = [relation for relation, field_name in dclass.get_relations()]
     entities_and_values = [field.type for entity, field in dclass.__dataclass_fields__.items()]
     all_classes = [dclass] + relations + entities_and_values
@@ -18,34 +25,49 @@ def get_related_classes(dclass, get_recursive = True):
             for klass in new_classes:
                 relations = [relation for relation, field_name in klass.get_relations()]
                 entities_and_values = [field.type for entity, field in klass.__dataclass_fields__.items()]
-                if klass not in all_classes:
-                    next_new_classes.append(klass)
-            if next_new_classes == []:
-                break
-            all_classes.extend(next_new_classes)
-            new_classes = next_new_classes.copy()
-            next_new_classes = []
-            if i == 99:
-                raise RecursionError("Max depth reached")
+                next_classes = relations + entities_and_values
+                new_next_classes = set(next_classes) - set(all_classes)
+                if new_classes == []:
+                    break
+                all_classes.extend(list(new_next_classes))
+                new_classes = new_next_classes.copy()
+                if i == 99:
+                    raise RecursionError("Max depth reached")
+            
+    predicate_lst, entity_lst, value_lst = [], [], []
+    for lst, parent in [(predicate_lst, Predicate), (entity_lst, Entity), (value_lst, Value)]:
+        for klass in all_classes:
+            if not include_abstract and klass.abstract:
+                continue
+            if issubclass(klass, parent):
+                lst.append(klass)
 
-    return all_classes
-    
+    return predicate_lst, entity_lst, value_lst   
 
-# TODO: probably want to create a value parent class if I want to keep using that concept
-def get_all_classes(module_lst):
+def _get_related_classes_lst(dclass_lst: List[Type], get_recursive = True):
+    predicate_lst, entity_lst, value_lst = [], [], []
+    for dclass in dclass_lst:
+        class_lsts = _get_related_classes_type(dclass, get_recursive)
+        for lst, new_klasses in zip([predicate_lst, entity_lst, value_lst], class_lsts): 
+            for klass in new_klasses: 
+                if klass not in lst:
+                    lst.append(klass)
+    return predicate_lst, entity_lst, value_lst        
+
+def get_module_classes(module_lst):
     predicate_lst, entity_lst, value_lst = [], [], []
     for module in module_lst:
         for k, v in module.__dict__.items():
             if not isinstance(v, type):
                 continue
-            for lst, parent in [(predicate_lst, Predicate), (entity_lst, Entity), (value_lst, Value)]:
-                if issubclass(v, parent):
-                    temps = get_related_classes(v)
-                    for t in temps:
-                        if t not in lst:
-                            lst.append(t)
-           
+            if issubclass(v, Resource):
+                class_lsts = get_related_classes(v)
+                for lst, new_klasses in zip([predicate_lst, entity_lst, value_lst], class_lsts): 
+                    for klass in new_klasses: 
+                        if klass not in lst:
+                            lst.append(klass)
     return predicate_lst, entity_lst, value_lst
+
 # a relation that is optional, and will be templatized (optional in bmotif template, used to query semantic data into objects)
 def optional_field(relation= None, label=None, comment=None):
     return field(
@@ -73,7 +95,6 @@ def required_field(relation = None, min = 1, max = None, qualified = True, label
         }
     )
 def semantic_object(cls):
-    """Automatically converts any redefined parent fields into fixed fields"""
     # Get parent class fields and their types
     parent_fields = {}
     for base in cls.__mro__[1:]:
@@ -92,6 +113,17 @@ def semantic_object(cls):
             cls.__annotations__[field_name] = parent_field.type
             # Set as fixed field
             setattr(cls, field_name, field(default=fixed_value, init=False))
+    
+    # Determine if class should be marked as abstract
+    # Check if _type is defined in this class or any parent
+    has_type = False
+    for base in cls.__mro__:
+        if '_type' in getattr(base, '__dict__', {}):
+            has_type = True
+            break
+    
+    # Add abstract class variable
+    cls.abstract = not has_type
     
     return dataclass(cls)
 
@@ -112,7 +144,9 @@ class Resource:
     @classmethod
     def _get_iri(cls):
         if not hasattr(cls, '_type'):
-            raise Exception('Class must have _type attribute')
+            if cls.abstract:
+                raise Exception(f'Class {cls} is abstract, has no iri')
+            raise Exception(f'Class {cls} must have _type attribute')
         return cls._ns[cls._type]
     
     @classmethod

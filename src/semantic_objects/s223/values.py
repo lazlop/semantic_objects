@@ -53,13 +53,10 @@ class QuantifiableObervableProperty(Property):
             self.unit = DEFAULT_UNIT_MAP[self.qk][DEFAULT_UNIT_SYSTEM]
 @semantic_object
 class Area(QuantifiableObervableProperty):
-    _type = 'Area'
     qk = quantitykinds.Area
 @semantic_object
 class Azimuth(QuantifiableObervableProperty):
-    _type = 'Azimuth'
     qk = quantitykinds.Azimuth
 @semantic_object
 class Tilt(QuantifiableObervableProperty):
-    _type = 'Tilt'
     qk = quantitykinds.Tilt

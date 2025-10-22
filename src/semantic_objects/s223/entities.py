@@ -8,7 +8,8 @@ from dataclasses import dataclass, field
 
 # TODO: Consider how I'm using localname vs class name. Not consistent 
 # If aligning with semanticMPC, class name will be used for template and classes, local_name would be the class type
-# 
+
+# TODO: Consider making such classes abstract
 @semantic_object
 class Entity(Node, core.Entity):
     _valid_relations = [
