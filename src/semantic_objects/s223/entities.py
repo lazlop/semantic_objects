@@ -1,7 +1,7 @@
 from ..core import * 
 from .core import Node
 from .. import units
-from .values import Area, Azimuth, Tilt, QuantifiableObervableProperty
+from .properties import Area, Azimuth, Tilt, QuantifiableObervableProperty
 from .relations import * 
 from typing import Optional, Self
 from dataclasses import dataclass, field

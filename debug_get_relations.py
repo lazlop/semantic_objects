@@ -2,7 +2,7 @@
 """Debug script to trace get_relations execution"""
 
 from src.semantic_objects.s223.entities import Space
-from src.semantic_objects.s223.values import Area
+from semantic_objects.s223.properties import Area
 
 print("=" * 60)
 print("DEBUG: Tracing get_relations() for Space")

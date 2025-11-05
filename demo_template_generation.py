@@ -8,7 +8,7 @@ templates/ directory.
 """
 
 from src.semantic_objects.s223.entities import Space, Space_OptArea, Window
-from src.semantic_objects.s223.values import Area, Azimuth, Tilt
+from semantic_objects.s223.properties import Area, Azimuth, Tilt
 
 def main():
     print("=" * 60)

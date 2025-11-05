@@ -38,8 +38,8 @@ DEFAULT_UNIT_MAP = {
 class Property(Node, Value):
     _type = 'Property'
     _valid_relations = [(hasQuantityKind, quantitykinds.QuantityKind),
+                        (hasValue, Property),
                         (hasValue, Value),
-                        (hasValue, Num),
                         (hasUnit, Unit)]
 
 # TODO: need to come up with a better solution for value and unit 

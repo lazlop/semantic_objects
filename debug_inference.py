@@ -2,7 +2,7 @@
 """Debug script to trace relation inference"""
 
 from src.semantic_objects.s223.entities import Space
-from src.semantic_objects.s223.values import Area
+from semantic_objects.s223.properties import Area
 import sys
 
 print("=" * 60)

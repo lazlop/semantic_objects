@@ -737,7 +737,7 @@ class Entity(Resource):
 
 # TODO: Probably want to change Value to property and have Value be something that is a number or an external reference
 # for now, want value to be num I think
-class Value(Resource):
+class Property(Resource):
     # A Literal
     pass
 
@@ -746,6 +746,6 @@ class NamedNode(Resource):
     # A Named Node 
     pass
 
-class Num(NamedNode):
+class Value(NamedNode):
     # A Literal
     pass

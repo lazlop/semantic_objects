@@ -40,6 +40,7 @@ class connectedTo(Predicate):
     _type = 'connectedTo'
     label = "connected to"
     comment = "Indicates that two entities are connected in some way."
+
 @semantic_object
 class hasWindow(Predicate):
     _type = 'hasWindow'
