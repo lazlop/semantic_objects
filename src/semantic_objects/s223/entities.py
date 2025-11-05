@@ -12,9 +12,7 @@ from dataclasses import dataclass, field
 # TODO: Consider making such classes abstract
 @semantic_object
 class Entity(Node, Entity):
-    _valid_relations = [
-        (hasProperty, QuantifiableObervableProperty),
-    ]
+    pass
 
 @semantic_object
 class DomainSpace(Entity):
@@ -26,10 +24,6 @@ class PhysicalSpace(Entity):
     _type = 'PhysicalSpace'
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
-    _valid_relations = [
-        (contains, Self),
-        (encloses, DomainSpace)
-    ]
 
 @semantic_object
 class Space(PhysicalSpace):
@@ -47,7 +41,3 @@ class Window(Entity):
     area: Area = required_field()
     azimuth: Azimuth = required_field()
     tilt: Tilt = required_field()
-
-DomainSpace._valid_relations = [
-    (hasWindow, Window),
-]

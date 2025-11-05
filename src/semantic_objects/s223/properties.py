@@ -47,7 +47,7 @@ class Property(Node, Value):
 class QuantifiableObervableProperty(Property):
     _type = 'QuantifiableObservableProperty'
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
-    value: Num = required_field()
+    value: Value = required_field()
     unit: Unit = required_field()
     def __init__(self, value, unit: Optional[Unit] = None):
         self.value = value
