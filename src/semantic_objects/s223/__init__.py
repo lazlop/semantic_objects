@@ -3,7 +3,7 @@ from .core import *
 from .entities import * 
 from .properties import * 
 from .relations import *
-from . import constraints  # Import constraints to apply relation constraints
+from . import constraints  
 
 def get_module_classes():
     from .. import core 

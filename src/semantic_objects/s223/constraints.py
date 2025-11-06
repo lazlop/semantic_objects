@@ -32,21 +32,11 @@ def apply_relation_constraints():
     # Apply constraints to each class
     for source_class, relations in constraints_by_class.items():
         source_class._valid_relations = relations
-
+    
+    # Apply constraints to relations
+    for source_class, relation, target_class in RELATION_CONSTRAINTS:
+        relation._applies_to = [(source_class, target_class)]
 
 # Apply the constraints
+# TODO: Will add inferences to this file. 
 apply_relation_constraints()
-
-
-# Keep the existing _relates definitions for backward compatibility
-encloses._relates = [
-    (PhysicalSpace, DomainSpace),
-]
-
-contains._relates = [
-    (PhysicalSpace, PhysicalSpace),
-]
-
-hasWindow._relates = [
-    (DomainSpace, Window),
-]
