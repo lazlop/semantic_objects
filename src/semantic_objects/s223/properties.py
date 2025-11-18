@@ -35,9 +35,9 @@ DEFAULT_UNIT_MAP = {
     },
 }
 @semantic_object
-class Property(Node, Value):
+class Property(Node):
     _type = 'Property'
-    _valid_relations = [(hasQuantityKind, quantitykinds.QuantityKind),
+    _valid_relations = [(hasAspect, EnumerationKind),
                         (hasValue, Property),
                         (hasValue, Value),
                         (hasUnit, Unit)]
