@@ -134,14 +134,15 @@ def semantic_object(cls):
     # Determine if class should be marked as abstract
     # Check if _name is defined in this class or any parent
     # _name may be cofusing since there is also python __name__ 
-    has_type = False
-    for base in cls.__mro__:
-        if '_name' in getattr(base, '__dict__', {}):
-            has_type = True
-            break
     
-    # Add abstract class variable
-    cls.abstract = not has_type
+    for base in cls.__mro__:
+        if '_name' not in getattr(base, '__dict__', {}):
+            cls._name = cls.__name__
+            break
+
+        # default is not abstract
+        if 'abstract' not in getattr(base, '__dict__', {}):
+            base.abstract = False
     
     return dataclass(cls)
 
