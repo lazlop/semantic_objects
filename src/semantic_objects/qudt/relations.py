@@ -4,4 +4,4 @@ from semantic_mpc_interface import QUDT
 @semantic_object
 class hasQuantityKind(corePredicate):
     _ns = QUDT
-    _type = 'hasQuantityKind'
+    _name = 'hasQuantityKind'

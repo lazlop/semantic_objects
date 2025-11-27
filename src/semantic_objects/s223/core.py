@@ -7,8 +7,13 @@ from . import relations
 
 class Node(core.Node):
     _ns = S223
-    _type = 'Class'
+    _name = 'Class'
     _other_types = [SH.NodeShape, RDFS.Class]
 
 class EnumerationKind(Node):
-    _type = 'EnumerationKind'
+    _name = 'EnumerationKind'
+
+# TODO: Consider making such classes abstract
+@core.semantic_object
+class Entity(Node):
+    pass

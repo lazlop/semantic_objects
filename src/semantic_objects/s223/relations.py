@@ -10,224 +10,224 @@ class Predicate(corePredicate):
     _ns = S223
 @semantic_object
 class actuatedByProperty(Predicate):
-    _type = 'actuatedByProperty'
+    _name = 'actuatedByProperty'
 
 @semantic_object
 class actuates(Predicate):
-    _type = 'actuates'
+    _name = 'actuates'
 
 @semantic_object
 class cnx(Predicate):
-    _type = 'cnx'
+    _name = 'cnx'
 
 @semantic_object
 class composedOf(Predicate):
-    _type = 'composedOf'
+    _name = 'composedOf'
 
 @semantic_object
 class connected(Predicate):
-    _type = 'connected'
+    _name = 'connected'
 
 @semantic_object
 class connectedFrom(Predicate):
-    _type = 'connectedFrom'
+    _name = 'connectedFrom'
 
 @semantic_object
 class connectedThrough(Predicate):
-    _type = 'connectedThrough'
+    _name = 'connectedThrough'
 
 @semantic_object
 class connectedTo(Predicate):
-    _type = 'connectedTo'
+    _name = 'connectedTo'
 
 @semantic_object
 class connectsAt(Predicate):
-    _type = 'connectsAt'
+    _name = 'connectsAt'
 
 @semantic_object
 class connectsFrom(Predicate):
-    _type = 'connectsFrom'
+    _name = 'connectsFrom'
 
 @semantic_object
 class connectsThrough(Predicate):
-    _type = 'connectsThrough'
+    _name = 'connectsThrough'
 
 @semantic_object
 class connectsTo(Predicate):
-    _type = 'connectsTo'
+    _name = 'connectsTo'
 
 @semantic_object
 class contains(Predicate):
-    _type = 'contains'
+    _name = 'contains'
 
 @semantic_object
 class encloses(Predicate):
-    _type = 'encloses'
+    _name = 'encloses'
 
 @semantic_object
 class executes(Predicate):
-    _type = 'executes'
+    _name = 'executes'
 
 @semantic_object
 class hasAspect(Predicate):
-    _type = 'hasAspect'
+    _name = 'hasAspect'
 
 @semantic_object
 class hasBoundaryConnectionPoint(Predicate):
-    _type = 'hasBoundaryConnectionPoint'
+    _name = 'hasBoundaryConnectionPoint'
 
 @semantic_object
 class hasConnectionPoint(Predicate):
-    _type = 'hasConnectionPoint'
+    _name = 'hasConnectionPoint'
 
 @semantic_object
 class hasDeadband(Predicate):
-    _type = 'hasDeadband'
+    _name = 'hasDeadband'
 
 @semantic_object
 class hasDomain(Predicate):
-    _type = 'hasDomain'
+    _name = 'hasDomain'
 
 @semantic_object
 class hasDomainSpace(Predicate):
-    _type = 'hasDomainSpace'
+    _name = 'hasDomainSpace'
 
 @semantic_object
 class hasElectricalPhase(Predicate):
-    _type = 'hasElectricalPhase'
+    _name = 'hasElectricalPhase'
 
 @semantic_object
 class hasEnumerationKind(Predicate):
-    _type = 'hasEnumerationKind'
+    _name = 'hasEnumerationKind'
 
 @semantic_object
 class hasExternalReference(Predicate):
-    _type = 'hasExternalReference'
+    _name = 'hasExternalReference'
 
 @semantic_object
 class hasFreezingPoint(Predicate):
-    _type = 'hasFreezingPoint'
+    _name = 'hasFreezingPoint'
 
 @semantic_object
 class hasFrequency(Predicate):
-    _type = 'hasFrequency'
+    _name = 'hasFrequency'
 
 @semantic_object
 class hasInput(Predicate):
-    _type = 'hasInput'
+    _name = 'hasInput'
 
 @semantic_object
 class hasInternalReference(Predicate):
-    _type = 'hasInternalReference'
+    _name = 'hasInternalReference'
 
 @semantic_object
 class hasMeasurementResolution(Predicate):
-    _type = 'hasMeasurementResolution'
+    _name = 'hasMeasurementResolution'
 
 @semantic_object
 class hasMedium(Predicate):
-    _type = 'hasMedium'
+    _name = 'hasMedium'
 
 @semantic_object
 class hasMember(Predicate):
-    _type = 'hasMember'
+    _name = 'hasMember'
 
 @semantic_object
 class hasNumberOfElectricalPhases(Predicate):
-    _type = 'hasNumberOfElectricalPhases'
+    _name = 'hasNumberOfElectricalPhases'
 
 @semantic_object
 class hasObservationLocation(Predicate):
-    _type = 'hasObservationLocation'
+    _name = 'hasObservationLocation'
 
 @semantic_object
 class hasOptionalConnectionPoint(Predicate):
-    _type = 'hasOptionalConnectionPoint'
+    _name = 'hasOptionalConnectionPoint'
 
 @semantic_object
 class hasOutput(Predicate):
-    _type = 'hasOutput'
+    _name = 'hasOutput'
 
 @semantic_object
 class hasPhysicalLocation(Predicate):
-    _type = 'hasPhysicalLocation'
+    _name = 'hasPhysicalLocation'
 
 @semantic_object
 class hasProperty(Predicate):
-    _type = 'hasProperty'
+    _name = 'hasProperty'
 
 @semantic_object
 class hasReferenceLocation(Predicate):
-    _type = 'hasReferenceLocation'
+    _name = 'hasReferenceLocation'
 
 @semantic_object
 class hasRole(Predicate):
-    _type = 'hasRole'
+    _name = 'hasRole'
 
 @semantic_object
 class hasSetpoint(Predicate):
-    _type = 'hasSetpoint'
+    _name = 'hasSetpoint'
 
 @semantic_object
 class hasThermodynamicPhase(Predicate):
-    _type = 'hasThermodynamicPhase'
+    _name = 'hasThermodynamicPhase'
 
 @semantic_object
 class hasThreshold(Predicate):
-    _type = 'hasThreshold'
+    _name = 'hasThreshold'
 
 @semantic_object
 class hasAlarmStatus(Predicate):
-    _type = 'hasAlarmStatus'
+    _name = 'hasAlarmStatus'
 
 @semantic_object
 class hasValue(Predicate):
-    _type = 'hasValue'
+    _name = 'hasValue'
 
 @semantic_object
 class hasVoltage(Predicate):
-    _type = 'hasVoltage'
+    _name = 'hasVoltage'
 
 @semantic_object
 class hasZone(Predicate):
-    _type = 'hasZone'
+    _name = 'hasZone'
 
 @semantic_object
 class inverseOf(Predicate):
-    _type = 'inverseOf'
+    _name = 'inverseOf'
 
 @semantic_object
 class isConnectionPointOf(Predicate):
-    _type = 'isConnectionPointOf'
+    _name = 'isConnectionPointOf'
 
 @semantic_object
 class mapsTo(Predicate):
-    _type = 'mapsTo'
+    _name = 'mapsTo'
 
 @semantic_object
 class observes(Predicate):
-    _type = 'observes'
+    _name = 'observes'
 
 @semantic_object
 class ofConstituent(Predicate):
-    _type = 'ofConstituent'
+    _name = 'ofConstituent'
 
 @semantic_object
 class ofMedium(Predicate):
-    _type = 'ofMedium'
+    _name = 'ofMedium'
 
 @semantic_object
 class ofSubstance(Predicate):
-    _type = 'ofSubstance'
+    _name = 'ofSubstance'
 
 @semantic_object
 class pairedConnectionPoint(Predicate):
-    _type = 'pairedConnectionPoint'
+    _name = 'pairedConnectionPoint'
 
 @semantic_object
 class hasQuantityKind(Predicate):
-    _type = 'hasQuantityKind'
+    _name = 'hasQuantityKind'
 
 @semantic_object
 class hasUnit(Predicate):
-    _type = 'hasUnit'
+    _name = 'hasUnit'

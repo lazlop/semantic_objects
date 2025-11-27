@@ -132,10 +132,11 @@ def semantic_object(cls):
             setattr(cls, field_name, field(default=fixed_value, init=False))
     
     # Determine if class should be marked as abstract
-    # Check if _type is defined in this class or any parent
+    # Check if _name is defined in this class or any parent
+    # _name may be cofusing since there is also python __name__ 
     has_type = False
     for base in cls.__mro__:
-        if '_type' in getattr(base, '__dict__', {}):
+        if '_name' in getattr(base, '__dict__', {}):
             has_type = True
             break
     
@@ -160,11 +161,11 @@ class Resource:
 
     @classmethod
     def _get_iri(cls):
-        if not hasattr(cls, '_type'):
+        if not hasattr(cls, '_name'):
             if cls.abstract:
                 raise Exception(f'Class {cls} is abstract, has no iri')
-            raise Exception(f'Class {cls} must have _type attribute')
-        return cls._ns[cls._type]
+            raise Exception(f'Class {cls} must have _name attribute')
+        return cls._ns[cls._name]
     
     @classmethod
     # TODO: have to edit this to get other attributes
@@ -368,7 +369,7 @@ class Resource:
                         continue
                     relation = cls._infer_relation_for_field(field_name, field_obj)
                     
-                    relation_key = (relation._type, field_name)
+                    relation_key = (relation._name, field_name)
                     if relation_key not in seen_relations:
                         all_relations.append((relation, field_name))
                         seen_relations.add(relation_key)
@@ -458,10 +459,10 @@ class Resource:
         
         # Add subclass relationship - look for meaningful parent classes
         for base in cls.__mro__[1:]:  # Skip self
-            if (hasattr(base, '_type') and hasattr(base, '_ns') and 
-                base != Resource and base._type != cls._type and
+            if (hasattr(base, '_name') and hasattr(base, '_ns') and 
+                base != Resource and base._name != cls._name and
                 base.__name__ not in ['Node', 'Value', 'Predicate', 'NamedNode']):
-                parent_iri = base._ns[base._type]
+                parent_iri = base._ns[base._name]
                 g.add((class_iri, RDFS.subClassOf, parent_iri))
                 break  # Only add the immediate parent
         
@@ -511,7 +512,7 @@ class Resource:
                     continue
                 
                 # Create unique key for this relation to avoid duplicates
-                relation_key = relation._type
+                relation_key = relation._name
                 if relation_key in processed_relations:
                     continue
                 processed_relations.add(relation_key)
@@ -540,7 +541,7 @@ class Resource:
                         target_class_name = str(field_obj.type)
                 
                 if not field_comment and target_class_name:
-                    field_comment = f"If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    field_comment = f"If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                 
                 if field_comment:
                     g.add((prop_node, RDFS.comment, Literal(field_comment)))
@@ -551,16 +552,16 @@ class Resource:
                     g.add((prop_node, SH['class'], target_class))
                     
                     # Generate SHACL message
-                    relation_name = relation._type
-                    message = f"s223: If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    relation_name = relation._name
+                    message = f"s223: If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                     g.add((prop_node, SH.message, Literal(message)))
                 elif field_obj.type == cls or 'Self' in str(field_obj.type):
                     # Handle Self reference
                     g.add((prop_node, SH['class'], class_iri))
                     
                     # Generate SHACL message for Self reference
-                    relation_name = relation._type
-                    message = f"s223: If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
+                    relation_name = relation._name
+                    message = f"s223: If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
                     g.add((prop_node, SH.message, Literal(message)))
             
             # Second pass: create qualified value shapes for each field
@@ -624,7 +625,7 @@ class Resource:
             # Process each relation in _valid_relations
             for relation, target_class in base_class._valid_relations:
                 # Create unique key for this relation to avoid duplicates
-                relation_key = relation._type
+                relation_key = relation._name
                 if relation_key in processed_relations:
                     continue
                 processed_relations.add(relation_key)
@@ -649,7 +650,7 @@ class Resource:
                     target_class_name = str(target_class)
                 
                 # Generate comment
-                field_comment = f"If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                field_comment = f"If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                 g.add((prop_node, RDFS.comment, Literal(field_comment)))
                 
                 # Add sh:class constraint if target class has _get_iri
@@ -658,7 +659,7 @@ class Resource:
                     g.add((prop_node, SH['class'], target_class_iri))
                     
                     # Generate SHACL message
-                    message = f"s223: If the relation `{relation._type}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                    message = f"s223: If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
                     g.add((prop_node, SH.message, Literal(message)))
         
         return g.serialize(format='turtle')
@@ -727,24 +728,26 @@ class Predicate(Resource):
         
         return g.serialize(format='turtle')
 
+
+# NOTE: Not sure I need any of these things at this level
 class Node(Resource):
     # A Node with a URI Ref
     pass
 
-class Entity(Resource):
+class Entity(Node):
     # A Node with a URI Ref
     pass
 
 # TODO: Probably want to change Value to property and have Value be something that is a number or an external reference
 # for now, want value to be num I think
-class Property(Resource):
+class Property(Node):
     pass
 
 # Probably don't need a NamedNode class, since can just directly use rdflib URIRefs
-class NamedNode(Resource):
+class NamedNode(Node):
     # A Named Node 
     pass
 
-class Value(NamedNode):
+class Literal(Node):
     # A Literal
     pass
