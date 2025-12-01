@@ -1,4 +1,4 @@
-from ..core import NamedNode, semantic_object
+from ..core import semantic_object
 from .quantitykinds import * 
 from .units import *
 

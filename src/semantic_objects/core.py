@@ -728,27 +728,9 @@ class Predicate(Resource):
             g.add((prop_iri, RDFS.range, range_iri))
         
         return g.serialize(format='turtle')
-
-
-# NOTE: Not sure I need any of these things at this level
+    
 class Node(Resource):
-    # A Node with a URI Ref
     pass
 
-class Entity(Node):
-    # A Node with a URI Ref
-    pass
-
-# TODO: Probably want to change Value to property and have Value be something that is a number or an external reference
-# for now, want value to be num I think
-class Property(Node):
-    pass
-
-# Probably don't need a NamedNode class, since can just directly use rdflib URIRefs
 class NamedNode(Node):
-    # A Named Node 
-    pass
-
-class Literal(Node):
-    # A Literal
     pass

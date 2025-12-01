@@ -10,224 +10,224 @@ class Predicate(corePredicate):
     _ns = S223
 @semantic_object
 class actuatedByProperty(Predicate):
-    _name = 'actuatedByProperty'
+    pass
 
 @semantic_object
 class actuates(Predicate):
-    _name = 'actuates'
+    pass
 
 @semantic_object
 class cnx(Predicate):
-    _name = 'cnx'
+    pass
 
 @semantic_object
 class composedOf(Predicate):
-    _name = 'composedOf'
+    pass
 
 @semantic_object
 class connected(Predicate):
-    _name = 'connected'
+    pass
 
 @semantic_object
 class connectedFrom(Predicate):
-    _name = 'connectedFrom'
+    pass
 
 @semantic_object
 class connectedThrough(Predicate):
-    _name = 'connectedThrough'
+    pass
 
 @semantic_object
 class connectedTo(Predicate):
-    _name = 'connectedTo'
+    pass
 
 @semantic_object
 class connectsAt(Predicate):
-    _name = 'connectsAt'
+    pass
 
 @semantic_object
 class connectsFrom(Predicate):
-    _name = 'connectsFrom'
+    pass
 
 @semantic_object
 class connectsThrough(Predicate):
-    _name = 'connectsThrough'
+    pass
 
 @semantic_object
 class connectsTo(Predicate):
-    _name = 'connectsTo'
+    pass
 
 @semantic_object
 class contains(Predicate):
-    _name = 'contains'
+    pass
 
 @semantic_object
 class encloses(Predicate):
-    _name = 'encloses'
+    pass
 
 @semantic_object
 class executes(Predicate):
-    _name = 'executes'
+    pass
 
 @semantic_object
 class hasAspect(Predicate):
-    _name = 'hasAspect'
+    pass
 
 @semantic_object
 class hasBoundaryConnectionPoint(Predicate):
-    _name = 'hasBoundaryConnectionPoint'
+    pass
 
 @semantic_object
 class hasConnectionPoint(Predicate):
-    _name = 'hasConnectionPoint'
+    pass
 
 @semantic_object
 class hasDeadband(Predicate):
-    _name = 'hasDeadband'
+    pass
 
 @semantic_object
 class hasDomain(Predicate):
-    _name = 'hasDomain'
+    pass
 
 @semantic_object
 class hasDomainSpace(Predicate):
-    _name = 'hasDomainSpace'
+    pass
 
 @semantic_object
 class hasElectricalPhase(Predicate):
-    _name = 'hasElectricalPhase'
+    pass
 
 @semantic_object
 class hasEnumerationKind(Predicate):
-    _name = 'hasEnumerationKind'
+    pass
 
 @semantic_object
 class hasExternalReference(Predicate):
-    _name = 'hasExternalReference'
+    pass
 
 @semantic_object
 class hasFreezingPoint(Predicate):
-    _name = 'hasFreezingPoint'
+    pass
 
 @semantic_object
 class hasFrequency(Predicate):
-    _name = 'hasFrequency'
+    pass
 
 @semantic_object
 class hasInput(Predicate):
-    _name = 'hasInput'
+    pass
 
 @semantic_object
 class hasInternalReference(Predicate):
-    _name = 'hasInternalReference'
+    pass
 
 @semantic_object
 class hasMeasurementResolution(Predicate):
-    _name = 'hasMeasurementResolution'
+    pass
 
 @semantic_object
 class hasMedium(Predicate):
-    _name = 'hasMedium'
+    pass
 
 @semantic_object
 class hasMember(Predicate):
-    _name = 'hasMember'
+    pass
 
 @semantic_object
 class hasNumberOfElectricalPhases(Predicate):
-    _name = 'hasNumberOfElectricalPhases'
+    pass
 
 @semantic_object
 class hasObservationLocation(Predicate):
-    _name = 'hasObservationLocation'
+    pass
 
 @semantic_object
 class hasOptionalConnectionPoint(Predicate):
-    _name = 'hasOptionalConnectionPoint'
+    pass
 
 @semantic_object
 class hasOutput(Predicate):
-    _name = 'hasOutput'
+    pass
 
 @semantic_object
 class hasPhysicalLocation(Predicate):
-    _name = 'hasPhysicalLocation'
+    pass
 
 @semantic_object
 class hasProperty(Predicate):
-    _name = 'hasProperty'
+    pass
 
 @semantic_object
 class hasReferenceLocation(Predicate):
-    _name = 'hasReferenceLocation'
+    pass
 
 @semantic_object
 class hasRole(Predicate):
-    _name = 'hasRole'
+    pass
 
 @semantic_object
 class hasSetpoint(Predicate):
-    _name = 'hasSetpoint'
+    pass
 
 @semantic_object
 class hasThermodynamicPhase(Predicate):
-    _name = 'hasThermodynamicPhase'
+    pass
 
 @semantic_object
 class hasThreshold(Predicate):
-    _name = 'hasThreshold'
+    pass
 
 @semantic_object
 class hasAlarmStatus(Predicate):
-    _name = 'hasAlarmStatus'
+    pass
 
 @semantic_object
 class hasValue(Predicate):
-    _name = 'hasValue'
+    pass
 
 @semantic_object
 class hasVoltage(Predicate):
-    _name = 'hasVoltage'
+    pass
 
 @semantic_object
 class hasZone(Predicate):
-    _name = 'hasZone'
+    pass
 
 @semantic_object
 class inverseOf(Predicate):
-    _name = 'inverseOf'
+    pass
 
 @semantic_object
 class isConnectionPointOf(Predicate):
-    _name = 'isConnectionPointOf'
+    pass
 
 @semantic_object
 class mapsTo(Predicate):
-    _name = 'mapsTo'
+    pass
 
 @semantic_object
 class observes(Predicate):
-    _name = 'observes'
+    pass
 
 @semantic_object
 class ofConstituent(Predicate):
-    _name = 'ofConstituent'
+    pass
 
 @semantic_object
 class ofMedium(Predicate):
-    _name = 'ofMedium'
+    pass
 
 @semantic_object
 class ofSubstance(Predicate):
-    _name = 'ofSubstance'
+    pass
 
 @semantic_object
 class pairedConnectionPoint(Predicate):
-    _name = 'pairedConnectionPoint'
+    pass
 
 @semantic_object
 class hasQuantityKind(Predicate):
-    _name = 'hasQuantityKind'
+    pass
 
 @semantic_object
 class hasUnit(Predicate):
-    _name = 'hasUnit'
+    pass
