@@ -8,8 +8,6 @@ from rdflib import Graph, Literal, BNode
 
 # TODO: Clean up implementation
 
-# BIG TODO: Decide what Value means, do we want values to be like points/properties, do we want them to be numerical values. 
-
 def export_templates(dclass_lst: List[Type], dir_path_str: str, overwrite = True):
     class_lsts = get_related_classes(dclass_lst)
     dir = Path(dir_path_str)
@@ -52,6 +50,7 @@ def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstra
                     raise RecursionError("Max depth reached")
             
     predicate_lst, entity_lst, value_lst = [], [], []
+    # TODO: consider if we want to keep these distinctions, and have them as predicate, entity, property
     for lst, parent in [(predicate_lst, Predicate), (entity_lst, Entity), (value_lst, Value)]:
         for klass in all_classes:
             if not include_abstract and klass.abstract:
@@ -128,8 +127,23 @@ def semantic_object(cls):
             fixed_value = cls.__dict__[field_name]
             # Copy the type annotation from parent
             cls.__annotations__[field_name] = parent_field.type
-            # Set as fixed field
-            setattr(cls, field_name, field(default=fixed_value, init=False))
+            # Set as required_field with the fixed value as default
+            # Preserve any existing metadata from parent field
+            parent_metadata = parent_field.metadata.copy() if parent_field.metadata else {}
+            # Create a new field with init=False since it has a fixed default
+            new_field = field(
+                default=fixed_value,
+                init=False,
+                metadata={
+                    'relation': parent_metadata.get('relation'),
+                    'min': parent_metadata.get('min', 1),
+                    'max': parent_metadata.get('max'),
+                    'qualified': parent_metadata.get('qualified', True),
+                    'label': parent_metadata.get('label'),
+                    'comment': parent_metadata.get('comment')
+                }
+            )
+            setattr(cls, field_name, new_field)
     
     # Determine if class should be marked as abstract
     # Check if _name is defined in this class or any parent
@@ -169,10 +183,10 @@ class Resource:
         return cls._ns[cls._name]
     
     @classmethod
-    # TODO: have to edit this to get other attributes
+    # TODO: not sure this works in all cases
     def _get_attributes(cls):
         attrs = {k: v for k, v in cls.__dict__.items()
-            if not k.startswith('_') and not callable(v)}
+            if not k.startswith('_')}
         return attrs
 
     @classmethod
@@ -431,6 +445,8 @@ class Resource:
             g.add((prop_node, SH.qualifiedValueShape, qual_val_shape))
             g.add((qual_val_shape, RDF.type, SH.NodeShape))
     
+
+
     # TODO: Address hardcoded type Class
     @classmethod
     def generate_rdf_class_definition(cls, include_hierarchy=False):
@@ -484,13 +500,13 @@ class Resource:
                 parent_fields = set()
                 for base in cls.__mro__[1:]:  # Skip self
                     if hasattr(base, '__dataclass_fields__'):
-                        parent_fields.update(base.__dataclass_fields__.keys())
+                        parent_fields.update(base.__dataclass_fields__.values())
                 
                 # Filter to only fields declared on this class
                 fields_to_process = [
                     (name, field_obj) 
                     for name, field_obj in cls.__dataclass_fields__.items()
-                    if name not in parent_fields
+                    if field_obj not in parent_fields
                 ]
             
             # First pass: count properties and create property shapes
@@ -531,9 +547,14 @@ class Resource:
                 field_comment = field_obj.metadata.get('comment')
                 target_class_name = None
                 
-                # Handle Self type annotation
-                if hasattr(field_obj, 'type'):
+                # handle class or value of annotation 
+                if hasattr(field_obj, 'default'):
+                    type_str = str(field_obj.default)
+                    
+                elif hasattr(field_obj, 'type'):
                     type_str = str(field_obj.type)
+                
+                if type_str:
                     if field_obj.type == cls or type_str == 'Self' or 'Self' in type_str:
                         target_class_name = cls.__name__
                     elif hasattr(field_obj.type, '__name__'):
@@ -548,21 +569,14 @@ class Resource:
                     g.add((prop_node, RDFS.comment, Literal(field_comment)))
                 
                 # Add target class constraint based on field type annotation
-                if hasattr(field_obj, 'type') and hasattr(field_obj.type, '_get_iri'):
+                if hasattr(field_obj, 'default'):
+                    target_class = field_obj.type._get_iri()
+                    g.add((prop_node, SH['value'], target_class))
+                elif hasattr(field_obj, 'type'):
                     target_class = field_obj.type._get_iri()
                     g.add((prop_node, SH['class'], target_class))
                     
-                    # Generate SHACL message
-                    relation_name = relation._name
                     message = f"s223: If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
-                    g.add((prop_node, SH.message, Literal(message)))
-                elif field_obj.type == cls or 'Self' in str(field_obj.type):
-                    # Handle Self reference
-                    g.add((prop_node, SH['class'], class_iri))
-                    
-                    # Generate SHACL message for Self reference
-                    relation_name = relation._name
-                    message = f"s223: If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{cls.__name__}`."
                     g.add((prop_node, SH.message, Literal(message)))
             
             # Second pass: create qualified value shapes for each field

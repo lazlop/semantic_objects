@@ -1,10 +1,11 @@
-from ..core import * 
-from .core import Node
-from .. import units
-from .properties import Area, Azimuth, Tilt, QuantifiableObervableProperty
-from .relations import * 
 from typing import Optional, Self
 from dataclasses import dataclass, field
+
+from ..core import *
+from .. import units
+from .core import Node
+from .properties import Area, Azimuth, Tilt, QuantifiableObervableProperty
+from .relations import *
 
 # TODO: Consider how I'm using localname vs class name. Not consistent 
 
@@ -18,7 +19,7 @@ class PhysicalSpace(Node):
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
 
 @semantic_object
-class Space(PhysicalSpace):
+class Space(DomainSpace):
     area: Area = required_field() 
 
 @semantic_object

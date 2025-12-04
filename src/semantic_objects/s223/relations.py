@@ -1,9 +1,5 @@
 from ..core import semantic_object, Predicate as corePredicate
-from semantic_mpc_interface import S223, QUDT
-
-# NOTE: not totally happy with declaring domains and ranges this way. Probably better to do it in the entities. I think this is ok for now. 
-# Advantage of doing it here: makes entities less of a mixture between object and graph. 
-# Disadvantage: Using Strings to specify domains and ranges, rather than classes. Registry concept probbaly not as good as just declaring the valid relatoins in the entities
+from ..namespaces import S223, QUDT
 
 @semantic_object
 class Predicate(corePredicate):

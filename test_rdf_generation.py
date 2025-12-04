@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 
 # Test the new RDF generation method
-from src.semantic_objects.s223.entities import PhysicalSpace
+from src.semantic_objects.s223 import PhysicalSpace, Area_FT2, Window, Area
 
-def test_rdf_generation():
-    print("Testing RDF class definition generation for PhysicalSpace:")
+def test_rdf_generation(for_class = PhysicalSpace):
+    print(f"Testing RDF class definition generation for {for_class.__name__}")
     print("=" * 60)
-    
-    try:
-        rdf_output = PhysicalSpace.generate_rdf_class_definition()
-        print(rdf_output)
-    except Exception as e:
-        print(f"Error: {e}")
-        import traceback
-        traceback.print_exc()
+    rdf_output = for_class.generate_rdf_class_definition()
+    print(rdf_output)
 
 if __name__ == "__main__":
     test_rdf_generation()
+    test_rdf_generation(Area_FT2)
+    test_rdf_generation(Area)
+    test_rdf_generation(Window)
