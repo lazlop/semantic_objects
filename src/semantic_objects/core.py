@@ -52,7 +52,7 @@ def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstra
             
     predicate_lst, entity_lst, value_lst = [], [], []
     # TODO: consider if we want to keep these distinctions, and have them as predicate, entity, property
-    for lst, parent in [(predicate_lst, Predicate), (entity_lst, Entity), (value_lst, Value)]:
+    for lst, parent in [(predicate_lst, Predicate), (entity_lst, Node), (value_lst, Node)]:
         for klass in all_classes:
             if not include_abstract and klass.abstract:
                 continue
@@ -160,18 +160,13 @@ def semantic_object(cls):
             )
             setattr(cls, field_name, new_field)
     
-    # Determine if class should be marked as abstract
-    # Check if _name is defined in this class or any parent
-    # _name may be cofusing since there is also python __name__ 
+    # Set _name if not already defined in this class's __dict__
+    if '_name' not in cls.__dict__:
+        cls._name = cls.__name__
     
-    for base in cls.__mro__:
-        if '_name' not in getattr(base, '__dict__', {}):
-            cls._name = cls.__name__
-            break
-
-        # default is not abstract
-        if 'abstract' not in getattr(base, '__dict__', {}):
-            base.abstract = False
+    # Set abstract to False if not already defined in this class's __dict__
+    if 'abstract' not in cls.__dict__:
+        cls.abstract = False
     
     return dataclass(cls)
 
