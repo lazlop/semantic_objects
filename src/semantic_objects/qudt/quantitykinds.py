@@ -3,17 +3,25 @@ from ..namespaces import QK
 
 @semantic_object
 class QuantityKind(NamedNode):
-    _type = 'QuantityKind'
+    _name = 'QuantityKind'
     _ns = QK
 
 @semantic_object
 class Area(QuantityKind):
-    _type = 'Area'
+    _name = 'Area'
 
 @semantic_object
 class Azimuth(QuantityKind):
-    _type = 'Azimuth'
+    _name = 'Azimuth'
 
 @semantic_object
 class Tilt(QuantityKind):
-    _type = 'Tilt'
+    _name = 'Tilt'
+
+@semantic_object
+class Power(QuantityKind):
+    _name = 'Power'
+
+@semantic_object
+class Pressure(QuantityKind):
+    _name = 'Pressure'

@@ -1,38 +1,30 @@
-from ..core import * 
-from .core import Node
-from .. import units
-from .values import Area, Azimuth, Tilt, QuantifiableObervableProperty
-from .relations import * 
 from typing import Optional, Self
 from dataclasses import dataclass, field
 
+from ..core import *
+from .. import units
+from .core import Node
+from .properties import Area, Azimuth, Tilt, QuantifiableObervableProperty
+from .relations import *
+
 # TODO: Consider how I'm using localname vs class name. Not consistent 
-# If aligning with semanticMPC, class name will be used for template and classes, local_name would be the class type
-
-# TODO: Consider making such classes abstract
-@semantic_object
-class Entity(Node, Entity):
-    _valid_relations = [
-        (hasProperty, QuantifiableObervableProperty),
-    ]
 
 @semantic_object
-class DomainSpace(Entity):
-    _type = 'DomainSpace'
+class Connectable(Node):
+    label = "Connectable"
+    # TODO: consider if we want something like abstract, which doesn't work exactly like on the s223 ontology
+    abstract = True
+@semantic_object
+class DomainSpace(Connectable):
     label = "Domain Space"
 
 @semantic_object
-class PhysicalSpace(Entity):
-    _type = 'PhysicalSpace'
+class PhysicalSpace(Connectable):
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
-    _valid_relations = [
-        (contains, Self),
-        (encloses, DomainSpace)
-    ]
 
 @semantic_object
-class Space(PhysicalSpace):
+class Space(DomainSpace):
     area: Area = required_field() 
 
 @semantic_object
@@ -41,13 +33,8 @@ class Space_TwoArea(Space):
     area2: Area = required_field()
 
 @semantic_object
-class Window(Entity):
+class Window(Node):
     """Window with multiple properties using field-based relations"""
-    _type = 'Window'
     area: Area = required_field()
     azimuth: Azimuth = required_field()
     tilt: Tilt = required_field()
-
-DomainSpace._valid_relations = [
-    (hasWindow, Window),
-]
