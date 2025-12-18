@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+import os 
+import sys
+sys.path.append('..')
 from src.semantic_objects.s223.entities import Space, SpaceOptArea, Window
 from src.semantic_objects.watr.entities import Tank
 

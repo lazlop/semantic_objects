@@ -1,5 +1,6 @@
 from .entities import *
 from .relations import *
+from .core import * 
 
 # describing valid relations 
 Node._valid_relations = [
@@ -10,3 +11,6 @@ DomainSpace._valid_relations = [
     (encloses, DomainSpace),
 ]
 
+QuantifiableObervableProperty._valid_relations = [
+    (hasAspect, EnumerationKind)
+]

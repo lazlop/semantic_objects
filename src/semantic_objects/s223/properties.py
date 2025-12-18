@@ -7,6 +7,7 @@ from ..units import *
 from ..qudt import quantitykinds, QuantityKind, units, DEFAULT_UNIT_SYSTEM, DEFAULT_UNIT_MAP
 from .core import Node, EnumerationKind, ExternalReference
 from .relations import *
+from .enumerationkinds import Setpoint, Deadband, Occupancy
 from semantic_mpc_interface.namespaces import QK, UNIT
 
 
@@ -50,3 +51,8 @@ class Tilt(QuantifiableObervableProperty):
 @semantic_object
 class Area_FT2(Area):
     unit = units.FT2
+
+# TODO: handle lists for things like aspect
+@semantic_object
+class Area_SP(Area):
+    aspects = [Setpoint, Deadband, Occupancy]

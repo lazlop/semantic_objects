@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Debug script to trace relation inference"""
-
+import os 
+import sys
+sys.path.append('..')
 from src.semantic_objects.s223.entities import Space
 from semantic_objects.s223.properties import Area
 import sys

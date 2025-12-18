@@ -10,11 +10,16 @@ from .relations import *
 # TODO: Consider how I'm using localname vs class name. Not consistent 
 
 @semantic_object
-class DomainSpace(Node):
+class Connectable(Node):
+    label = "Connectable"
+    # TODO: consider if we want something like abstract, which doesn't work exactly like on the s223 ontology
+    abstract = True
+@semantic_object
+class DomainSpace(Connectable):
     label = "Domain Space"
 
 @semantic_object
-class PhysicalSpace(Node):
+class PhysicalSpace(Connectable):
     label = "Physical Space"
     comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
 

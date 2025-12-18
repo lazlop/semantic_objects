@@ -6,7 +6,9 @@ This demonstrates the enhanced semantic_objects functionality that allows
 s223 resources to generate YAML templates similar to the examples in the
 templates/ directory.
 """
-
+import os 
+import sys
+sys.path.append('..')
 from src.semantic_objects.s223.entities import Space, Space_OptArea, Window
 from semantic_objects.s223.properties import Area, Azimuth, Tilt
 

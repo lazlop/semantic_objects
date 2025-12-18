@@ -110,6 +110,20 @@ def required_field(relation = None, min = 1, max = None, qualified = True, label
             'comment': comment
         }
     )
+
+# TODO: consider an alternative way of defining the maximum and minimum 
+def exclusive_field(relation = None, min = 1, max = 1, qualified = True, label=None, comment=None):
+    # If the relation is none, it will use a default relation from the types of each thing.
+    return field(
+        metadata={
+            'relation': relation,
+            'min': min,
+            'max': max,
+            'qualified': qualified,
+            'label': label,
+            'comment': comment
+        }
+    )
 def semantic_object(cls):
     # Get parent class fields and their types
     parent_fields = {}

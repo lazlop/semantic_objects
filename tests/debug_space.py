@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Debug script to understand Space class structure"""
-
+import os 
+import sys
+sys.path.append('..')
 from src.semantic_objects.s223.entities import Space, PhysicalSpace
 import sys
 
