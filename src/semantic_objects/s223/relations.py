@@ -37,7 +37,6 @@ class connectedTo(Predicate):
     pass
 
 @semantic_object
-<<<<<<< HEAD
 class hasWindow(Predicate):
     _type = 'hasWindow'
     label = "has window"
@@ -47,7 +46,6 @@ class hasWindow(Predicate):
 @semantic_object
 class hasExternalReference(Predicate):
     _type = 'hasExternalReference'
-=======
 class connectsAt(Predicate):
     pass
 
@@ -238,4 +236,3 @@ class hasQuantityKind(Predicate):
 @semantic_object
 class hasUnit(Predicate):
     pass
->>>>>>> @{-1}

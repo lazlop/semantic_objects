@@ -1,6 +1,7 @@
 from .entities import *
 from .relations import *
 from .core import * 
+from ..qudt import QuantityKind, Unit
 
 # describing valid relations 
 Node._valid_relations = [
@@ -12,5 +13,10 @@ DomainSpace._valid_relations = [
 ]
 
 QuantifiableObervableProperty._valid_relations = [
-    (hasAspect, EnumerationKind)
+    (hasAspect, EnumerationKind),
+    (hasValue, ExternalReference),
+    (hasValue, Literal),
+    (hasValue, float),
+    (hasUnit, Unit),
+    (hasQuantityKind, QuantityKind),
 ]
