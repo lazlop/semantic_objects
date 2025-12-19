@@ -9,10 +9,19 @@ Tilt:
         s223:hasUnit P:unit ;
         s223:hasValue P:value .
 
-  dependencies:
-  - args:
-      name: value
-    template: float
+  dependencies: []
+Area:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+    P:name a s223:Area ;
+        s223:hasQuantityKind quantitykind:Area ;
+        s223:hasUnit P:unit ;
+        s223:hasValue P:value .
+
+  dependencies: []
 Window:
   body: |+
     @prefix P: <urn:___param___#> .
@@ -33,21 +42,6 @@ Window:
   - args:
       name: tilt
     template: Tilt
-Area:
-  body: |+
-    @prefix P: <urn:___param___#> .
-    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
-    @prefix s223: <http://data.ashrae.org/standard223#> .
-
-    P:name a s223:Area ;
-        s223:hasQuantityKind quantitykind:Area ;
-        s223:hasUnit P:unit ;
-        s223:hasValue P:value .
-
-  dependencies:
-  - args:
-      name: value
-    template: float
 Azimuth:
   body: |+
     @prefix P: <urn:___param___#> .
@@ -59,10 +53,7 @@ Azimuth:
         s223:hasUnit P:unit ;
         s223:hasValue P:value .
 
-  dependencies:
-  - args:
-      name: value
-    template: float
+  dependencies: []
 QuantityKind:
   body: |+
     @prefix P: <urn:___param___#> .

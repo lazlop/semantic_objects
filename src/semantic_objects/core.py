@@ -1,10 +1,12 @@
 from typing import List, Dict, Tuple, Type, Union, get_origin, get_args, Self
 from dataclasses import dataclass, field, fields, _MISSING_TYPE
-from semantic_mpc_interface.namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
+from .namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
+from .query import SparqlQueryBuilder
 import yaml
 import sys
 from pathlib import Path
-from rdflib import Graph, Literal, BNode
+from rdflib import Graph, Literal, BNode, URIRef
+from rdflib.namespace import RDF as RDF_NS
 
 # TODO: Clean up implementation
 
@@ -29,6 +31,8 @@ def get_related_classes(dclass: Union[Type, List[Type]], get_recursive = True):
         return _get_related_classes_type(dclass, get_recursive)
     
 def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstract = False):
+    if issubclass(dclass, Resource) == False:
+        return [], []
     relations = [relation for relation, field_name in dclass.get_relations()]
     entities_and_values = [field.type for entity, field in dclass.__dataclass_fields__.items()]
     all_classes = [dclass] + relations + entities_and_values
@@ -188,6 +192,7 @@ yaml.add_representer(FoldedString, folded_str_representer)
 
 @semantic_object
 class Resource:
+    templatize = True
 
     @classmethod
     def _get_iri(cls):
@@ -249,19 +254,22 @@ class Resource:
         if hasattr(cls, '__dataclass_fields__'):
             for field_name, field_obj in cls.__dataclass_fields__.items():
                 annotation_type = field_obj.type
+
+                if not issubclass(annotation_type, Resource):
+                    continue
+                
+                if annotation_type.templatize == False:
+                    continue
                 # Skip if field has init=False and templatize=False
                 if (field_obj.init == False and 
                     field_obj.metadata.get('templatize', True) == False):
-                    continue
-
-                if issubclass(annotation_type, NamedNode):
                     continue
 
                 if not isinstance(field_obj.default,_MISSING_TYPE):
                     continue
 
                 dependencies.append({
-                    'template': annotation_type.__name__,
+                    'template': annotation_type,
                     'args': {'name': field_name}
                 })
         
@@ -287,10 +295,15 @@ class Resource:
         if template_name == None:
             template_name = cls.__name__
             
+        bmotif_format_dependencies = [
+            {'template': v['template'].__name__,
+            'args': v['args'] }
+            for v in cls.get_dependencies()
+        ]
         template = {
             template_name: {
                 'body': cls.generate_turtle_body(),
-                'dependencies': cls.get_dependencies()
+                'dependencies': bmotif_format_dependencies
             }
         }
         # NOTE: Only adding dependencies if they exist
@@ -694,6 +707,21 @@ class Resource:
         
         return g.serialize(format='turtle')
     
+    @classmethod
+    def get_sparql_query(cls, ontology=None):
+        """
+        Convenience method to generate a SPARQL query from the class definition.
+        Delegates to SparqlQueryBuilder.
+        
+        Args:
+            ontology: Optional ontology identifier (e.g., 's223') for special handling
+            
+        Returns:
+            A SPARQL query string that can be used to query for instances of this class
+        """
+        builder = SparqlQueryBuilder(cls)
+        return builder.get_sparql_query(ontology)
+    
 class Predicate(Resource):
     # TODO: Predicate is partially implemented
     _subproperty_of = None  # Can be set to another Predicate class
@@ -759,7 +787,7 @@ class Predicate(Resource):
         return g.serialize(format='turtle')
     
 class Node(Resource):
-    pass
+    templatize = True
 
 class NamedNode(Node):
-    pass
+    templatize = False
