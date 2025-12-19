@@ -26,11 +26,13 @@ class Property(Node):
 class QuantifiableObervableProperty(Property):
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
     value: float = required_field()
-    unit: Unit = required_field()
+    unit: Optional[Unit] = field(default=None, metadata={'relation': None, 'min': 1, 'max': None, 'qualified': True})
     
-    def __init__(self, value, unit: Optional[Unit] = None):
-        self.value = value
-        if unit is None:
+    def __post_init__(self):
+        """Set default unit if not provided"""
+        super().__post_init__()
+        # If unit wasn't set, set it from DEFAULT_UNIT_MAP
+        if self.unit is None:
             self.unit = DEFAULT_UNIT_MAP[self.qk][DEFAULT_UNIT_SYSTEM]
 
 

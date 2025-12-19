@@ -194,6 +194,52 @@ yaml.add_representer(FoldedString, folded_str_representer)
 class Resource:
     templatize = True
 
+    def __post_init__(self):
+        """
+        Automatically convert field values to their proper types.
+        If a field expects a Resource subclass but receives a raw value,
+        instantiate the Resource with that value.
+        """
+        if not hasattr(self.__class__, '__dataclass_fields__'):
+            return
+            
+        for field_name, field_obj in self.__class__.__dataclass_fields__.items():
+            # Skip fields that weren't initialized
+            if not hasattr(self, field_name):
+                continue
+                
+            current_value = getattr(self, field_name)
+            
+            # Skip if value is None or already the correct type
+            if current_value is None:
+                continue
+                
+            expected_type = field_obj.type
+            
+            # Handle Optional types
+            origin = get_origin(expected_type)
+            if origin is not None:
+                args = get_args(expected_type)
+                if args:
+                    expected_type = args[0]
+            
+            # Skip if already the correct type
+            if isinstance(current_value, expected_type):
+                continue
+            
+            # If expected type is a Resource subclass and current value is not,
+            # try to instantiate it
+            if (isinstance(expected_type, type) and 
+                issubclass(expected_type, Resource) and 
+                not isinstance(current_value, Resource)):
+                try:
+                    # Try to instantiate with the current value
+                    setattr(self, field_name, expected_type(current_value))
+                except Exception:
+                    # If instantiation fails, leave the value as-is
+                    # This allows for more complex initialization patterns
+                    pass
+
     @classmethod
     def _get_iri(cls):
         if not hasattr(cls, '_name'):
@@ -210,6 +256,26 @@ class Resource:
         return attrs
 
     @classmethod
+    def _get_template_parameters(cls):
+        seen_fields = set()
+        parameters = {}
+
+        for base in cls.__mro__:
+            if hasattr(base, '__dataclass_fields__'):
+                for field_name, field_obj in base.__dataclass_fields__.items():
+                    # Skip fields with init=False and templatize=False
+                    if (field_obj.init == False and 
+                        field_obj.metadata.get('templatize', True) == False):
+                        continue
+                    if field_name in seen_fields:
+                        continue
+                    seen_fields.add(field_name)
+                    parameters[field_name] = field_obj
+
+        return parameters
+
+                    
+    @classmethod
     def generate_turtle_body(cls, subject_name="name"):
         """Generate RDF/Turtle body for template"""
         
@@ -224,23 +290,14 @@ class Resource:
         
         # TODO: May also want to get the class variables, or consider making all class variables fields
         # currently things have to be written as fields in order to be templated 
-        seen_fields = set()
-        for base in cls.__mro__:
-            if hasattr(base, '__dataclass_fields__'):
-                for field_name, field_obj in base.__dataclass_fields__.items():
-                    # Skip fields with init=False and templatize=False
-                    if (field_obj.init == False and 
-                        field_obj.metadata.get('templatize', True) == False):
-                        continue
-                    if field_name in seen_fields:
-                        continue
-                    seen_fields.add(field_name)
-                    relation = cls._infer_relation_for_field(field_name, field_obj)
-                    if not isinstance(field_obj.default,_MISSING_TYPE):
-                        g.add((PARAM['name'], relation._get_iri(), field_obj.default._get_iri()))
-                    else:
-                        # Following lead from how we get args, not exactly aligned with Semantic_MPC_Interface
-                        g.add((PARAM['name'], relation._get_iri(), PARAM[field_name]))
+        parameters = cls._get_template_parameters()
+        for field_name, field_obj in parameters.items():
+            relation = cls._infer_relation_for_field(field_name, field_obj)
+            if not isinstance(field_obj.default,_MISSING_TYPE):
+                g.add((PARAM['name'], relation._get_iri(), field_obj.default._get_iri()))
+            else:
+                # Following lead from how we get args, not exactly aligned with Semantic_MPC_Interface
+                g.add((PARAM['name'], relation._get_iri(), PARAM[field_name]))
             
         return g.serialize(format = 'ttl')
 
@@ -257,7 +314,7 @@ class Resource:
 
                 if not issubclass(annotation_type, Resource):
                     continue
-                
+
                 if annotation_type.templatize == False:
                     continue
                 # Skip if field has init=False and templatize=False
@@ -722,6 +779,16 @@ class Resource:
         builder = SparqlQueryBuilder(cls)
         return builder.get_sparql_query(ontology)
     
+    def _get_evaluation_dict(self):
+        parameters = self._get_template_parameters()
+        evaluation_dict = {}
+        for field_name, field_obj in parameters.items():
+            if not isinstance(field_obj.default, _MISSING_TYPE):
+                evaluation_dict[field_name] = field_obj.default
+            else:
+                evaluation_dict[field_name] = None
+        return evaluation_dict
+
 class Predicate(Resource):
     # TODO: Predicate is partially implemented
     _subproperty_of = None  # Can be set to another Predicate class

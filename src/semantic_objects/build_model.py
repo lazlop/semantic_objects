@@ -8,7 +8,7 @@ from semantic_objects.core import get_related_classes
 class BMotifSession():
     
     def __init__(self):
-        bm = BuildingMOTIF("sqlite://")
+        self.bm = BuildingMOTIF("sqlite://")
         self.lib = Library.create("semantic_objects")
         self.templates = {}
 
@@ -27,5 +27,6 @@ class BMotifSession():
                     continue
                 for dependency in obj.get_dependencies():
                     self.templates[obj.__name__].add_dependency(self.templates[dependency['template'].__name__], dependency['args'])
+
 
         

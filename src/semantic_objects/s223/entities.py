@@ -25,7 +25,15 @@ class PhysicalSpace(Connectable):
 
 @semantic_object
 class Space(DomainSpace):
-    area: Area = required_field() 
+    area: Area = required_field()
+    
+    def __post_init__(self):
+        """Convert raw values to proper types"""
+        super().__post_init__()
+        # Convert area if it's a raw number
+        if not isinstance(self.area, Area):
+            # Area.__init__ expects (value, unit=None) as positional args
+            self.area = Area(self.area)
 
 @semantic_object
 class Space_TwoArea(Space):
