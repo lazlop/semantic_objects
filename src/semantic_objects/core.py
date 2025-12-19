@@ -43,6 +43,12 @@ def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstra
         next_new_classes = []
         for i in range(100):
             for klass in new_classes:
+                # Skip if not a class (e.g., Optional[X], float, etc.)
+                if not isinstance(klass, type):
+                    continue
+                # Skip if not a Resource subclass
+                if not issubclass(klass, Resource):
+                    continue
                 relations = [relation for relation, field_name in klass.get_relations()]
                 entities_and_values = [field.type for entity, field in klass.__dataclass_fields__.items()]
                 next_classes = relations + entities_and_values
@@ -60,6 +66,9 @@ def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstra
     # TODO: consider if we want to keep these distinctions, and have them as predicate, entity, property
     for lst, parent in [(predicate_lst, Predicate), (entity_lst, Node), (value_lst, Node)]:
         for klass in all_classes:
+            # Skip if not a class type
+            if not isinstance(klass, type):
+                continue
             # TODO: added this ignorantly, make sure it isn't bugged
             if not issubclass(klass, parent):
                 continue
@@ -293,7 +302,7 @@ class Resource:
         parameters = cls._get_template_parameters()
         for field_name, field_obj in parameters.items():
             relation = cls._infer_relation_for_field(field_name, field_obj)
-            if not isinstance(field_obj.default,_MISSING_TYPE):
+            if not isinstance(field_obj.default,_MISSING_TYPE) and field_obj.default is not None:
                 g.add((PARAM['name'], relation._get_iri(), field_obj.default._get_iri()))
             else:
                 # Following lead from how we get args, not exactly aligned with Semantic_MPC_Interface
@@ -311,6 +320,17 @@ class Resource:
         if hasattr(cls, '__dataclass_fields__'):
             for field_name, field_obj in cls.__dataclass_fields__.items():
                 annotation_type = field_obj.type
+                
+                # Handle Optional types - extract the actual type
+                origin = get_origin(annotation_type)
+                if origin is not None:
+                    args = get_args(annotation_type)
+                    if args:
+                        annotation_type = args[0]
+                
+                # Skip if not a class type
+                if not isinstance(annotation_type, type):
+                    continue
 
                 if not issubclass(annotation_type, Resource):
                     continue
