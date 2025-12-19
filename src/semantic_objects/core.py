@@ -49,17 +49,22 @@ def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstra
                 new_classes = new_next_classes.copy()
                 if i == 99:
                     raise RecursionError("Max depth reached")
-            
+        
+    # TODO: Fix this to what I want the sets of templates to be. Could do it based on class structure, but then it won't work well with HPFlex
+    # Maybe how the template library is broken up is a separate piece of information within the class, or can be customized per ontology 
     predicate_lst, entity_lst, value_lst = [], [], []
     # TODO: consider if we want to keep these distinctions, and have them as predicate, entity, property
     for lst, parent in [(predicate_lst, Predicate), (entity_lst, Node), (value_lst, Node)]:
         for klass in all_classes:
+            # TODO: added this ignorantly, make sure it isn't bugged
+            if not issubclass(klass, parent):
+                continue
             if not include_abstract and klass.abstract:
                 continue
             if issubclass(klass, parent):
                 lst.append(klass)
 
-    return predicate_lst, entity_lst, value_lst   
+    return predicate_lst, entity_lst
 
 def _get_related_classes_lst(dclass_lst: List[Type], get_recursive = True):
     predicate_lst, entity_lst, value_lst = [], [], []

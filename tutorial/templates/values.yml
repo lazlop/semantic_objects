@@ -1,39 +1,81 @@
-Tilt:
+Window:
   body: |+
     @prefix P: <urn:___param___#> .
-    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
-    @prefix qudt: <http://qudt.org/schema/qudt/> .
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
-    P:name a s223:QuantifiableObservableProperty ;
-        s223:hasUnit P:unit ;
-        s223:hasValue P:value ;
-        qudt:hasQuantityKind quantitykind:Tilt .
+    P:name a s223:Window ;
+        s223:hasProperty P:area,
+            P:azimuth,
+            P:tilt .
 
-  dependencies: []
+  dependencies:
+  - args:
+      name: area
+    template: Area
+  - args:
+      name: azimuth
+    template: Azimuth
+  - args:
+      name: tilt
+    template: Tilt
 Area:
   body: |+
     @prefix P: <urn:___param___#> .
     @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
-    @prefix qudt: <http://qudt.org/schema/qudt/> .
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
-    P:name a s223:QuantifiableObservableProperty ;
+    P:name a s223:Area ;
+        s223:hasQuantityKind quantitykind:Area ;
         s223:hasUnit P:unit ;
-        s223:hasValue P:value ;
-        qudt:hasQuantityKind quantitykind:Area .
+        s223:hasValue P:value .
 
-  dependencies: []
+  dependencies:
+  - args:
+      name: value
+    template: float
 Azimuth:
   body: |+
     @prefix P: <urn:___param___#> .
     @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
-    @prefix qudt: <http://qudt.org/schema/qudt/> .
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
-    P:name a s223:QuantifiableObservableProperty ;
+    P:name a s223:Azimuth ;
+        s223:hasQuantityKind quantitykind:Azimuth ;
         s223:hasUnit P:unit ;
-        s223:hasValue P:value ;
-        qudt:hasQuantityKind quantitykind:Azimuth .
+        s223:hasValue P:value .
+
+  dependencies:
+  - args:
+      name: value
+    template: float
+Tilt:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+    P:name a s223:Tilt ;
+        s223:hasQuantityKind quantitykind:Tilt ;
+        s223:hasUnit P:unit ;
+        s223:hasValue P:value .
+
+  dependencies:
+  - args:
+      name: value
+    template: float
+QuantityKind:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
+    P:name a quantitykind:QuantityKind .
+
+  dependencies: []
+Unit:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix unit: <http://qudt.org/vocab/unit/> .
+
+    P:name a unit:Resource .
 
   dependencies: []

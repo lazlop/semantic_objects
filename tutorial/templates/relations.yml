@@ -6,20 +6,20 @@ hasProperty:
     P:name s223:hasProperty P:target .
 
   dependencies: []
+hasQuantityKind:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+    P:name s223:hasQuantityKind P:target .
+
+  dependencies: []
 hasValue:
   body: |+
     @prefix P: <urn:___param___#> .
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
     P:name s223:hasValue P:target .
-
-  dependencies: []
-hasQuantityKind:
-  body: |+
-    @prefix P: <urn:___param___#> .
-    @prefix qudt: <http://qudt.org/schema/qudt/> .
-
-    P:name qudt:hasQuantityKind P:target .
 
   dependencies: []
 hasUnit:
