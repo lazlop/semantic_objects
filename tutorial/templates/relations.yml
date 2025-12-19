@@ -6,6 +6,14 @@ hasProperty:
     P:name s223:hasProperty P:target .
 
   dependencies: []
+hasUnit:
+  body: |+
+    @prefix P: <urn:___param___#> .
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+    P:name s223:hasUnit P:target .
+
+  dependencies: []
 hasValue:
   body: |+
     @prefix P: <urn:___param___#> .
@@ -20,13 +28,5 @@ hasQuantityKind:
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
     P:name s223:hasQuantityKind P:target .
-
-  dependencies: []
-hasUnit:
-  body: |+
-    @prefix P: <urn:___param___#> .
-    @prefix s223: <http://data.ashrae.org/standard223#> .
-
-    P:name s223:hasUnit P:target .
 
   dependencies: []

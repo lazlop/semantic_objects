@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Type, Union, get_origin, get_args, Self
+from typing import List, Dict, Tuple, Type, Union, Optional, get_origin, get_args, Self
 from dataclasses import dataclass, field, fields, _MISSING_TYPE
 from .namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
 from .query import SparqlQueryBuilder
@@ -808,6 +808,53 @@ class Resource:
             else:
                 evaluation_dict[field_name] = None
         return evaluation_dict
+    def get_field_values(self, recursive=False, _visited=None):
+        """
+        Get field values for this instance.
+        
+        Args:
+            recursive: If True, recursively get field values for all related Resource objects.
+                      If False (default), only get field values for this instance.
+            _visited: Internal parameter to track visited objects and prevent infinite recursion.
+        
+        Returns:
+            Dictionary of field names to values. When recursive=True, Resource field values
+            are replaced with their nested field value dictionaries.
+        """
+        # Initialize visited set for tracking circular references
+        if _visited is None:
+            _visited = set()
+        
+        # Use object id to track visited instances
+        obj_id = id(self)
+        if obj_id in _visited:
+            # Return a reference marker to indicate circular reference
+            return {'_circular_ref': True, '_name': getattr(self, '_name', self.__class__.__name__)}
+        
+        # Mark this object as visited
+        _visited.add(obj_id)
+        
+        field_values = {}
+        for field_name, field_obj in self.__class__.__dataclass_fields__.items():
+            field_value = getattr(self, field_name)
+            
+            if isinstance(field_value, type):
+                if issubclass(field_value, NamedNode):
+                    field_values[field_name] = field_value._get_iri()
+            elif isinstance(field_value, Resource):
+                if recursive:
+                    # Recursively get field values for Resource instances
+                    field_values[field_name] = {
+                        '_name': field_value._name,
+                        '_type': field_value.__class__.__name__,
+                        **field_value.get_field_values(recursive=True, _visited=_visited)
+                    }
+                else:
+                    field_values[field_name] = field_value._name
+            else:
+                field_values[field_name] = field_value
+        
+        return field_values
 
 class Predicate(Resource):
     # TODO: Predicate is partially implemented
@@ -875,6 +922,25 @@ class Predicate(Resource):
     
 class Node(Resource):
     templatize = True
+    _name: Optional[str] = field(default=None, init=True, metadata={'templatize': False})
+    _instance_counter = {}  # Class variable to track instance counts per class
+    
+    def __post_init__(self):
+        """Auto-generate _name if not provided"""
+        super().__post_init__()
+        
+        # Check if _name is the class-level attribute (not an instance attribute)
+        # This happens when _name wasn't provided during instantiation
+        if self._name is None or self._name == self.__class__.__name__:
+            class_name = self.__class__.__name__
+            
+            # Get or initialize counter for this class
+            if class_name not in Node._instance_counter:
+                Node._instance_counter[class_name] = 0
+            
+            # Increment counter and generate name
+            Node._instance_counter[class_name] += 1
+            self._name = f"{class_name}_{Node._instance_counter[class_name]}"
 
 class NamedNode(Node):
     templatize = False
