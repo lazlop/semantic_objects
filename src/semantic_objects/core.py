@@ -23,66 +23,27 @@ def export_templates(dclass_lst: List[Type], dir_path_str: str, overwrite = True
             file.unlink()
         for klass in lst:
             klass.to_yaml(file_path = file)
-            
+
 def get_related_classes(dclass: Union[Type, List[Type]], get_recursive = True):
+    """
+    Module-level convenience function for getting related classes.
+    Delegates to the Resource.get_related_classes() class method.
+    """
     if isinstance(dclass, list):
         return _get_related_classes_lst(dclass, get_recursive)
     else:
-        return _get_related_classes_type(dclass, get_recursive)
-    
-def _get_related_classes_type(dclass: Type, get_recursive = True, include_abstract = False):
-    if issubclass(dclass, Resource) == False:
-        return [], []
-    relations = [relation for relation, field_name in dclass.get_relations()]
-    entities_and_values = [field.type for entity, field in dclass.__dataclass_fields__.items()]
-    all_classes = [dclass] + relations + entities_and_values
-    all_classes = list(set(all_classes))
-
-    if get_recursive:
-        new_classes = all_classes.copy()
-        next_new_classes = []
-        for i in range(100):
-            for klass in new_classes:
-                # Skip if not a class (e.g., Optional[X], float, etc.)
-                if not isinstance(klass, type):
-                    continue
-                # Skip if not a Resource subclass
-                if not issubclass(klass, Resource):
-                    continue
-                relations = [relation for relation, field_name in klass.get_relations()]
-                entities_and_values = [field.type for entity, field in klass.__dataclass_fields__.items()]
-                next_classes = relations + entities_and_values
-                new_next_classes = set(next_classes) - set(all_classes)
-                if new_classes == []:
-                    break
-                all_classes.extend(list(new_next_classes))
-                new_classes = new_next_classes.copy()
-                if i == 99:
-                    raise RecursionError("Max depth reached")
-        
-    # TODO: Fix this to what I want the sets of templates to be. Could do it based on class structure, but then it won't work well with HPFlex
-    # Maybe how the template library is broken up is a separate piece of information within the class, or can be customized per ontology 
-    predicate_lst, entity_lst, value_lst = [], [], []
-    # TODO: consider if we want to keep these distinctions, and have them as predicate, entity, property
-    for lst, parent in [(predicate_lst, Predicate), (entity_lst, Node), (value_lst, Node)]:
-        for klass in all_classes:
-            # Skip if not a class type
-            if not isinstance(klass, type):
-                continue
-            # TODO: added this ignorantly, make sure it isn't bugged
-            if not issubclass(klass, parent):
-                continue
-            if not include_abstract and klass.abstract:
-                continue
-            if issubclass(klass, parent):
-                lst.append(klass)
-
-    return predicate_lst, entity_lst
+        # Delegate to the class method
+        if not isinstance(dclass, type) or not issubclass(dclass, Resource):
+            return [], []
+        return dclass.get_related_classes(get_recursive=get_recursive)
 
 def _get_related_classes_lst(dclass_lst: List[Type], get_recursive = True):
+    """Helper function to get related classes from a list of classes."""
     predicate_lst, entity_lst, value_lst = [], [], []
     for dclass in dclass_lst:
-        class_lsts = _get_related_classes_type(dclass, get_recursive)
+        if not isinstance(dclass, type) or not issubclass(dclass, Resource):
+            continue
+        class_lsts = dclass.get_related_classes(get_recursive=get_recursive)
         for lst, new_klasses in zip([predicate_lst, entity_lst, value_lst], class_lsts): 
             for klass in new_klasses: 
                 if klass not in lst:
@@ -90,17 +51,19 @@ def _get_related_classes_lst(dclass_lst: List[Type], get_recursive = True):
     return predicate_lst, entity_lst, value_lst        
 
 def get_module_classes(module_lst):
+    """Get all Resource classes from a list of modules."""
     predicate_lst, entity_lst, value_lst = [], [], []
     for module in module_lst:
         for k, v in module.__dict__.items():
             if not isinstance(v, type):
                 continue
-            if issubclass(v, Resource):
-                class_lsts = get_related_classes(v)
-                for lst, new_klasses in zip([predicate_lst, entity_lst, value_lst], class_lsts): 
-                    for klass in new_klasses: 
-                        if klass not in lst:
-                            lst.append(klass)
+            if not issubclass(v, Resource):
+                continue
+            class_lsts = v.get_related_classes()
+            for lst, new_klasses in zip([predicate_lst, entity_lst, value_lst], class_lsts): 
+                for klass in new_klasses: 
+                    if klass not in lst:
+                        lst.append(klass)
     return predicate_lst, entity_lst, value_lst
 
 # a relation that is optional, and will be templatized (optional in bmotif template, used to query semantic data into objects)
@@ -497,6 +460,94 @@ class Resource:
         return all_relations
 
     @classmethod
+    def get_related_classes(cls, get_recursive=True, include_abstract=False):
+        """
+        Get related classes for this class, categorized by type.
+        
+        This method works correctly regardless of how the class or this module is imported,
+        because it uses the actual class hierarchy (MRO) to determine class types rather
+        than comparing against hardcoded class references.
+        
+        Args:
+            get_recursive: If True, recursively find all related classes. If False, only
+                          find classes directly referenced by this class.
+            include_abstract: If True, include abstract classes in the results.
+        
+        Returns:
+            Tuple of (predicate_list, entity_list, value_list) where each list contains
+            classes of that type found in the class hierarchy.
+        """
+        # Helper function to check if a class is a subclass of a base by name
+        def _is_subclass_of_name(klass, base_name):
+            """Check if klass is a subclass of a class with the given name."""
+            if not isinstance(klass, type):
+                return False
+            for base in klass.__mro__:
+                if base.__name__ == base_name:
+                    return True
+            return False
+        
+        # Collect all related classes
+        relations = [relation for relation, field_name in cls.get_relations()]
+        entities_and_values = [field.type for entity, field in cls.__dataclass_fields__.items()]
+        all_classes = [cls] + relations + entities_and_values
+        all_classes = list(set(all_classes))
+
+        if get_recursive:
+            new_classes = all_classes.copy()
+            for i in range(100):
+                next_new_classes = []
+                for klass in new_classes:
+                    # Skip if not a class (e.g., Optional[X], float, etc.)
+                    if not isinstance(klass, type):
+                        continue
+                    # Skip if not a Resource subclass
+                    if not _is_subclass_of_name(klass, 'Resource'):
+                        continue
+                    
+                    # Get relations and fields from this class
+                    relations = [relation for relation, field_name in klass.get_relations()]
+                    entities_and_values = [field.type for entity, field in klass.__dataclass_fields__.items()]
+                    next_classes = relations + entities_and_values
+                    
+                    # Add new classes we haven't seen yet
+                    for next_class in next_classes:
+                        if next_class not in all_classes:
+                            next_new_classes.append(next_class)
+                            all_classes.append(next_class)
+                
+                if not next_new_classes:
+                    break
+                new_classes = next_new_classes
+                
+                if i == 99:
+                    raise RecursionError("Max depth reached")
+        
+        # Categorize classes by type using name-based checks
+        predicate_lst, entity_lst, value_lst = [], [], []
+        
+        for klass in all_classes:
+            # Skip if not a class type
+            if not isinstance(klass, type):
+                continue
+            
+            # Skip if not a Resource subclass
+            if not _is_subclass_of_name(klass, 'Resource'):
+                continue
+            
+            # Skip abstract classes if requested
+            if not include_abstract and hasattr(klass, 'abstract') and klass.abstract:
+                continue
+            
+            # Categorize by checking class hierarchy
+            if _is_subclass_of_name(klass, 'Predicate'):
+                predicate_lst.append(klass)
+            elif _is_subclass_of_name(klass, 'Node'):
+                entity_lst.append(klass)
+        
+        return predicate_lst, entity_lst
+
+    @classmethod
     def _create_qualified_value_shape(cls, g, prop_node, field_obj, field_name, class_iri):
         # TODO: THIS IMPLEMENTATION IS UNFINISHED
         """
@@ -808,9 +859,9 @@ class Resource:
             else:
                 evaluation_dict[field_name] = None
         return evaluation_dict
-    def get_field_values(self, recursive=False, _visited=None):
+    def get_field_values(self, recursive=False, _visited=None, _prefix = ""):
         """
-        Get field values for this instance.
+        Get field values for this instance. For now doing in buildingmotif template form
         
         Args:
             recursive: If True, recursively get field values for all related Resource objects.
@@ -833,21 +884,25 @@ class Resource:
         
         # Mark this object as visited
         _visited.add(obj_id)
-        
+
         field_values = {}
+        field_values['_name'] = getattr(self, '_name', self.__class__.__name__)
         for field_name, field_obj in self.__class__.__dataclass_fields__.items():
             field_value = getattr(self, field_name)
-            
+            if _prefix:
+                param_name = f"{_prefix}-{field_name}"
+            else:
+                param_name = field_name
             if isinstance(field_value, type):
                 if issubclass(field_value, NamedNode):
-                    field_values[field_name] = field_value._get_iri()
+                    field_values[param_name] = field_value._get_iri()
             elif isinstance(field_value, Resource):
                 if recursive:
                     # Recursively get field values for Resource instances
                     field_values[field_name] = {
                         '_name': field_value._name,
                         '_type': field_value.__class__.__name__,
-                        **field_value.get_field_values(recursive=True, _visited=_visited)
+                        **field_value.get_field_values(recursive=True, _visited=_visited, _prefix=param_name)
                     }
                 else:
                     field_values[field_name] = field_value._name
