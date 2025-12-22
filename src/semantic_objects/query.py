@@ -1,7 +1,7 @@
 from .namespaces import * 
 from rdflib import Graph, URIRef, Literal, RDF
 from typing import Type, get_origin, get_args
-from dataclasses import _MISSING_TYPE
+from dataclasses import _MISSING_TYPE, field
 
 class SparqlQueryBuilder:
     """
@@ -135,8 +135,28 @@ class SparqlQueryBuilder:
                         # Check if the field type is a subclass of Resource
                         if (hasattr(field_type, '__mro__') and 
                             any(base.__name__ == 'Resource' for base in field_type.__mro__)):
-                            # Add type triple for this dependency
-                            self.graph.add((PARAM[field_name], RDF.type, field_type._get_iri()))
+                            # Check if this is a QuantifiableObservableProperty subclass with a qk field
+                            is_quant_property = any(base.__name__ == 'QuantifiableObservableProperty' for base in field_type.__mro__)
+                            
+                            if is_quant_property and hasattr(field_type, 'qk') and not isinstance(field_type.qk, type(field)):
+                                # For QuantifiableObservableProperty subclasses, use the parent type
+                                # and add hasQuantityKind constraint
+                                try:
+                                    from semantic_mpc_interface.namespaces import QUDT
+                                    # Find the QuantifiableObservableProperty class in the MRO
+                                    for base in field_type.__mro__:
+                                        if base.__name__ == 'QuantifiableObservableProperty':
+                                            self.graph.add((PARAM[field_name], RDF.type, base._get_iri()))
+                                            # Add the quantity kind constraint
+                                            qk_iri = field_type.qk._get_iri()
+                                            self.graph.add((PARAM[field_name], QUDT['hasQuantityKind'], qk_iri))
+                                            break
+                                except ImportError:
+                                    # Fallback to regular type triple if QUDT not available
+                                    self.graph.add((PARAM[field_name], RDF.type, field_type._get_iri()))
+                            else:
+                                # Add type triple for this dependency
+                                self.graph.add((PARAM[field_name], RDF.type, field_type._get_iri()))
         
         # Now bind the prefixes we need by calling convert_to_prefixed on each URI
         # This will cause RDFLib to automatically bind the necessary namespaces

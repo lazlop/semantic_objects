@@ -23,7 +23,7 @@ class Property(Node):
 
 
 @semantic_object
-class QuantifiableObervableProperty(Property):
+class QuantifiableObservableProperty(Property):
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
     value: float = required_field()
     unit: Optional[Unit] = field(default=None, metadata={'relation': None, 'min': 1, 'max': None, 'qualified': True})
@@ -37,17 +37,17 @@ class QuantifiableObervableProperty(Property):
 
 
 @semantic_object
-class Area(QuantifiableObervableProperty):
+class Area(QuantifiableObservableProperty):
     qk = quantitykinds.Area
 
 
 @semantic_object
-class Azimuth(QuantifiableObervableProperty):
+class Azimuth(QuantifiableObservableProperty):
     qk = quantitykinds.Azimuth
 
 
 @semantic_object
-class Tilt(QuantifiableObervableProperty):
+class Tilt(QuantifiableObservableProperty):
     qk = quantitykinds.Tilt
 
 @semantic_object

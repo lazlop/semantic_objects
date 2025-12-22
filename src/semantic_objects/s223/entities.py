@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from ..core import *
 from .. import units
 from .core import Node
-from .properties import Area, Azimuth, Tilt, QuantifiableObervableProperty
+from .properties import Area, Azimuth, Tilt, QuantifiableObservableProperty
 from .relations import *
 
 # TODO: Consider how I'm using localname vs class name. Not consistent 

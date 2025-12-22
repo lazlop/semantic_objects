@@ -221,14 +221,15 @@ class ModelLoader:
         # Prepare kwargs for instantiation
         kwargs = {}
         
-        # Get the _name for the instance
+        # We'll set _name after instantiation if needed, since it may not be in __init__
+        # due to how the @semantic_object decorator works
+        local_name = None
         if issubclass(resource_class, Node):
-            # Extract local name from URI
+            # Extract local name from URI for later use
             try:
                 _, _, local_name = self.g.compute_qname(entity_uri)
-                kwargs['_name'] = local_name
             except:
-                kwargs['_name'] = str(entity_uri).split('#')[-1].split('/')[-1]
+                local_name = str(entity_uri).split('#')[-1].split('/')[-1]
         
         # Process each field
         if hasattr(resource_class, '__dataclass_fields__'):
@@ -267,38 +268,76 @@ class ModelLoader:
                             else:
                                 # Create a minimal instance
                                 try:
-                                    _, _, local_name = self.g.compute_qname(field_value_uri)
+                                    _, _, related_local_name = self.g.compute_qname(field_value_uri)
                                 except:
-                                    local_name = str(field_value_uri).split('#')[-1].split('/')[-1]
+                                    related_local_name = str(field_value_uri).split('#')[-1].split('/')[-1]
                                 
                                 # Get value if it's a property
+                                # Convert to URIRef if it's a string
+                                if isinstance(field_value_uri, str):
+                                    field_value_uri = URIRef(field_value_uri)
+                                
                                 value = self.g.value(field_value_uri, S223['hasValue'])
                                 unit = self.g.value(field_value_uri, QUDT['hasUnit'])
                                 
                                 if value is not None:
                                     # It's a property with a value
-                                    related_kwargs = {'_name': local_name}
-                                    if 'value' in [f.name for f in fields(field_type)]:
+                                    related_kwargs = {}
+                                    
+                                    # Check if this is a QuantifiableObservableProperty subclass
+                                    is_quant_property = any(base.__name__ == 'QuantifiableObservableProperty' 
+                                                           for base in field_type.__mro__ if hasattr(base, '__name__'))
+                                    
+                                    if is_quant_property:
+                                        # For QuantifiableObservableProperty, we need value and optionally unit
+                                        # The qk field is set at the class level, so we don't pass it
                                         related_kwargs['value'] = float(value) if value else None
-                                    if 'unit' in [f.name for f in fields(field_type)] and unit:
-                                        # Find the Unit class for this unit
-                                        try:
-                                            _, _, unit_name = self.g.compute_qname(unit)
-                                            # Try to import the unit class
-                                            from . import units
-                                            unit_class = getattr(units, unit_name, None)
-                                            if unit_class:
-                                                related_kwargs['unit'] = unit_class
-                                        except:
-                                            pass
+                                        
+                                        if unit:
+                                            # Find the Unit class for this unit
+                                            try:
+                                                _, _, unit_name = self.g.compute_qname(unit)
+                                                # Try to import the unit class
+                                                from . import units
+                                                unit_class = getattr(units, unit_name, None)
+                                                if unit_class:
+                                                    related_kwargs['unit'] = unit_class
+                                            except:
+                                                pass
+                                    else:
+                                        # For other Node types, include _name
+                                        related_kwargs['_name'] = related_local_name
+                                        if 'value' in [f.name for f in fields(field_type)]:
+                                            related_kwargs['value'] = float(value) if value else None
+                                        if 'unit' in [f.name for f in fields(field_type)] and unit:
+                                            # Find the Unit class for this unit
+                                            try:
+                                                _, _, unit_name = self.g.compute_qname(unit)
+                                                # Try to import the unit class
+                                                from . import units
+                                                unit_class = getattr(units, unit_name, None)
+                                                if unit_class:
+                                                    related_kwargs['unit'] = unit_class
+                                            except:
+                                                pass
                                     
                                     related_instance = field_type(**related_kwargs)
+                                    instances_cache[str(field_value_uri)] = related_instance
+                                    kwargs[field_name] = related_instance
                                 else:
-                                    # Just create with name
-                                    related_instance = field_type(_name=local_name)
-                                
-                                instances_cache[str(field_value_uri)] = related_instance
-                                kwargs[field_name] = related_instance
+                                    # No value found - check if this is a QuantifiableObservableProperty
+                                    is_quant_property = any(base.__name__ == 'QuantifiableObservableProperty' 
+                                                           for base in field_type.__mro__ if hasattr(base, '__name__'))
+                                    
+                                    if is_quant_property:
+                                        # For QuantifiableObservableProperty without a value, we can't create it
+                                        # Skip this field - don't add to kwargs
+                                        pass
+                                    else:
+                                        # Just create with name
+                                        related_instance = field_type(_name=related_local_name)
+                                        instances_cache[str(field_value_uri)] = related_instance
+                                        kwargs[field_name] = related_instance
                     else:
                         # For primitive types, extract the value
                         value = self._get_field_value_from_uri(
@@ -309,7 +348,22 @@ class ModelLoader:
                         kwargs[field_name] = value
         
         # Instantiate the object
-        instance = resource_class(**kwargs)
+        try:
+            instance = resource_class(**kwargs)
+        except TypeError as e:
+            # Debug: print what fields the class expects vs what we're providing
+            if hasattr(resource_class, '__dataclass_fields__'):
+                expected_fields = {name: f for name, f in resource_class.__dataclass_fields__.items() if f.init}
+                print(f"Debug: Expected fields for {resource_class.__name__}: {list(expected_fields.keys())}")
+                print(f"Debug: Provided kwargs: {list(kwargs.keys())}")
+                print(f"Debug: Field details:")
+                for name, f in expected_fields.items():
+                    print(f"  {name}: init={f.init}, default={f.default}, default_factory={f.default_factory}")
+            raise
+        
+        # Set _name if we extracted it and the instance has this attribute
+        if local_name is not None and hasattr(instance, '_name'):
+            instance._name = local_name
         
         # Cache the instance
         instances_cache[entity_key] = instance
