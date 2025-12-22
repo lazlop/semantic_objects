@@ -6,10 +6,12 @@ and instantiate Python objects based on Resource class definitions.
 """
 
 from rdflib import Graph, Namespace, Literal, URIRef
-from semantic_objects.model_loader import ModelLoader
-from semantic_objects.s223.entities import Space, Window
-from semantic_objects.s223.properties import Area, Azimuth, Tilt
-from semantic_objects.namespaces import S223, QUDT, UNIT, bind_prefixes
+import sys
+sys.path.append('..')
+from src.semantic_objects.model_loader import ModelLoader
+from src.semantic_objects.s223.entities import Space, Window
+from src.semantic_objects.s223.properties import Area, Azimuth, Tilt
+from src.semantic_objects.namespaces import S223, QUDT, UNIT, bind_prefixes
 
 
 def create_sample_graph():
