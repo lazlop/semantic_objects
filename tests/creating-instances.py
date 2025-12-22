@@ -21,3 +21,4 @@ bm.templates
 # %%
 bm.evaluate(s)
 # %%
+bm.graph.print()

@@ -1,7 +1,7 @@
 from buildingmotif import BuildingMOTIF
 from typing import Any, Dict, Mapping
 from buildingmotif.dataclasses import Library, Model, Template
-from rdflib import Graph, Namespace
+from rdflib import Graph, Namespace, URIRef, Literal
 
 
 class BMotifSession():
@@ -60,7 +60,8 @@ class BMotifSession():
                         out[parent_key] = self.building_ns[v]
                     continue                     # nothing else to do for this entry
                 # ---------------------------------------------------------------------
-
+                if not isinstance(v, URIRef) and not isinstance(v, dict):
+                    v = Literal(v)
                 # Build the new composite key
                 new_key = f"{parent_key}{sep}{k}" if parent_key else k
 
@@ -74,7 +75,7 @@ class BMotifSession():
 
         eval_dict = flatten_dict(eval_dict)
         print(eval_dict)
-        entity_graph = self.templates[obj.__class__.__name__].evaluate(eval_dict)
+        entity_graph = self.templates[obj.__class__.__name__].inline_dependencies().evaluate(eval_dict)
         self.model.add_graph(entity_graph)
 
 
