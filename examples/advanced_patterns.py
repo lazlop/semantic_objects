@@ -21,6 +21,19 @@ from rdflib import Graph
 
 # Custom entity definitions
 @semantic_object
+class DualTempTank(Node):
+    """A """
+    bottom_temperature: Temperature = required_field(
+        label="t_bot",
+        comment="Temperature measured at the bottom of the tank"
+    )
+    top_temperature: Temperature = required_field(
+        label="t_top",
+        comment="Temperature measured at the top of the tank"
+    )
+    
+
+@semantic_object
 class ConditionedSpace(Space):
     """A space with HVAC conditioning"""
     design_temperature: Temperature = required_field(
