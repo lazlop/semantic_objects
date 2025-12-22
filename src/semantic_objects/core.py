@@ -889,20 +889,16 @@ class Resource:
         field_values['_name'] = getattr(self, '_name', self.__class__.__name__)
         for field_name, field_obj in self.__class__.__dataclass_fields__.items():
             field_value = getattr(self, field_name)
-            if _prefix:
-                param_name = f"{_prefix}-{field_name}"
-            else:
-                param_name = field_name
             if isinstance(field_value, type):
                 if issubclass(field_value, NamedNode):
-                    field_values[param_name] = field_value._get_iri()
+                    field_values[field_name] = field_value._get_iri()
             elif isinstance(field_value, Resource):
                 if recursive:
                     # Recursively get field values for Resource instances
                     field_values[field_name] = {
                         '_name': field_value._name,
                         '_type': field_value.__class__.__name__,
-                        **field_value.get_field_values(recursive=True, _visited=_visited, _prefix=param_name)
+                        **field_value.get_field_values(recursive=True, _visited=_visited)
                     }
                 else:
                     field_values[field_name] = field_value._name

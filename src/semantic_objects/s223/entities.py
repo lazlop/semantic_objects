@@ -30,7 +30,6 @@ class Space(DomainSpace):
     def __post_init__(self):
         """Convert raw values to proper types"""
         super().__post_init__()
-        # Convert area if it's a raw number
         if not isinstance(self.area, Area):
             # Area.__init__ expects (value, unit=None) as positional args
             self.area = Area(self.area)

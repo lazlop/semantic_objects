@@ -152,3 +152,4 @@ class SparqlQueryBuilder:
         # Generate and return the SPARQL query
         # The graph now has only the namespaces that were actually used
         return self._get_query(self.graph, ontology)
+    
