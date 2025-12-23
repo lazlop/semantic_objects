@@ -80,8 +80,9 @@ def optional_field(relation= None, label=None, comment=None):
 
 # a field that is required (A SHACL qualified value shape requirement)
 # TODO: Consider how to handle qualified vs nonqualified constraints
-def required_field(relation = None, min = 1, max = None, qualified = True, label=None, comment=None):
+def required_field(relation = None, min = 1, max = None, qualified = True, label=None, comment=None, value=None):
     # If the relation is none, it will use a default relation from the types of each thing.
+    # The 'value' parameter allows specifying a target field name for inter-field relations
     return field(
         metadata={
             'relation': relation,
@@ -89,7 +90,8 @@ def required_field(relation = None, min = 1, max = None, qualified = True, label
             'max': max,
             'qualified': qualified,
             'label': label,
-            'comment': comment
+            'comment': comment,
+            'value': value  # New parameter for inter-field relations
         }
     )
 
@@ -106,6 +108,35 @@ def exclusive_field(relation = None, min = 1, max = 1, qualified = True, label=N
             'comment': comment
         }
     )
+
+def inter_field_relation(source_field: str, relation, target_field: str, min=1, max=None, qualified=True, label=None, comment=None):
+    """
+    Define a relation between two fields in a class.
+    
+    Args:
+        source_field: Name of the source field
+        relation: The relation/predicate to use
+        target_field: Name of the target field
+        min: Minimum cardinality
+        max: Maximum cardinality
+        qualified: Whether to use qualified value shapes
+        label: Optional label for the relation
+        comment: Optional comment for the relation
+    
+    Returns:
+        A dictionary describing the inter-field relation
+    """
+    return {
+        'source_field': source_field,
+        'relation': relation,
+        'target_field': target_field,
+        'min': min,
+        'max': max,
+        'qualified': qualified,
+        'label': label,
+        'comment': comment
+    }
+
 def semantic_object(cls):
     # Get parent class fields and their types
     parent_fields = {}
@@ -148,6 +179,10 @@ def semantic_object(cls):
     # Set abstract to False if not already defined in this class's __dict__
     if 'abstract' not in cls.__dict__:
         cls.abstract = False
+    
+    # Initialize _inter_field_relations if not present
+    if '_inter_field_relations' not in cls.__dict__:
+        cls._inter_field_relations = []
     
     return dataclass(cls)
 
@@ -246,6 +281,25 @@ class Resource:
 
         return parameters
 
+    @classmethod
+    def _get_inter_field_relations(cls):
+        """
+        Get all inter-field relations defined for this class and its parents.
+        Returns a list of inter-field relation dictionaries.
+        """
+        all_relations = []
+        seen_relations = set()
+        
+        for base in reversed(cls.__mro__):
+            if hasattr(base, '_inter_field_relations'):
+                for rel in base._inter_field_relations:
+                    # Create a unique key for this relation
+                    rel_key = (rel['source_field'], rel['relation']._name if hasattr(rel['relation'], '_name') else str(rel['relation']), rel['target_field'])
+                    if rel_key not in seen_relations:
+                        all_relations.append(rel)
+                        seen_relations.add(rel_key)
+        
+        return all_relations
                     
     @classmethod
     def generate_turtle_body(cls, subject_name="name"):
@@ -264,12 +318,33 @@ class Resource:
         # currently things have to be written as fields in order to be templated 
         parameters = cls._get_template_parameters()
         for field_name, field_obj in parameters.items():
+            # Check if this field has a 'value' metadata pointing to another field
+            target_field_name = field_obj.metadata.get('value')
+            if target_field_name is not None:
+                # This is an inter-field relation - skip it here, handle separately
+                continue
+            
+            # Check if relation is explicitly set to None (skip main entity relation)
+            if field_obj.metadata.get('relation') is None and 'relation' in field_obj.metadata:
+                # Relation explicitly set to None - skip creating main entity relation
+                continue
+                
             relation = cls._infer_relation_for_field(field_name, field_obj)
             if not isinstance(field_obj.default,_MISSING_TYPE) and field_obj.default is not None:
                 g.add((PARAM['name'], relation._get_iri(), field_obj.default._get_iri()))
             else:
                 # Following lead from how we get args, not exactly aligned with Semantic_MPC_Interface
                 g.add((PARAM['name'], relation._get_iri(), PARAM[field_name]))
+        
+        # Handle inter-field relations
+        inter_field_rels = cls._get_inter_field_relations()
+        for rel in inter_field_rels:
+            source_field = rel['source_field']
+            target_field = rel['target_field']
+            relation = rel['relation']
+            
+            # Add triple: P:source_field relation P:target_field
+            g.add((PARAM[source_field], relation._get_iri(), PARAM[target_field]))
             
         return g.serialize(format = 'ttl')
 
@@ -282,6 +357,12 @@ class Resource:
         # Check if this is a dataclass with fields
         if hasattr(cls, '__dataclass_fields__'):
             for field_name, field_obj in cls.__dataclass_fields__.items():
+                # Skip fields that are targets of inter-field relations (they're not separate dependencies)
+                target_field_name = field_obj.metadata.get('value')
+                if target_field_name is not None:
+                    # This field is a source in an inter-field relation, skip it
+                    continue
+                
                 annotation_type = field_obj.type
                 
                 # Handle Optional types - extract the actual type
@@ -450,12 +531,32 @@ class Resource:
                     if (field_obj.init == False and 
                         field_obj.metadata.get('templatize', True) == False):
                         continue
+                    
+                    # Skip fields that are part of inter-field relations (source fields with 'value' metadata)
+                    if field_obj.metadata.get('value') is not None:
+                        continue
+                    
+                    # Skip fields with relation explicitly set to None
+                    if field_obj.metadata.get('relation') is None and 'relation' in field_obj.metadata:
+                        continue
+                    
                     relation = cls._infer_relation_for_field(field_name, field_obj)
                     
                     relation_key = (relation._name, field_name)
                     if relation_key not in seen_relations:
                         all_relations.append((relation, field_name))
                         seen_relations.add(relation_key)
+        
+        # Add inter-field relations
+        inter_field_rels = cls._get_inter_field_relations()
+        for rel in inter_field_rels:
+            relation = rel['relation']
+            source_field = rel['source_field']
+            
+            relation_key = (relation._name, source_field)
+            if relation_key not in seen_relations:
+                all_relations.append((relation, source_field))
+                seen_relations.add(relation_key)
         
         return all_relations
 
@@ -667,6 +768,10 @@ class Resource:
             
             # First pass: count properties and create property shapes
             for field_name, field_obj in fields_to_process:
+                # Skip fields that are part of inter-field relations
+                if field_obj.metadata.get('value') is not None:
+                    continue
+                
                 # Infer or get the relation
                 relation = cls._infer_relation_for_field(field_name, field_obj)
                 if relation is None:
@@ -737,6 +842,10 @@ class Resource:
             
             # Second pass: create qualified value shapes for each field
             for field_name, field_obj in fields_to_process:
+                # Skip fields that are part of inter-field relations
+                if field_obj.metadata.get('value') is not None:
+                    continue
+                
                 # Infer or get the relation
                 relation = cls._infer_relation_for_field(field_name, field_obj)
                 if relation is None:

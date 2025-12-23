@@ -137,6 +137,7 @@ class ModelLoader:
         # Execute query and return results
         return query_to_df(query, self.g, prefixed=False)
     
+    # TODO: Fix this shortcut
     def _get_field_value_from_uri(
         self,
         uri: URIRef,
@@ -324,6 +325,7 @@ class ModelLoader:
                                     related_instance = field_type(**related_kwargs)
                                     instances_cache[str(field_value_uri)] = related_instance
                                     kwargs[field_name] = related_instance
+                                    # TODO: Fix this shortcut
                                 else:
                                     # No value found - check if this is a QuantifiableObservableProperty
                                     is_quant_property = any(base.__name__ == 'QuantifiableObservableProperty' 

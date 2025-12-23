@@ -45,3 +45,37 @@ class Window(Node):
     area: Area = required_field()
     azimuth: Azimuth = required_field()
     tilt: Tilt = required_field()
+
+@semantic_object
+class SpaceWithWindow(Space):
+    """Example of a Space with a Window using inter-field relations"""
+    space: Space = required_field(relation=hasDomainSpace)
+    window: Window = required_field(relation=hasWindow)
+    
+    # Define inter-field relations using the class attribute
+    _inter_field_relations = [
+        inter_field_relation(
+            source_field='space',
+            relation=connectedTo,
+            target_field='window',
+            min=1,
+            max=1
+        )
+    ]
+
+@semantic_object
+class SpaceWithWindowNoMainRelation(Space):
+    """Example where window has no relation to main entity, only space->window relation"""
+    space: Space = required_field(relation=hasDomainSpace)
+    window: Window = required_field(relation=None)  # No relation from main entity to window
+    
+    # Define inter-field relations using the class attribute
+    _inter_field_relations = [
+        inter_field_relation(
+            source_field='space',
+            relation=connectedTo,
+            target_field='window',
+            min=1,
+            max=1
+        )
+    ]
