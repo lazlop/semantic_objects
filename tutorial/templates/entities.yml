@@ -1,31 +1,32 @@
 Area:
-  body: |+
+  body: >+
     @prefix P: <urn:___param___#> .
-    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
-    P:name a s223:Area ;
-        s223:hasQuantityKind quantitykind:Area ;
-        s223:hasUnit P:unit ;
-        s223:hasValue P:value .
+
+    P:name a s223:Area .
 
   dependencies: []
 Space:
-  body: |+
+  body: >+
     @prefix P: <urn:___param___#> .
+
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
-    P:name a s223:Space ;
-        s223:hasProperty P:area .
+
+    P:name a s223:Space .
 
   dependencies:
   - args:
       name: area
     template: Area
 QuantityKind:
-  body: |+
+  body: >+
     @prefix P: <urn:___param___#> .
+
     @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
 
     P:name a quantitykind:QuantityKind .
 

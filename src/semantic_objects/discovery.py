@@ -1,11 +1,5 @@
 from typing import List, Dict, Tuple, Type, Union, Optional, get_origin, get_args, Self
-from dataclasses import dataclass, field, fields, _MISSING_TYPE
-from .namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
-from .query import SparqlQueryBuilder
-import yaml
-import sys
-from pathlib import Path
-from rdflib import Graph, Literal, BNode, URIRef
+from .core import Resource
 
 def get_related_classes(dclass: Union[Type, List[Type]], get_recursive = True):
     """
