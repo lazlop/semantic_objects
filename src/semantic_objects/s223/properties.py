@@ -39,23 +39,28 @@ class QuantifiableObservableProperty(Property):
 @semantic_object
 class Area(QuantifiableObservableProperty):
     qk = quantitykinds.Area
+    _semantic_type = QuantifiableObservableProperty
 
 
 @semantic_object
 class Azimuth(QuantifiableObservableProperty):
     qk = quantitykinds.Azimuth
+    _semantic_type = QuantifiableObservableProperty
 
 
 @semantic_object
 class Tilt(QuantifiableObservableProperty):
     qk = quantitykinds.Tilt
+    _semantic_type = QuantifiableObservableProperty
 
 @semantic_object
 class Area_FT2(Area):
     unit = units.FT2
+    _semantic_type = QuantifiableObservableProperty
 
 @semantic_object
 class Area_SP(Area):
+    _semantic_type = QuantifiableObservableProperty
     aspects: Optional[list] = field(
         default=None,
         init=False,

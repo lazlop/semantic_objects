@@ -10,7 +10,7 @@ import os
 import pandas as pd
 from typing import Any, Dict, List, Optional, Union, Type, get_origin, get_args
 from pathlib import Path
-from dataclasses import fields, is_dataclass, MISSING
+from dataclasses import fields, is_dataclass, MISSING, _MISSING_TYPE
 
 from rdflib import Graph, Literal, Namespace, URIRef
 from buildingmotif import BuildingMOTIF, get_building_motif
@@ -285,26 +285,30 @@ class ModelLoader:
                                     # It's a property with a value
                                     related_kwargs = {}
                                     
-                                    # Check if this is a QuantifiableObservableProperty subclass
-                                    is_quant_property = any(base.__name__ == 'QuantifiableObservableProperty' 
-                                                           for base in field_type.__mro__ if hasattr(base, '__name__'))
+                                    # Check if this class has a _semantic_type attribute
+                                    # This indicates fields that are set at the class level and shouldn't be passed to __init__
+                                    has_semantic_type = hasattr(field_type, '_semantic_type') and field_type._semantic_type is not None
                                     
-                                    if is_quant_property:
-                                        # For QuantifiableObservableProperty, we need value and optionally unit
-                                        # The qk field is set at the class level, so we don't pass it
-                                        related_kwargs['value'] = float(value) if value else None
-                                        
-                                        if unit:
-                                            # Find the Unit class for this unit
-                                            try:
-                                                _, _, unit_name = self.g.compute_qname(unit)
-                                                # Try to import the unit class
-                                                from . import units
-                                                unit_class = getattr(units, unit_name, None)
-                                                if unit_class:
-                                                    related_kwargs['unit'] = unit_class
-                                            except:
-                                                pass
+                                    if has_semantic_type:
+                                        # For classes with _semantic_type, only pass instance-level fields
+                                        # Identify which fields are instance-level (init=True) vs class-level (init=False)
+                                        if hasattr(field_type, '__dataclass_fields__'):
+                                            for inst_field_name, inst_field_obj in field_type.__dataclass_fields__.items():
+                                                if inst_field_obj.init:
+                                                    # This is an instance-level field
+                                                    if inst_field_name == 'value':
+                                                        related_kwargs['value'] = float(value) if value else None
+                                                    elif inst_field_name == 'unit' and unit:
+                                                        # Find the Unit class for this unit
+                                                        try:
+                                                            _, _, unit_name = self.g.compute_qname(unit)
+                                                            # Try to import the unit class
+                                                            from . import units
+                                                            unit_class = getattr(units, unit_name, None)
+                                                            if unit_class:
+                                                                related_kwargs['unit'] = unit_class
+                                                        except:
+                                                            pass
                                     else:
                                         # For other Node types, include _name
                                         related_kwargs['_name'] = related_local_name
@@ -325,15 +329,20 @@ class ModelLoader:
                                     related_instance = field_type(**related_kwargs)
                                     instances_cache[str(field_value_uri)] = related_instance
                                     kwargs[field_name] = related_instance
-                                    # TODO: Fix this shortcut
                                 else:
-                                    # No value found - check if this is a QuantifiableObservableProperty
-                                    is_quant_property = any(base.__name__ == 'QuantifiableObservableProperty' 
-                                                           for base in field_type.__mro__ if hasattr(base, '__name__'))
+                                    # No value found - check if this class requires instance-level fields
+                                    has_semantic_type = hasattr(field_type, '_semantic_type') and field_type._semantic_type is not None
                                     
-                                    if is_quant_property:
-                                        # For QuantifiableObservableProperty without a value, we can't create it
-                                        # Skip this field - don't add to kwargs
+                                    # Check if there are required instance-level fields
+                                    has_required_instance_fields = False
+                                    if hasattr(field_type, '__dataclass_fields__'):
+                                        for inst_field_name, inst_field_obj in field_type.__dataclass_fields__.items():
+                                            if inst_field_obj.init and isinstance(inst_field_obj.default, _MISSING_TYPE):
+                                                has_required_instance_fields = True
+                                                break
+                                    
+                                    if has_semantic_type and has_required_instance_fields:
+                                        # Can't create instance without required fields - skip this field
                                         pass
                                     else:
                                         # Just create with name
