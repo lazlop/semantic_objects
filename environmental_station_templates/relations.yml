@@ -1,0 +1,10 @@
+hasExternalReference:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:hasExternalReference .
+
+  dependencies: []

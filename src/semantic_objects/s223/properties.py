@@ -75,3 +75,41 @@ class Area_SP(Area):
 class Power(QuantifiableObservableProperty):
     qk = quantitykinds.Power
     _semantic_type = QuantifiableObservableProperty
+
+@semantic_object
+class PowerConsumption(QuantifiableObservableProperty):
+    qk = quantitykinds.Power
+    _semantic_type = QuantifiableObservableProperty
+
+@semantic_object
+class AirPressure(QuantifiableObservableProperty):
+    qk = quantitykinds.Pressure
+    _semantic_type = QuantifiableObservableProperty
+
+@semantic_object
+class EnvironmentalStation(Node):
+    _name = "Environmental_Station"
+    label = "Environmental Station"
+    comment = "A comprehensive environmental monitoring station"
+    
+    power_consumption: PowerConsumption = required_field()
+    air_pressure: AirPressure = required_field()
+    
+    # Optional fields - using hasExternalReference for the station ID
+    station_id: Optional[str] = optional_field(relation=hasExternalReference)
+    
+    def __post_init__(self):
+        """Convert raw values to proper property types"""
+        super().__post_init__()
+        if not isinstance(self.power_consumption, PowerConsumption):
+            self.power_consumption = PowerConsumption(self.power_consumption)
+        if not isinstance(self.air_pressure, AirPressure):
+            self.air_pressure = AirPressure(self.air_pressure)
+
+# Set up valid relations for Node to include hasProperty for QuantifiableObservableProperty
+# This needs to be done here to avoid circular imports
+if not hasattr(Node, '_valid_relations') or not Node._valid_relations:
+    Node._valid_relations = []
+
+# Add the hasProperty relation for QuantifiableObservableProperty
+Node._valid_relations.append((hasProperty, QuantifiableObservableProperty))

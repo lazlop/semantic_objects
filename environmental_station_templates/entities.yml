@@ -1,0 +1,48 @@
+PowerConsumption:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:PowerConsumption .
+
+  dependencies: []
+AirPressure:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:AirPressure .
+
+  dependencies: []
+EnvironmentalStation:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:Environmental_Station ;
+        s223:hasExternalReference P:station_id .
+
+  dependencies:
+  - args:
+      name: power_consumption
+    template: PowerConsumption
+  - args:
+      name: air_pressure
+    template: AirPressure
+  optional: station_id
+QuantityKind:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
+
+    P:name a quantitykind:QuantityKind .
+
+  dependencies: []
