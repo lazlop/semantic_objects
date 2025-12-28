@@ -2,20 +2,30 @@ PowerConsumption:
   body: >+
     @prefix P: <urn:___param___#> .
 
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
 
-    P:name a s223:PowerConsumption .
+    P:name a s223:PowerConsumption ;
+        s223:hasQuantityKind quantitykind:Power ;
+        s223:hasUnit P:unit ;
+        s223:hasValue P:value .
 
   dependencies: []
 AirPressure:
   body: >+
     @prefix P: <urn:___param___#> .
 
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
     @prefix s223: <http://data.ashrae.org/standard223#> .
 
 
-    P:name a s223:AirPressure .
+    P:name a s223:AirPressure ;
+        s223:hasQuantityKind quantitykind:Pressure ;
+        s223:hasUnit P:unit ;
+        s223:hasValue P:value .
 
   dependencies: []
 EnvironmentalStation:
@@ -26,7 +36,9 @@ EnvironmentalStation:
 
 
     P:name a s223:Environmental_Station ;
-        s223:hasExternalReference P:station_id .
+        s223:hasExternalReference P:station_id ;
+        s223:hasProperty P:air_pressure,
+            P:power_consumption .
 
   dependencies:
   - args:

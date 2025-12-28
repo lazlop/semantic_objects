@@ -26,7 +26,7 @@ class Property(Node):
 class QuantifiableObservableProperty(Property):
     qk: quantitykinds.QuantityKind = required_field(qualified=False)
     value: float = required_field()
-    unit: Optional[Unit] = field(default=None, metadata={'relation': None, 'min': 1, 'max': None, 'qualified': True})
+    unit: Optional[Unit] = field(default=None, metadata={'min': 1, 'max': None, 'qualified': True})
     
     def __post_init__(self):
         """Set default unit if not provided"""
@@ -92,6 +92,7 @@ class EnvironmentalStation(Node):
     label = "Environmental Station"
     comment = "A comprehensive environmental monitoring station"
     
+    # Don't specify relation=None, let it be inferred from _valid_relations
     power_consumption: PowerConsumption = required_field()
     air_pressure: AirPressure = required_field()
     

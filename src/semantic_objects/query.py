@@ -154,30 +154,26 @@ class SparqlQueryBuilder:
                         # Check if the field type is a subclass of Resource
                         if (hasattr(field_type, '__mro__') and 
                             any(base.__name__ == 'Resource' for base in field_type.__mro__)):
-                            # Check if this class has a _semantic_type attribute
-                            # This allows classes to specify which parent type should be used in the semantic model
-                            if hasattr(field_type, '_semantic_type') and field_type._semantic_type is not None:
-                                semantic_type = field_type._semantic_type
-                                # Use the semantic type for the RDF type triple
-                                self.graph.add((PARAM[field_name], RDF.type, semantic_type._get_iri()))
+                            # Use the actual field type for the RDF type triple instead of _semantic_type
+                            self.graph.add((PARAM[field_name], RDF.type, field_type._get_iri()))
                                 
-                                # Add triples for any class-level fields (fields with init=False and a non-missing default)
-                                if hasattr(field_type, '__dataclass_fields__'):
-                                    for class_field_name, class_field_obj in field_type.__dataclass_fields__.items():
-                                        # Check if this is a class-level field (init=False with a default value)
-                                        if (not class_field_obj.init and 
-                                            not isinstance(class_field_obj.default, _MISSING_TYPE) and
-                                            class_field_obj.default is not None):
-                                            # Infer the relation for this class-level field
-                                            try:
-                                                class_field_relation = field_type._infer_relation_for_field(class_field_name, class_field_obj)
-                                                # Get the value - it should be a class attribute
-                                                class_field_value = getattr(field_type, class_field_name)
-                                                # Add triple for this class-level constraint
-                                                if hasattr(class_field_value, '_get_iri'):
-                                                    self.graph.add((PARAM[field_name], class_field_relation._get_iri(), class_field_value._get_iri()))
-                                            except (ValueError, AttributeError):
-                                                # If we can't infer the relation or get the value, skip it
+                            # Add triples for any class-level fields (fields with init=False and a non-missing default)
+                            if hasattr(field_type, '__dataclass_fields__'):
+                                for class_field_name, class_field_obj in field_type.__dataclass_fields__.items():
+                                    # Check if this is a class-level field (init=False with a default value)
+                                    if (not class_field_obj.init and 
+                                        not isinstance(class_field_obj.default, _MISSING_TYPE) and
+                                        class_field_obj.default is not None):
+                                        # Infer the relation for this class-level field
+                                        try:
+                                            class_field_relation = field_type._infer_relation_for_field(class_field_name, class_field_obj)
+                                            # Get the value - it should be a class attribute
+                                            class_field_value = getattr(field_type, class_field_name)
+                                            # Add triple for this class-level constraint
+                                            if hasattr(class_field_value, '_get_iri'):
+                                                self.graph.add((PARAM[field_name], class_field_relation._get_iri(), class_field_value._get_iri()))
+                                        except (ValueError, AttributeError):
+                                            # If we can't infer the relation or get the value, skip it
                                                 pass
                             else:
                                 # Add type triple for this dependency using the field type itself

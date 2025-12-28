@@ -20,18 +20,21 @@ def required_field(relation = None, min = 1, max = None, qualified = True, label
     # If the relation is none, it will use a default relation from the types of each thing.
     # The 'value' parameter allows specifying a target field name for inter-field relations
     # The 'exact_values' parameter specifies that the semantic model must have exactly these values (not at least)
-    return field(
-        metadata={
-            'relation': relation,
-            'min': min,
-            'max': max,
-            'qualified': qualified,
-            'label': label,
-            'comment': comment,
-            'value': value,  # New parameter for inter-field relations
-            'exact_values': exact_values  # New parameter for exact value matching
-        }
-    )
+    metadata = {
+        'min': min,
+        'max': max,
+        'qualified': qualified,
+        'label': label,
+        'comment': comment,
+        'value': value,  # New parameter for inter-field relations
+        'exact_values': exact_values  # New parameter for exact value matching
+    }
+    
+    # Only include relation in metadata if it's not None
+    if relation is not None:
+        metadata['relation'] = relation
+    
+    return field(metadata=metadata)
 
 # TODO: consider an alternative way of defining the maximum and minimum 
 def exclusive_field(relation = None, min = 1, max = 1, qualified = True, label=None, comment=None):

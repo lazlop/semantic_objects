@@ -8,3 +8,43 @@ hasExternalReference:
     P:name a s223:hasExternalReference .
 
   dependencies: []
+hasProperty:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:hasProperty .
+
+  dependencies: []
+hasQuantityKind:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:hasQuantityKind .
+
+  dependencies: []
+hasValue:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:hasValue .
+
+  dependencies: []
+hasUnit:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:hasUnit .
+
+  dependencies: []

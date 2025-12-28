@@ -29,18 +29,26 @@ def semantic_object(cls):
             # Set as required_field with the fixed value as default
             # Preserve any existing metadata from parent field
             parent_metadata = parent_field.metadata.copy() if parent_field.metadata else {}
+            
+            # Create metadata dict, only including relation if it's not None
+            metadata = {
+                'min': parent_metadata.get('min', 1),
+                'max': parent_metadata.get('max'),
+                'qualified': parent_metadata.get('qualified', True),
+                'label': parent_metadata.get('label'),
+                'comment': parent_metadata.get('comment')
+            }
+            
+            # Only include relation if it's not None
+            parent_relation = parent_metadata.get('relation')
+            if parent_relation is not None:
+                metadata['relation'] = parent_relation
+            
             # Create a new field with init=False since it has a fixed default
             new_field = field(
                 default=fixed_value,
                 init=False,
-                metadata={
-                    'relation': parent_metadata.get('relation'),
-                    'min': parent_metadata.get('min', 1),
-                    'max': parent_metadata.get('max'),
-                    'qualified': parent_metadata.get('qualified', True),
-                    'label': parent_metadata.get('label'),
-                    'comment': parent_metadata.get('comment')
-                }
+                metadata=metadata
             )
             setattr(cls, field_name, new_field)
     

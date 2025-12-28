@@ -1,12 +1,21 @@
 @prefix ns1: <http://data.ashrae.org/standard223#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <urn:test_env_station#> a owl:Ontology .
 
-<urn:test_env_station#AirPressure_4> a ns1:AirPressure .
-
 <urn:test_env_station#BMotif_Station> a ns1:Environmental_Station ;
-    ns1:hasExternalReference "BMOTIF_001" .
+    ns1:hasExternalReference "BMOTIF_001" ;
+    ns1:hasProperty <urn:test_env_station#AirPressure_4>,
+        <urn:test_env_station#PowerConsumption_4> .
 
-<urn:test_env_station#PowerConsumption_4> a ns1:PowerConsumption .
+<urn:test_env_station#AirPressure_4> a ns1:AirPressure ;
+    ns1:hasQuantityKind <http://qudt.org/vocab/quantitykind/Pressure> ;
+    ns1:hasUnit <http://qudt.org/vocab/unit/PA> ;
+    ns1:hasValue 1.02e+03 .
+
+<urn:test_env_station#PowerConsumption_4> a ns1:PowerConsumption ;
+    ns1:hasQuantityKind <http://qudt.org/vocab/quantitykind/Power> ;
+    ns1:hasUnit <http://qudt.org/vocab/unit/KiloW> ;
+    ns1:hasValue 2e+02 .
 
