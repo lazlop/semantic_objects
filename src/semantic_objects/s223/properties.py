@@ -54,7 +54,14 @@ class Tilt(QuantifiableObservableProperty):
 class Area_FT2(Area):
     unit = units.FT2
 
-# TODO: handle lists for things like aspect
 @semantic_object
 class Area_SP(Area):
-    aspects = [Setpoint, Deadband, Occupancy]
+    aspects: Optional[list] = field(
+        default=None,
+        init=False,
+        metadata={
+            'relation': hasAspect,
+            'exact_values': [Setpoint, Deadband, Occupancy],
+            'qualified': False
+        }
+    )

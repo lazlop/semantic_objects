@@ -15,9 +15,10 @@ def optional_field(relation= None, label=None, comment=None):
 
 # a field that is required (A SHACL qualified value shape requirement)
 # TODO: Consider how to handle qualified vs nonqualified constraints
-def required_field(relation = None, min = 1, max = None, qualified = True, label=None, comment=None, value=None):
+def required_field(relation = None, min = 1, max = None, qualified = True, label=None, comment=None, value=None, exact_values=None):
     # If the relation is none, it will use a default relation from the types of each thing.
     # The 'value' parameter allows specifying a target field name for inter-field relations
+    # The 'exact_values' parameter specifies that the semantic model must have exactly these values (not at least)
     return field(
         metadata={
             'relation': relation,
@@ -26,7 +27,8 @@ def required_field(relation = None, min = 1, max = None, qualified = True, label
             'qualified': qualified,
             'label': label,
             'comment': comment,
-            'value': value  # New parameter for inter-field relations
+            'value': value,  # New parameter for inter-field relations
+            'exact_values': exact_values  # New parameter for exact value matching
         }
     )
 
