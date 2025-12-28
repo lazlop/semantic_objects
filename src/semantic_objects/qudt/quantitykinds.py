@@ -25,3 +25,7 @@ class Power(QuantityKind):
 @semantic_object
 class Pressure(QuantityKind):
     _name = 'Pressure'
+
+@semantic_object
+class Temperature(QuantityKind):
+    pass

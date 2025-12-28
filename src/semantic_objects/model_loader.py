@@ -233,6 +233,7 @@ class ModelLoader:
                 local_name = str(entity_uri).split('#')[-1].split('/')[-1]
         
         # Process each field
+        # TODO: still need to generalize this. Right now just working for QuantifiableObservableProperty types with value
         if hasattr(resource_class, '__dataclass_fields__'):
             for field_name, field_obj in resource_class.__dataclass_fields__.items():
                 # Skip _name field as we handled it above

@@ -1,0 +1,49 @@
+Power:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:Power .
+
+  dependencies: []
+AirPressure:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:AirPressure .
+
+  dependencies: []
+AirHandlingUnit:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix s223: <http://data.ashrae.org/standard223#> .
+
+
+    P:name a s223:AirHandlingUnit .
+
+  dependencies:
+  - args:
+      name: power
+    template: Power
+  - args:
+      name: supply_pressure
+    template: AirPressure
+  - args:
+      name: return_pressure
+    template: AirPressure
+QuantityKind:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
+    @prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
+
+    P:name a quantitykind:QuantityKind .
+
+  dependencies: []

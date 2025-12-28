@@ -236,3 +236,7 @@ class hasQuantityKind(Predicate):
 @semantic_object
 class hasUnit(Predicate):
     pass
+
+@semantic_object
+class label(Predicate):
+    pass

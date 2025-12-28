@@ -70,3 +70,8 @@ class Area_SP(Area):
             'qualified': False
         }
     )
+
+@semantic_object
+class Power(QuantifiableObservableProperty):
+    qk = quantitykinds.Power
+    _semantic_type = QuantifiableObservableProperty
