@@ -1,0 +1,12 @@
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix s223: <http://data.ashrae.org/standard223#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/Space1> a s223:DomainSpace ;
+    s223:hasProperty <http://example.org/Area1> .
+
+<http://example.org/Area1> a s223:QuantifiableObservableProperty ;
+    qudt:hasQuantityKind quantitykind:Area ;
+    qudt:hasValue 1e+02 .
+

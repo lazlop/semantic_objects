@@ -1,0 +1,237 @@
+@prefix hpfs: <urn:hpflex/shapes#> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix s223: <http://data.ashrae.org/standard223#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+
+hpfs:AreaAnnotation a sh:NodeShape ;
+    sh:rule hpfs:AreaAnnotationRule ;
+    sh:targetClass s223:Area .
+
+hpfs:Area_FT2Annotation a sh:NodeShape ;
+    sh:rule hpfs:Area_FT2AnnotationRule ;
+    sh:targetClass s223:Area_FT2 .
+
+hpfs:Area_SPAnnotation a sh:NodeShape ;
+    sh:rule hpfs:Area_SPAnnotationRule ;
+    sh:targetClass s223:Area_SP .
+
+hpfs:AzimuthAnnotation a sh:NodeShape ;
+    sh:rule hpfs:AzimuthAnnotationRule ;
+    sh:targetClass s223:Azimuth .
+
+hpfs:DeadbandAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DeadbandAnnotationRule ;
+    sh:targetClass s223:Deadband .
+
+hpfs:DomainSpaceAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DomainSpaceAnnotationRule ;
+    sh:targetClass s223:DomainSpace .
+
+hpfs:EnumerationKindAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EnumerationKindAnnotationRule ;
+    sh:targetClass s223:EnumerationKind .
+
+hpfs:ExternalReferenceAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ExternalReferenceAnnotationRule ;
+    sh:targetClass s223:ExternalReference .
+
+hpfs:FT_2Annotation a sh:NodeShape ;
+    sh:rule hpfs:FT_2AnnotationRule ;
+    sh:targetClass unit:FT_2 .
+
+hpfs:NodeAnnotation a sh:NodeShape ;
+    sh:rule hpfs:NodeAnnotationRule ;
+    sh:targetClass s223:Node .
+
+hpfs:OccupancyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:OccupancyAnnotationRule ;
+    sh:targetClass s223:Occupancy .
+
+hpfs:PhysicalSpaceAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PhysicalSpaceAnnotationRule ;
+    sh:targetClass s223:PhysicalSpace .
+
+hpfs:PropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PropertyAnnotationRule ;
+    sh:targetClass s223:Property .
+
+hpfs:QuantifiableObservablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:QuantifiableObservablePropertyAnnotationRule ;
+    sh:targetClass s223:QuantifiableObservableProperty .
+
+hpfs:QuantityKindAnnotation a sh:NodeShape ;
+    sh:rule hpfs:QuantityKindAnnotationRule ;
+    sh:targetClass quantitykind:QuantityKind .
+
+hpfs:SetpointAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SetpointAnnotationRule ;
+    sh:targetClass s223:Setpoint .
+
+hpfs:SpaceAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SpaceAnnotationRule ;
+    sh:targetClass s223:Space .
+
+hpfs:SpaceWithWindowAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SpaceWithWindowAnnotationRule ;
+    sh:targetClass s223:SpaceWithWindow .
+
+hpfs:SpaceWithWindowNoMainRelationAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SpaceWithWindowNoMainRelationAnnotationRule ;
+    sh:targetClass s223:SpaceWithWindowNoMainRelation .
+
+hpfs:Space_TwoAreaAnnotation a sh:NodeShape ;
+    sh:rule hpfs:Space_TwoAreaAnnotationRule ;
+    sh:targetClass s223:Space_TwoArea .
+
+hpfs:TiltAnnotation a sh:NodeShape ;
+    sh:rule hpfs:TiltAnnotationRule ;
+    sh:targetClass s223:Tilt .
+
+hpfs:UnitAnnotation a sh:NodeShape ;
+    sh:rule hpfs:UnitAnnotationRule ;
+    sh:targetClass unit:Unit .
+
+hpfs:WindowAnnotation a sh:NodeShape ;
+    sh:rule hpfs:WindowAnnotationRule ;
+    sh:targetClass s223:Window .
+
+hpfs:AreaAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Area ;
+    sh:object s223:Area ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Area_FT2AnnotationRule a sh:TripleRule ;
+    sh:condition s223:Area_FT2 ;
+    sh:object s223:Area_FT2 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Area_SPAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Area_SP ;
+    sh:object s223:Area_SP ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:AzimuthAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Azimuth ;
+    sh:object s223:Azimuth ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DeadbandAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Aspect-Threshold ;
+    sh:object s223:Aspect-Threshold ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DomainSpaceAnnotationRule a sh:TripleRule ;
+    sh:condition s223:DomainSpace ;
+    sh:object s223:DomainSpace ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EnumerationKindAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Class ;
+    sh:object s223:Class ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ExternalReferenceAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ExternalReference ;
+    sh:object s223:ExternalReference ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FT_2AnnotationRule a sh:TripleRule ;
+    sh:condition unit:FT_2 ;
+    sh:object unit:FT_2 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:NodeAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Class ;
+    sh:object s223:Class ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OccupancyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Domain-Occupancy ;
+    sh:object s223:Domain-Occupancy ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PhysicalSpaceAnnotationRule a sh:TripleRule ;
+    sh:condition s223:PhysicalSpace ;
+    sh:object s223:PhysicalSpace ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Property ;
+    sh:object s223:Property ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:QuantifiableObservablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:QuantifiableObservableProperty ;
+    sh:object s223:QuantifiableObservableProperty ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:QuantityKindAnnotationRule a sh:TripleRule ;
+    sh:condition quantitykind:QuantityKind ;
+    sh:object quantitykind:QuantityKind ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:SetpointAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Aspect-Setpoint ;
+    sh:object s223:Aspect-Setpoint ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:SpaceAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Space ;
+    sh:object s223:Space ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:SpaceWithWindowAnnotationRule a sh:TripleRule ;
+    sh:condition s223:SpaceWithWindow ;
+    sh:object s223:SpaceWithWindow ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:SpaceWithWindowNoMainRelationAnnotationRule a sh:TripleRule ;
+    sh:condition s223:SpaceWithWindowNoMainRelation ;
+    sh:object s223:SpaceWithWindowNoMainRelation ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Space_TwoAreaAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Space_TwoArea ;
+    sh:object s223:Space_TwoArea ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:TiltAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Tilt ;
+    sh:object s223:Tilt ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:UnitAnnotationRule a sh:TripleRule ;
+    sh:condition unit: ;
+    sh:object unit: ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:WindowAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Window ;
+    sh:object s223:Window ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
