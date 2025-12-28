@@ -17,6 +17,7 @@ The goal of this package is to simplify:
 
 ### Tutorials
 - [Basic Tutorial](../tutorial/basic-tutorial.ipynb) - Interactive Jupyter notebook tutorial
+- [Class Creation Tutorial](../tutorial/class-creation-tutorial.ipynb) - Creating your own semantic object classes
 - [Model Loading Tutorial](../tutorial/model-loading-tutorial.ipynb) - Loading RDF data into Python objects
 - [Template Generation Tutorial](../tutorial/template-generation-tutorial.ipynb) - Creating BuildingMOTIF templates
 - [Advanced Examples](../tutorial/advanced-examples.ipynb) - Complex use cases and patterns
@@ -45,6 +46,12 @@ Define semantic objects as simple Python dataclasses:
 @semantic_object
 class Space(DomainSpace):
     area: Area = required_field()
+
+# Create your own classes easily
+@semantic_object
+class TemperatureSensor(Node):
+    temperature: Temperature = required_field()
+    location: Optional[str] = field(default=None)
 ```
 
 ### 2. **Automatic Query Generation**

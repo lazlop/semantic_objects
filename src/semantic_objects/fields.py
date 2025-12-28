@@ -5,11 +5,12 @@ from dataclasses import field
 def optional_field(relation= None, label=None, comment=None):
     return field(
         default=None,
-        init=False,
+        init=True,
         metadata={
             'relation': relation,
             'label': label,
-            'comment': comment
+            'comment': comment,
+            'optional': True
         }
     )
 
