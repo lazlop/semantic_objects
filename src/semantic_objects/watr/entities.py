@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from ..core import *
 from .. import units
 from .core import Node
-from .properties import Area, Azimuth, Tilt, QuantifiableObservableProperty, Power
+from .properties import Area, Azimuth, Tilt, QuantifiableObservableProperty
 from .relations import *
 
 # TODO: Consider how I'm using localname vs class name. Not consistent 
@@ -45,11 +45,6 @@ class Window(Node):
     area: Area = required_field()
     azimuth: Azimuth = required_field()
     tilt: Tilt = required_field()
-
-@semantic_object
-class Pump(Node):
-    """Pump with multiple properties using field-based relations"""
-    power: Powe= required_field()
 
 @semantic_object
 class SpaceWithWindow(Space):
