@@ -15,11 +15,17 @@ def semantic_object(cls):
     for base in cls.__mro__[1:]:
         if hasattr(base, '__dataclass_fields__'):
             parent_fields.update(base.__dataclass_fields__)
-    
+
     # Ensure cls has __annotations__
     if not hasattr(cls, '__annotations__'):
         cls.__annotations__ = {}
-    
+
+    # Fields pinned to a fixed value via default_factory (because the value is
+    # unhashable, e.g. a Resource instance) lose their plain class attribute
+    # when dataclass() processes them - restore it after decoration so
+    # `cls.field_name` keeps working the same way it does for hashable defaults.
+    factory_pinned_fields = {}
+
     # Check which ones are redefined in this class
     for field_name, parent_field in parent_fields.items():
         if field_name in cls.__dict__ and not isinstance(getattr(cls, field_name), type(field)):
@@ -29,11 +35,9 @@ def semantic_object(cls):
             # Set as required_field with the fixed value as default
             # Preserve any existing metadata from parent field
             parent_metadata = parent_field.metadata.copy() if parent_field.metadata else {}
-            # Create a new field with init=False since it has a fixed default
-            new_field = field(
-                default=fixed_value,
-                init=False,
-                metadata={
+            field_kwargs = {
+                'init': False,
+                'metadata': {
                     'relation': parent_metadata.get('relation'),
                     'min': parent_metadata.get('min', 1),
                     'max': parent_metadata.get('max'),
@@ -41,22 +45,38 @@ def semantic_object(cls):
                     'label': parent_metadata.get('label'),
                     'comment': parent_metadata.get('comment')
                 }
-            )
+            }
+            try:
+                hash(fixed_value)
+                field_kwargs['default'] = fixed_value
+            except TypeError:
+                # dataclasses reject unhashable (mutable) objects as a plain
+                # `default`, e.g. `domain = enumerationkinds.HVAC()` - pin it
+                # via a factory instead so it can still be a fixed value.
+                field_kwargs['default_factory'] = lambda fixed_value=fixed_value: fixed_value
+                factory_pinned_fields[field_name] = fixed_value
+            # Create a new field with init=False since it has a fixed default
+            new_field = field(**field_kwargs)
             setattr(cls, field_name, new_field)
-    
+
     # Set _name if not already defined in this class's __dict__
     if '_name' not in cls.__dict__:
         cls._name = cls.__name__
-    
+
     # Set abstract to False if not already defined in this class's __dict__
     if 'abstract' not in cls.__dict__:
         cls.abstract = False
-    
+
     # Initialize _inter_field_relations if not present
     if '_inter_field_relations' not in cls.__dict__:
         cls._inter_field_relations = []
-    
-    return dataclass(cls)
+
+    cls = dataclass(cls)
+
+    for field_name, fixed_value in factory_pinned_fields.items():
+        setattr(cls, field_name, fixed_value)
+
+    return cls
 
 @semantic_object
 class Resource:
@@ -141,6 +161,18 @@ class Resource:
 
         return parameters
 
+    @staticmethod
+    def _resolve_fixed_default(field_obj):
+        """Return a field's fixed value, whether pinned via `default` or
+        `default_factory` (used for unhashable values like Resource instances).
+        Returns the `_MISSING_TYPE` sentinel if the field has neither - i.e. it's
+        a real template parameter, not a fixed value."""
+        if not isinstance(field_obj.default, _MISSING_TYPE):
+            return field_obj.default
+        if not isinstance(field_obj.default_factory, _MISSING_TYPE):
+            return field_obj.default_factory()
+        return field_obj.default
+
     @classmethod
     def _get_inter_field_relations(cls):
         """
@@ -198,7 +230,7 @@ class Resource:
                     field_obj.metadata.get('templatize', True) == False):
                     continue
 
-                if not isinstance(field_obj.default,_MISSING_TYPE):
+                if not isinstance(cls._resolve_fixed_default(field_obj), _MISSING_TYPE):
                     continue
 
                 dependencies.append({
@@ -430,8 +462,9 @@ class Resource:
         parameters = self._get_template_parameters()
         evaluation_dict = {}
         for field_name, field_obj in parameters.items():
-            if not isinstance(field_obj.default, _MISSING_TYPE):
-                evaluation_dict[field_name] = field_obj.default
+            resolved_default = self._resolve_fixed_default(field_obj)
+            if not isinstance(resolved_default, _MISSING_TYPE):
+                evaluation_dict[field_name] = resolved_default
             else:
                 evaluation_dict[field_name] = None
         return evaluation_dict
@@ -554,3 +587,10 @@ class Node(Resource):
 
 class NamedNode(Node):
     templatize = False
+
+
+def get_related_classes(dclass, get_recursive=True):
+    """Module-level convenience re-export; delegates to discovery.get_related_classes
+    (kept as a local import to avoid a core<->discovery circular import)."""
+    from .discovery import get_related_classes as _get_related_classes
+    return _get_related_classes(dclass, get_recursive=get_recursive)
