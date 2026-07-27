@@ -7,13 +7,13 @@ import sys
 sys.path.append('..')
 
 # Test 1: Import from core module
-from src.semantic_objects.core import get_related_classes as get_related_classes_from_core
+from semantic_objects.core import get_related_classes as get_related_classes_from_core
 
-# Test 2: Import from s223 module  
-from src.semantic_objects.s223 import get_related_classes as get_related_classes_from_s223
+# Test 2: Import from s223 module
+from semantic_objects.s223 import get_related_classes as get_related_classes_from_s223
 
 # Import a sample s223 class to test with
-from src.semantic_objects.s223.entities import Space
+from examples.s223_framework_demo import Space
 
 def test_import_from_core():
     """Test that get_related_classes works when imported from core module."""

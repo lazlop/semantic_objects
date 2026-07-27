@@ -21,7 +21,7 @@ def test_semantic_type_attribute():
 
 def test_query_uses_semantic_type():
     """Test that SPARQL query generation uses _semantic_type instead of the subclass"""
-    from src.semantic_objects.s223.entities import Space
+    from examples.s223_framework_demo import Space
     
     # Generate query for Space which has an Area field
     query = Space.get_sparql_query()
@@ -36,7 +36,7 @@ def test_query_uses_semantic_type():
 
 def test_semantic_type_in_query_builder():
     """Test that SparqlQueryBuilder correctly handles _semantic_type"""
-    from src.semantic_objects.s223.entities import Space
+    from examples.s223_framework_demo import Space
     
     builder = SparqlQueryBuilder(Space)
     

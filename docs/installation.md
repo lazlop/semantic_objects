@@ -77,17 +77,17 @@ pip install -e .[dev]
 Test your installation:
 
 ```python
-# Test basic imports
-from semantic_objects.s223 import Space, Window, Area
+# Test basic imports - these classes are generated from the real s223 ontology
+from semantic_objects.s223 import entities, enumerationkinds
 from semantic_objects.model_loader import ModelLoader
-from semantic_objects.core import export_templates
+from semantic_objects.exporters import export_templates
 
-# Create a simple space
-space = Space(area=100.0)
-print(f"Created space with area: {space.area.value} {space.area.unit}")
+# Create an ontology-generated DomainSpace
+zone = entities.DomainSpace(domain=enumerationkinds.HVAC())
+print(f"Created {zone._name} with domain {zone.domain._name}")
 
 # Test template generation
-space_yaml = space.generate_yaml_template()
+zone_yaml = zone.generate_yaml_template()
 print("✅ Installation successful!")
 ```
 
@@ -141,6 +141,6 @@ pip install semantic-objects[all]
 ## Next Steps
 
 1. **Quick Start**: Follow the [Quick Start Guide](quick-start.md)
-2. **Tutorial**: Work through the [Basic Tutorial](../tutorial/basic-tutorial.ipynb)
+2. **Tutorial**: Work through the [Working with Generated Classes](../tutorial/s223-generated-classes-tutorial.ipynb)
 3. **Examples**: Explore the [examples directory](../examples/)
 4. **Documentation**: Read the [Core Concepts](core-concepts.md)

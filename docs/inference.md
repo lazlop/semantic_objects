@@ -50,13 +50,13 @@ The `AnnotationRuleGenerator` class creates SHACL annotation rules that use Trip
 
 ```python
 from semantic_objects.inference import AnnotationRuleGenerator
-from semantic_objects.s223.entities import Space, Window
+from semantic_objects.s223 import entities
 
 # Create generator
 generator = AnnotationRuleGenerator()
 
 # Generate rules for specific classes
-rules = generator.generate_annotation_rules([Space, Window])
+rules = generator.generate_annotation_rules([entities.DomainSpace, entities.Pump])
 
 # Access the shapes graph
 print(f"Generated {len(rules)} triples")
@@ -97,16 +97,16 @@ Generate SHACL annotation rules from classes or modules.
 ```python
 from semantic_objects.inference import generate_annotation_rules
 from semantic_objects.s223 import entities, properties
-from semantic_objects.s223.entities import Space
+from semantic_objects.s223 import entities
 
 # From modules
 rules = generate_annotation_rules([entities, properties])
 
 # From specific classes
-rules = generate_annotation_rules([Space])
+rules = generate_annotation_rules([entities.DomainSpace])
 
 # From a single class
-rules = generate_annotation_rules(Space)
+rules = generate_annotation_rules(entities.DomainSpace)
 ```
 
 #### infer_types()
@@ -134,12 +134,12 @@ inferred_data = infer_types(data, annotation_rules=rules)
 
 ### Annotation Rules
 
-The annotation rule generator creates SHACL shapes that define structural patterns for each semantic object class. For example, for a `Space` class with an `area` property:
+The annotation rule generator creates SHACL shapes that define structural patterns for each semantic object class. For example, for `entities.DomainSpace` (a real, ontology-generated class with a required `domain` field):
 
-1. An annotation shape is created: `hpfs:SpaceAnnotation`
-2. A SHACL TripleRule is defined: `hpfs:SpaceAnnotationRule`
-3. The rule targets instances of `s223:DomainSpace` (the base RDF type)
-4. When an instance matches the Space pattern (has required properties), the rule adds: `?instance rdf:type hpfs:Space`
+1. An annotation shape is created: `hpfs:DomainSpaceAnnotation`
+2. A SHACL TripleRule is defined: `hpfs:DomainSpaceAnnotationRule`
+3. The rule targets instances matching the `s223:DomainSpace` shape condition
+4. When an instance matches the pattern, the rule adds: `?instance rdf:type s223:DomainSpace`
 
 ### Inference Process
 
@@ -183,24 +183,21 @@ inferred_data = infer_types(data, classes=[entities], use_tq_shacl=False)
 ### Example 1: Basic Inference
 
 ```python
-from rdflib import Graph, Literal, URIRef
+from rdflib import Graph, URIRef
 from semantic_objects.s223 import entities, properties
 from semantic_objects.inference import generate_annotation_rules, infer_types
-from semantic_objects.namespaces import S223, QUDT, UNIT, bind_prefixes
+from semantic_objects.namespaces import S223, bind_prefixes
 
 # Create sample data
 data = Graph()
 bind_prefixes(data)
 
-space = URIRef("http://example.org/Space1")
-area = URIRef("http://example.org/Area1")
+zone = URIRef("http://example.org/Zone1")
+domain_value = URIRef("http://example.org/HVAC1")
 
-# Add triples matching Space pattern
-data.add((space, URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), S223.DomainSpace))
-data.add((space, S223.hasProperty, area))
-data.add((area, URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), S223.QuantifiableObservableProperty))
-data.add((area, QUDT.hasQuantityKind, URIRef("http://qudt.org/vocab/quantitykind/Area")))
-data.add((area, S223.hasValue, Literal(100.0)))
+# Add triples matching the real DomainSpace/hasDomain pattern
+data.add((zone, S223.hasDomain, domain_value))
+data.add((domain_value, URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), S223["EnumerationKind-Domain"]))
 
 # Run inference
 inferred = infer_types(data, classes=[entities, properties])
@@ -236,16 +233,16 @@ for data_file in ['building1.ttl', 'building2.ttl']:
 ### Example 3: Inspecting Generated Rules
 
 ```python
-from semantic_objects.s223.entities import Space
+from semantic_objects.s223 import entities
 from semantic_objects.inference import AnnotationRuleGenerator
 from semantic_objects.namespaces import HPFS, RDF, SH
 
 generator = AnnotationRuleGenerator()
-rules = generator.generate_annotation_rules(Space)
+rules = generator.generate_annotation_rules(entities.DomainSpace)
 
 # Query the rules graph
-annotation_shape = HPFS["SpaceAnnotation"]
-rule_iri = HPFS["SpaceAnnotationRule"]
+annotation_shape = HPFS["DomainSpaceAnnotation"]
+rule_iri = HPFS["DomainSpaceAnnotationRule"]
 
 print("Annotation Shape:")
 for s, p, o in rules.triples((annotation_shape, None, None)):

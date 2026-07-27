@@ -4,11 +4,12 @@ Understanding the fundamental concepts behind Semantic Objects will help you use
 
 ## Architecture Overview
 
-Semantic Objects provides three main capabilities:
+Semantic Objects provides four main capabilities:
 
-1. **Model Creation**: Define semantic objects as Python dataclasses
-2. **Model Loading**: Query RDF graphs and instantiate Python objects  
-3. **Template Generation**: Create BuildingMOTIF templates and SHACL shapes
+1. **Ontology Ingestion**: Parse an ontology's SHACL shapes into typed Python classes (`src/semantic_objects/ingest/`) - this is how `semantic_objects.s223` gets its ~576 entity/property/enumeration classes and ~60 relations, not hand-typing
+2. **Generated + Override Classes**: Generated base classes live in `s223/_generated/`; the sibling `s223/entities.py`, `s223/properties.py`, etc. add hand-written customization that isn't derivable from SHACL, then re-export everything - see `tutorial/ontology-ingestion-tutorial.ipynb`
+3. **Model Loading**: Query RDF graphs and instantiate Python objects
+4. **Template Generation**: Create BuildingMOTIF templates and SHACL shapes
 
 ## Resource Hierarchy
 
@@ -17,12 +18,12 @@ All semantic objects inherit from the `Resource` base class:
 ```python
 Resource                    # Base class for all semantic objects
 ├── Node                   # Concrete entities with auto-generated names
-│   ├── Space             # Domain-specific entities
-│   ├── Window
+│   ├── DomainSpace        # Ontology-generated entities (s223/_generated/entities.py)
+│   ├── Pump
 │   └── Equipment
 ├── NamedNode             # Fixed-value nodes (units, enums)
 │   ├── Unit              # FT2, M2, DEG, etc.
-│   └── EnumerationKind   # Setpoint, Deadband, etc.
+│   └── EnumerationKind   # Setpoint, Threshold, HVAC, etc.
 └── Predicate             # Relations between entities
     ├── hasProperty
     ├── connectedTo
@@ -44,13 +45,15 @@ class MyEntity(Resource):
 
 ### Node Classes
 
-`Node` represents concrete entities that can be instantiated:
+`Node` represents concrete entities that can be instantiated. This is a hand-written
+example (`examples/s223_framework_demo.py`); real ontology-generated `Node`
+subclasses live in `s223/_generated/entities.py`:
 
 ```python
 @semantic_object
-class Space(Node):
+class Room(Node):
     area: Area = required_field()
-    
+
     def __post_init__(self):
         # Custom initialization logic
         super().__post_init__()
@@ -107,17 +110,23 @@ area: Area = required_field(
 
 ## Property System
 
-Properties represent quantifiable attributes with values and units:
+Properties represent quantifiable attributes with values and units. The
+`Property`/`ObservableProperty`/`QuantifiableProperty`/`QuantifiableObservableProperty`/
+`EnumerableProperty` hierarchy is ontology-generated (`s223/_generated/properties.py`).
+`qk`/`value`/`unit` are hand-added on top in `s223/properties.py` - the ontology
+models those via QUDT-namespace relations (`qudt:hasQuantityKind`, `qudt:hasUnit`),
+which this pipeline doesn't ingest. Concrete quantity-kind leaves are hand-written
+the same way:
 
 ### Property Hierarchy
 
 ```python
-Property                           # Base property class
-└── QuantifiableObservableProperty # Properties with values and units
-    ├── Area                      # Specific property types
-    ├── Temperature
-    ├── Pressure
-    └── Flow
+Property (generated)
+└── QuantifiableObservableProperty (generated, extended by hand with qk/value/unit)
+    ├── Area      # hand-written leaf, s223/properties.py
+    ├── Azimuth
+    ├── Tilt
+    └── Power
 ```
 
 ### Property Definition
@@ -133,15 +142,15 @@ class Area(QuantifiableObservableProperty):
 
 ```python
 # Create with value only (uses default unit)
-area1 = Area(100.0)  # 100.0 ft² (default)
+area1 = Area(100.0)  # 100.0 m² (default - see qudt/defaults.py)
 
 # Create with explicit unit
-from semantic_objects.qudt.units import M2
-area2 = Area(100.0, unit=M2)  # 100.0 m²
+from semantic_objects.qudt.units import M2, FT2
+area2 = Area(100.0, unit=FT2)  # 100.0 ft²
 
 # Access components
 print(area1.value)  # 100.0
-print(area1.unit)   # FT2 
+print(area1.unit)   # M2
 print(area1.qk)     # Area quantity kind
 ```
 
@@ -170,36 +179,40 @@ class contains(Predicate):
 
 ### Automatic Relation Inference
 
-The library automatically infers relations from field types:
+The library automatically infers relations from field types. This is (simplified)
+how the real, generated `DomainSpace` is defined:
 
 ```python
 @semantic_object
-class Space(Node):
-    area: Area = required_field()  # Automatically uses hasProperty relation
-    
+class DomainSpace(Connectable):
+    domain: Domain = required_field()  # Automatically uses hasDomain relation
+
 # Equivalent to:
-@semantic_object  
-class Space(Node):
-    area: Area = required_field(relation=hasProperty)
+@semantic_object
+class DomainSpace(Connectable):
+    domain: Domain = required_field(relation=hasDomain)
 ```
 
 ## Template Generation
 
-Semantic objects automatically generate BuildingMOTIF templates:
-
-### Template Structure
+Semantic objects automatically generate BuildingMOTIF templates. This is the real
+output for `entities.DomainSpace.to_yaml()`:
 
 ```yaml
-Space:
-  body: |
+DomainSpace:
+  body: >+
+    @prefix P: <urn:___param___#> .
+
     @prefix s223: <http://data.ashrae.org/standard223#> .
-    @prefix param: <urn:___param___#> .
-    
-    param:name a s223:Space ;
-        s223:hasProperty param:area .
+
+
+    P:name a s223:DomainSpace ;
+        s223:hasDomain P:domain .
+
   dependencies:
-    - template: Area
-      args: {name: area}
+  - args:
+      name: domain
+    template: Domain
 ```
 
 ### Template Parameters
@@ -208,11 +221,11 @@ Templates use parameters for flexible instantiation:
 
 ```python
 # Get template parameters for a class
-params = Space._get_template_parameters()
-# Returns: {'area': Field(type=Area, ...)}
+params = entities.DomainSpace._get_template_parameters()
+# Returns: {'domain': Field(type=Domain, ...)}
 
 # Generate template body
-body = Space.generate_turtle_body()
+body = entities.DomainSpace.generate_turtle_body()
 # Returns RDF/Turtle with param: placeholders
 ```
 
@@ -222,10 +235,10 @@ Generate SHACL shapes for validation:
 
 ```python
 # Generate SHACL shape with full hierarchy
-shacl_full = Space.generate_rdf_class_definition(include_hierarchy=True)
+shacl_full = entities.DomainSpace.generate_rdf_class_definition(include_hierarchy=True)
 
-# Generate only local constraints  
-shacl_local = Space.generate_rdf_class_definition(include_hierarchy=False)
+# Generate only local constraints
+shacl_local = entities.DomainSpace.generate_rdf_class_definition(include_hierarchy=False)
 ```
 
 ### SHACL Features
@@ -240,35 +253,39 @@ shacl_local = Space.generate_rdf_class_definition(include_hierarchy=False)
 Automatically generate SPARQL queries from class definitions:
 
 ```python
-# Generate query for Space class
-query = Space.get_sparql_query(ontology='s223')
+# Generate query for DomainSpace class
+query = entities.DomainSpace.get_sparql_query(ontology='s223')
 
 # Query includes:
-# - Class type constraints (a s223:Space)
-# - Property patterns (s223:hasProperty ?area)
-# - Property type constraints (?area a s223:QuantifiableObservableProperty)
-# - Quantity kind filters (for s223 ontology)
+# - Class type constraints (a s223:DomainSpace)
+# - Property patterns (s223:hasDomain ?domain)
+# - Property type constraints (?domain a s223:EnumerationKind-Domain)
 ```
 
 ## Ontology Support
 
 ### S223 (ASHRAE Standard 223P)
 
-Complete implementation of ASHRAE 223P concepts:
+Classes are generated from the real ontology's SHACL shapes - see
+`tutorial/ontology-ingestion-tutorial.ipynb` for how, and
+`tutorial/s223-generated-classes-tutorial.ipynb` for a full usage walkthrough:
 
 ```python
-from semantic_objects.s223 import *
+from semantic_objects.s223 import entities, properties, enumerationkinds
 
-# Entities
-space = Space(area=100.0)
-window = Window(area=10.0, azimuth=180.0, tilt=90.0)
+# Entities (ontology-generated)
+zone = entities.DomainSpace(domain=enumerationkinds.HVAC())
 
-# Relations  
-space.windows = [window]  # Uses hasWindow relation
+water = enumerationkinds.Water()
+connection = entities.Connection(medium=water)
+pump = entities.Pump(
+    outlet_connection_point=entities.OutletConnectionPoint(medium=water, connection=connection),
+    inlet_connection_point=entities.InletConnectionPoint(medium=water, connection=connection),
+)
 
-# Properties with quantity kinds
-area = Area(100.0)        # Area quantity kind
-temp = Temperature(72.0)  # Temperature quantity kind
+# Properties with quantity kinds (qk/value/unit hand-added on generated base - see s223/properties.py)
+area = properties.Area(100.0)        # Area quantity kind
+power = properties.Power(500.0)      # Power quantity kind
 ```
 
 ### QUDT (Quantities, Units, Dimensions, Types)
@@ -280,42 +297,50 @@ from semantic_objects.qudt import quantitykinds, units
 
 # Quantity kinds
 area_qk = quantitykinds.Area
-temp_qk = quantitykinds.Temperature
+temp_qk = quantitykinds.Temperature  # a QuantityKind marker exists, but there's
+                                      # no hand-written Temperature *property* leaf
+                                      # yet in s223/properties.py - add one the same
+                                      # way Area/Power are defined, if you need it
 
 # Units
 ft2 = units.FT2
 m2 = units.M2
-celsius = units.DEG_C
-fahrenheit = units.DEG_F
+psi = units.PSI
+pa = units.PA
 ```
 
 ## Best Practices
+
+These examples subclass `entities.DomainSpace` (real, ontology-generated) to show
+customization patterns - the same patterns apply whether you're extending a
+generated class or a hand-written one.
 
 ### 1. Use Type Hints
 
 ```python
 from typing import Optional, List
+from semantic_objects.s223 import entities
 
 @semantic_object
-class Space(Node):
-    area: Area = required_field()
-    windows: Optional[List[Window]] = optional_field()
+class MyZone(entities.DomainSpace):
+    extra_area: Area = required_field()
+    notes: Optional[Area] = optional_field()
 ```
 
 ### 2. Implement __post_init__ for Validation
 
 ```python
 @semantic_object
-class Space(Node):
-    area: Area = required_field()
-    
+class MyZone(entities.DomainSpace):
+    extra_area: Area = required_field()
+
     def __post_init__(self):
         super().__post_init__()
         # Convert raw values to proper types
-        if not isinstance(self.area, Area):
-            self.area = Area(self.area)
+        if not isinstance(self.extra_area, Area):
+            self.extra_area = Area(self.extra_area)
         # Add validation logic
-        if self.area.value <= 0:
+        if self.extra_area.value <= 0:
             raise ValueError("Area must be positive")
 ```
 
@@ -323,10 +348,10 @@ class Space(Node):
 
 ```python
 @semantic_object
-class Space(Node):
-    area: Area = required_field(
-        label="Floor Area",
-        comment="Total conditioned floor area of the space in square feet"
+class MyZone(entities.DomainSpace):
+    extra_area: Area = required_field(
+        label="Extra Area",
+        comment="Additional floor area associated with this zone"
     )
 ```
 
@@ -334,19 +359,19 @@ class Space(Node):
 
 ```python
 @semantic_object
-class ConditionedSpace(Space):
-    """Space with HVAC conditioning"""
-    design_temperature: Temperature = required_field()
+class ConditionedZone(entities.DomainSpace):
+    """Zone with HVAC conditioning"""
+    design_power: Power = required_field()
 
-@semantic_object  
-class Office(ConditionedSpace):
-    """Office space with occupancy"""
-    occupancy: Occupancy = required_field()
+@semantic_object
+class Office(ConditionedZone):
+    """Office zone with occupancy"""
+    occupancy: Domain = required_field()
 ```
 
 ## Next Steps
 
-- **Hands-on Practice**: Work through the [Basic Tutorial](../tutorial/basic-tutorial.ipynb)
-- **Model Loading**: Learn about [loading RDF data](../tutorial/model-loading-tutorial.ipynb)
+- **Hands-on Practice**: Work through the [Working with Generated Classes](../tutorial/s223-generated-classes-tutorial.ipynb)
+- **Model Loading**: Learn about [the ontology ingestion pipeline](../tutorial/ontology-ingestion-tutorial.ipynb)
 - **Custom Entities**: Create [custom semantic objects](guides/custom-entities.md)
 - **API Reference**: Explore the [detailed API documentation](api/)

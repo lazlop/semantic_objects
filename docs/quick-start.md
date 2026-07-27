@@ -12,29 +12,36 @@ pip install semantic-objects[buildingmotif]
 
 ## Basic Usage
 
-### 1. Define Semantic Objects
+### 1. Use the Ontology-Generated Classes
+
+`semantic_objects.s223` classes are generated from the real ASHRAE 223P ontology's
+SHACL shapes (`python -m semantic_objects.ingest.cli --ontology s223`), not
+hand-typed. See `tutorial/s223-generated-classes-tutorial.ipynb` for the full walkthrough.
 
 ```python
-from semantic_objects.s223 import Space, Window, Area, Azimuth, Tilt
+from semantic_objects.s223 import entities, enumerationkinds
 
-# Create a space with area
-space = Space(area=100.0)  # Area in default units (ft²)
+# DomainSpace is a real ontology class - `domain` is required (min=1, max=1)
+zone = entities.DomainSpace(domain=enumerationkinds.HVAC())
 
-# Create a window with multiple properties
-window = Window(
-    area=10.0,      # ft²
-    azimuth=180.0,  # degrees (south-facing)
-    tilt=90.0       # degrees (vertical)
+# Pump demonstrates qualified fields: two connection points sharing the same
+# `hasConnectionPoint` relation, narrowed to specific subtypes by the ontology
+water = enumerationkinds.Water()
+connection = entities.Connection(medium=water)
+pump = entities.Pump(
+    outlet_connection_point=entities.OutletConnectionPoint(medium=water, connection=connection),
+    inlet_connection_point=entities.InletConnectionPoint(medium=water, connection=connection),
 )
 
-print(f"Space area: {space.area.value} {space.area.unit}")
-print(f"Window facing: {window.azimuth.value}° azimuth")
+print(f"{zone._name}: domain={zone.domain._name}")
+print(f"{pump._name}: outlet medium={pump.outlet_connection_point.medium._name}")
 ```
 
 ### 2. Load Data from RDF Graphs
 
 ```python
 from semantic_objects.model_loader import ModelLoader
+from semantic_objects.s223 import entities
 from rdflib import Graph
 
 # Load an RDF graph
@@ -43,22 +50,21 @@ graph.parse("building_model.ttl")
 
 # Initialize loader and load spaces
 loader = ModelLoader(source=graph)
-spaces = loader.load_instances(Space, ontology='s223')
+spaces = loader.load_instances(entities.DomainSpace, ontology='s223')
 
 # Work with loaded objects
 for space in spaces:
     print(f"Loaded space: {space._name}")
-    if space.area:
-        print(f"  Area: {space.area.value} {space.area.unit}")
 ```
 
 ### 3. Generate Templates
 
 ```python
-from semantic_objects.core import export_templates
+from semantic_objects.exporters import export_templates
+from semantic_objects.s223 import entities
 
 # Export templates for BuildingMOTIF
-export_templates(Space, 'templates/')
+export_templates(entities.DomainSpace, 'templates/')
 
 # This creates:
 # templates/entities.yml
@@ -70,34 +76,35 @@ export_templates(Space, 'templates/')
 
 ```python
 from semantic_objects.build_model import BMotifSession
+from semantic_objects.s223 import entities, enumerationkinds
 
 # Create session and load templates
 session = BMotifSession()
-session.load_class_templates(Space)
+session.load_class_templates(entities.DomainSpace)
 
 # Create and evaluate a space
-space = Space(area=150.0)
-session.evaluate(space)
+zone = entities.DomainSpace(domain=enumerationkinds.HVAC())
+session.evaluate(zone)
 
-# The RDF model is now in session.graph
-print(session.graph.serialize(format='turtle'))
+# The RDF model is now in session.model.graph
+print(session.model.graph.serialize(format='turtle'))
 ```
 
 ## Key Concepts
 
 ### Entities vs Properties
 
-- **Entities**: Physical or logical objects (Space, Window, Equipment)
-- **Properties**: Attributes with values and units (Area, Temperature, Pressure)
+- **Entities**: Physical or logical objects (`DomainSpace`, `Pump`, `Equipment`) - generated from ontology classes into `s223/_generated/entities.py`
+- **Properties**: Attributes with values and units (`Area`, `Power`) - the `Property`/`QuantifiableObservableProperty` hierarchy is generated too, but `qk`/`value`/`unit` and concrete quantity-kind leaves like `Area` are hand-written on top (see `s223/properties.py`) since they come from the QUDT namespace, which this pipeline doesn't ingest
 
 ```python
-# Entity with properties
-space = Space(area=Area(100.0))  # Space is entity, Area is property
+from semantic_objects.s223.properties import Area
 
 # Properties have quantity kinds and units
-print(space.area.qk)    # Area quantity kind
-print(space.area.unit)  # Square feet (default)
-print(space.area.value) # 100.0
+area = Area(100.0)
+print(area.qk)     # Area quantity kind
+print(area.unit)   # M2 (default unit)
+print(area.value)  # 100.0
 ```
 
 ### Field Types
@@ -107,11 +114,15 @@ print(space.area.value) # 100.0
 - `exclusive_field()`: Exactly one value (min=1, max=1)
 
 ```python
+from semantic_objects.core import semantic_object
+from semantic_objects.fields import required_field, optional_field
+from semantic_objects.s223 import entities
+from semantic_objects.s223.properties import Area
+
 @semantic_object
-class MySpace(Space):
-    area: Area = required_field()           # Required
-    volume: Volume = optional_field()       # Optional
-    zone_type: ZoneType = exclusive_field() # Exactly one
+class ZoneWithExtraArea(entities.DomainSpace):
+    conditioned_area: Area = required_field()    # Required
+    unconditioned_area: Area = optional_field()  # Optional
 ```
 
 ### Automatic Features
@@ -126,8 +137,8 @@ The library automatically:
 ## Next Steps
 
 1. **Learn More**: Read the [Core Concepts](core-concepts.md) guide
-2. **Interactive Tutorial**: Work through the [Basic Tutorial](../tutorial/basic-tutorial.ipynb)
-3. **Advanced Usage**: Explore [Model Loading](../tutorial/model-loading-tutorial.ipynb)
+2. **Interactive Tutorial**: Work through the [Working with Generated Classes](../tutorial/s223-generated-classes-tutorial.ipynb)
+3. **Advanced Usage**: Explore [Ontology Ingestion](../tutorial/ontology-ingestion-tutorial.ipynb)
 4. **Custom Objects**: Learn to [create custom entities](guides/custom-entities.md)
 
 ## Common Patterns
@@ -135,19 +146,22 @@ The library automatically:
 ### Loading Multiple Entity Types
 
 ```python
+from semantic_objects.s223 import entities
+
 # Load multiple classes at once
 results = loader.load_multiple_classes({
-    'spaces': Space,
-    'windows': Window,
+    'zones': entities.DomainSpace,
+    'pumps': entities.Pump,
 }, ontology='s223')
 
-spaces = results['spaces']
-windows = results['windows']
+zones = results['zones']
+pumps = results['pumps']
 ```
 
 ### Working with Units
 
 ```python
+from semantic_objects.s223.properties import Area
 from semantic_objects.qudt.units import M2, FT2
 
 # Explicit unit specification
@@ -155,14 +169,16 @@ area_metric = Area(100.0, unit=M2)
 area_imperial = Area(100.0, unit=FT2)
 
 # Default units are used if not specified
-area_default = Area(100.0)  # Uses FT2 by default
+area_default = Area(100.0)  # Uses M2 by default (see qudt/defaults.py)
 ```
 
 ### Query Generation
 
 ```python
+from semantic_objects.s223 import entities
+
 # Generate SPARQL query for any Resource class
-query = Space.get_sparql_query(ontology='s223')
+query = entities.DomainSpace.get_sparql_query(ontology='s223')
 print(query)
 
 # Execute query manually

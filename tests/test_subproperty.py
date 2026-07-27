@@ -1,7 +1,8 @@
 """Test subproperty relations functionality"""
 
-from src.semantic_objects.s223.entities import DomainSpace, Window
-from src.semantic_objects.s223.relations import hasWindow, connectedTo
+from semantic_objects.s223.entities import DomainSpace
+from semantic_objects.s223.relations import connectedTo
+from examples.s223_framework_demo import Window, hasWindow
 
 def test_hasWindow_relation():
     """Test that hasWindow relation is properly defined as a subproperty"""

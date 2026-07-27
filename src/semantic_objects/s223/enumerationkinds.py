@@ -1,28 +1,8 @@
-from ..core import NamedNode, semantic_object
-# TODO move enumerationkind
-# TODO seems like I can actually remove NamedNode
-from .core import EnumerationKind
+"""Hand-written overrides on top of the ontology-generated enumeration kinds.
 
-@semantic_object
-class Aspect(EnumerationKind):
-    _name = 'EnumerationKind-Aspect'
-
-@semantic_object
-class Setpoint(Aspect):
-    _name = 'Aspect-Setpoint'
-
-@semantic_object
-class Deadband(Aspect):
-    _name = 'Aspect-Deadband'
-
-@semantic_object
-class Deadband(Aspect):
-    _name = 'Aspect-Threshold'
-
-@semantic_object
-class Domain(EnumerationKind):
-    _name = 'EnumerationKind-Domain'
-
-@semantic_object
-class Occupancy(Domain):
-    _name = 'Domain-Occupancy'
+See _generated/enumerationkinds.py (regenerated via
+`python -m semantic_objects.ingest.cli --ontology s223`) for the ~490 enumeration
+values derived from the vendored ontology. Nothing needs hand customization here
+currently.
+"""
+from ._generated.enumerationkinds import *

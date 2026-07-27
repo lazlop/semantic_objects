@@ -66,13 +66,16 @@ The query builder now:
 
 **File**: `src/semantic_objects/s223/properties.py`
 
-Changed from hardcoded class attribute to field metadata:
+Changed from hardcoded class attribute to field metadata. Note: `Deadband` was
+later renamed `Threshold` when `enumerationkinds.py` was regenerated from the real
+ontology (`s223:Aspect-Threshold`'s label is "Threshold", not "Deadband" - the two
+duplicate hand-written `Deadband` classes that existed before generation are gone).
 
 **Before**:
 ```python
 @semantic_object
 class Area_SP(Area):
-    aspects = [Setpoint, Deadband, Occupancy]
+    aspects = [Setpoint, Threshold, Occupancy]
 ```
 
 **After**:
@@ -84,7 +87,7 @@ class Area_SP(Area):
         init=False,
         metadata={
             'relation': hasAspect,
-            'exact_values': [Setpoint, Deadband, Occupancy],
+            'exact_values': [Setpoint, Threshold, Occupancy],
             'qualified': False
         }
     )
@@ -92,7 +95,7 @@ class Area_SP(Area):
 
 ## Generated SPARQL Query Example
 
-For `Area_SP`, the system now generates:
+For `Area_SP`, the system generates (real output as of the current codebase):
 
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -100,9 +103,9 @@ PREFIX quantitykind: <http://qudt.org/vocab/quantitykind/>
 PREFIX s223: <http://data.ashrae.org/standard223#>
 
 SELECT DISTINCT * WHERE {
-    ?name rdf:type s223:Area_SP .
-    ?name s223:hasValue ?value .
     ?name s223:hasQuantityKind quantitykind:Area .
+    ?name s223:hasValue ?value .
+    ?name rdf:type s223:Area_SP .
     ?name <http://data.ashrae.org/standard223#hasAspect> ?name_exact_values .
     FILTER(?name_exact_values IN (s223:Aspect-Setpoint,s223:Aspect-Threshold,s223:Domain-Occupancy) )
 }

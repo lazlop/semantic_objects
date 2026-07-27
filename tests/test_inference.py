@@ -42,7 +42,7 @@ def test_generate_annotation_rules_from_classes():
     print("\n=== Testing Annotation Rule Generation from Classes ===")
     
     # Generate rules for specific classes
-    from semantic_objects.s223.entities import Space, Window
+    from examples.s223_framework_demo import Space, Window
     from semantic_objects.s223.properties import Area, Azimuth
     
     rules = generate_annotation_rules([Space, Window, Area, Azimuth])
@@ -57,8 +57,8 @@ def test_annotation_rule_structure():
     """Test that annotation rules have the correct structure"""
     print("\n=== Testing Annotation Rule Structure ===")
     
-    from semantic_objects.s223.entities import Space
-    
+    from examples.s223_framework_demo import Space
+
     generator = AnnotationRuleGenerator()
     rules = generator.generate_annotation_rules(Space)
     

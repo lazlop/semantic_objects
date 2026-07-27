@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Test the qualified value shapes in RDF generation
-from src.semantic_objects.s223.entities import Space, Window
+from examples.s223_framework_demo import Space, Window
 
 def test_space_rdf():
     print("Testing RDF class definition generation for Space (with Area field):")

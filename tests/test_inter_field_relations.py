@@ -5,7 +5,7 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from semantic_objects.s223.entities import SpaceWithWindow, SpaceWithWindowNoMainRelation, Space, Window
+from examples.s223_framework_demo import SpaceWithWindow, SpaceWithWindowNoMainRelation, Space, Window
 from semantic_objects.s223.properties import Area, Azimuth, Tilt
 from semantic_objects.s223.relations import connectedTo
 from semantic_objects import units

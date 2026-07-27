@@ -6,7 +6,7 @@ for querying semantic models that must have exactly the specified values.
 """
 
 from semantic_objects.s223.properties import Area_SP
-from semantic_objects.s223.enumerationkinds import Setpoint, Deadband, Occupancy
+from semantic_objects.s223.enumerationkinds import Setpoint, Threshold, Occupancy
 
 
 def test_area_sp_query_generation():
@@ -48,7 +48,7 @@ def test_exact_values_metadata():
     exact_values = field_obj.metadata['exact_values']
     assert len(exact_values) == 3, "Should have exactly 3 aspect values"
     assert Setpoint in exact_values, "Should include Setpoint"
-    assert Deadband in exact_values, "Should include Deadband"
+    assert Threshold in exact_values, "Should include Threshold"
     assert Occupancy in exact_values, "Should include Occupancy"
     
     print("✓ Metadata test passed")

@@ -43,9 +43,15 @@ class YamlExporter:
         """Generate RDF/Turtle body for template"""
         g = Graph()
         bind_prefixes(g)
-        
-        g.add((PARAM['name'], RDF.type, cls._get_iri()))
-        
+
+        # Classes that pin fields to fixed values purely as a Python-level
+        # convenience (not a new ontology class) can set `_semantic_type` to the
+        # real ontology class that should appear in the asserted rdf:type - the
+        # same mechanism already used for e.g. properties.Area/QuantifiableObservableProperty.
+        semantic_type = getattr(cls, '_semantic_type', None)
+        type_source = semantic_type if semantic_type is not None else cls
+        g.add((PARAM['name'], RDF.type, type_source._get_iri()))
+
         parameters = cls._get_template_parameters()
         for field_name, field_obj in parameters.items():
             # Check if this field has a 'value' metadata pointing to another field
@@ -53,15 +59,16 @@ class YamlExporter:
             if target_field_name is not None:
                 # This is an inter-field relation - skip it here, handle separately
                 continue
-            
+
             # Check if relation is explicitly set to None (skip main entity relation)
             if field_obj.metadata.get('relation') is None and 'relation' in field_obj.metadata:
                 # Relation explicitly set to None - skip creating main entity relation
                 continue
-                
+
             relation = cls._infer_relation_for_field(field_name, field_obj)
-            if not isinstance(field_obj.default, _MISSING_TYPE) and field_obj.default is not None:
-                g.add((PARAM['name'], relation._get_iri(), field_obj.default._get_iri()))
+            fixed_value = cls._resolve_fixed_default(field_obj)
+            if not isinstance(fixed_value, _MISSING_TYPE) and fixed_value is not None:
+                g.add((PARAM['name'], relation._get_iri(), fixed_value._get_iri()))
             else:
                 g.add((PARAM['name'], relation._get_iri(), PARAM[field_name]))
         
@@ -162,16 +169,19 @@ class RdfExporter:
             target_type = cls
         
         add_qual_val_shape = True
-        
+
+        fixed_value = cls._resolve_fixed_default(field_obj)
+        has_fixed_value = not isinstance(fixed_value, _MISSING_TYPE)
+
         # Check if this is a literal type
-        if isinstance(field_obj.default, Literal) if hasattr(field_obj, 'default') else False:
-            g.add((qual_val_shape, SH.hasValue, field_obj.default))
+        if has_fixed_value and isinstance(fixed_value, Literal):
+            g.add((qual_val_shape, SH.hasValue, fixed_value))
         # Check if target is a Resource subclass
         elif hasattr(target_type, '_get_iri'):
             g.add((qual_val_shape, SH['class'], target_type._get_iri()))
         # For other types, use hasValue if a default is provided
-        elif hasattr(field_obj, 'default') and field_obj.default is not None:
-            g.add((qual_val_shape, SH.hasValue, field_obj.default))
+        elif has_fixed_value and fixed_value is not None:
+            g.add((qual_val_shape, SH.hasValue, fixed_value))
         else:
             add_qual_val_shape = False
         

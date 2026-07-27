@@ -1,86 +1,9 @@
-from typing import Optional, Self
-from dataclasses import dataclass, field
+"""Hand-written overrides on top of the ontology-generated entities.
 
-from ..core import *
-from .. import units
-from .core import Node
-from .properties import Area, Azimuth, Tilt, QuantifiableObservableProperty, Power
-from .relations import *
-
-# TODO: Consider how I'm using localname vs class name. Not consistent 
-
-@semantic_object
-class Connectable(Node):
-    label = "Connectable"
-    # TODO: consider if we want something like abstract, which doesn't work exactly like on the s223 ontology
-    abstract = True
-@semantic_object
-class DomainSpace(Connectable):
-    label = "Domain Space"
-
-@semantic_object
-class PhysicalSpace(Connectable):
-    label = "Physical Space"
-    comment = "A `PhysicalSpace` is an architectural concept representing a room, a part of a room, a collection of rooms, or any other physical region in a building. PhysicalSpaces may be grouped to define larger `PhysicalSpace`s using the relation `contains` (see {s223:contains})."
-
-@semantic_object
-class Space(DomainSpace):
-    area: Area = required_field()
-    
-    def __post_init__(self):
-        """Convert raw values to proper types"""
-        super().__post_init__()
-        if not isinstance(self.area, Area):
-            # Area.__init__ expects (value, unit=None) as positional args
-            self.area = Area(self.area)
-
-@semantic_object
-class Space_TwoArea(Space):
-    """Space with two area fields for testing hierarchy"""
-    area2: Area = required_field()
-
-@semantic_object
-class Window(Node):
-    """Window with multiple properties using field-based relations"""
-    area: Area = required_field()
-    azimuth: Azimuth = required_field()
-    tilt: Tilt = required_field()
-
-@semantic_object
-class Pump(Node):
-    """Pump with multiple properties using field-based relations"""
-    power: Powe= required_field()
-
-@semantic_object
-class SpaceWithWindow(Space):
-    """Example of a Space with a Window using inter-field relations"""
-    space: Space = required_field(relation=hasDomainSpace)
-    window: Window = required_field(relation=hasWindow)
-    
-    # Define inter-field relations using the class attribute
-    _inter_field_relations = [
-        inter_field_relation(
-            source_field='space',
-            relation=connectedTo,
-            target_field='window',
-            min=1,
-            max=1
-        )
-    ]
-
-@semantic_object
-class SpaceWithWindowNoMainRelation(Space):
-    """Example where window has no relation to main entity, only space->window relation"""
-    space: Space = required_field(relation=hasDomainSpace)
-    window: Window = required_field(relation=None)  # No relation from main entity to window
-    
-    # Define inter-field relations using the class attribute
-    _inter_field_relations = [
-        inter_field_relation(
-            source_field='space',
-            relation=connectedTo,
-            target_field='window',
-            min=1,
-            max=1
-        )
-    ]
+See _generated/entities.py (regenerated via
+`python -m semantic_objects.ingest.cli --ontology s223`) for the classes derived
+from the vendored ontology's SHACL shapes. Nothing needs hand customization here
+currently - add __post_init__ coercion, _inter_field_relations, or other
+non-derivable behavior on a subclass here as needed.
+"""
+from ._generated.entities import *

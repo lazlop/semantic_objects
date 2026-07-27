@@ -3,7 +3,8 @@
 Test script to verify the include_hierarchy parameter in generate_rdf_class_definition
 """
 
-from src.semantic_objects.s223.entities import Space, PhysicalSpace, Space_TwoArea, Window
+from src.semantic_objects.s223.entities import PhysicalSpace
+from examples.s223_framework_demo import Space, Space_TwoArea, Window
 
 def test_hierarchy_modes():
     """Test both hierarchy modes for RDF class definition generation"""

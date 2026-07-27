@@ -1,0 +1,6 @@
+{
+    "source_url": "https://open223.info/223p.ttl",
+    "fetched_at": "2026-07-24T00:00:00Z",
+    "sha256": "47bdad8925032c84e750e46b3649d102f4e41190c8161df3c9efa3265009b0e0",
+    "notes": "Pinned copy of the ASHRAE Standard 223P ontology, vendored for reproducible/offline ontology ingestion. Not fetched live during generation. Re-vendor with scripts/vendor_ontology.py."
+}

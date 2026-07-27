@@ -5,6 +5,26 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix unit: <http://qudt.org/vocab/unit/> .
 
+hpfs:ActuatablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ActuatablePropertyAnnotationRule ;
+    sh:targetClass s223:ActuatableProperty .
+
+hpfs:ActuatorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ActuatorAnnotationRule ;
+    sh:targetClass s223:Actuator .
+
+hpfs:AirHandlingUnitAnnotation a sh:NodeShape ;
+    sh:rule hpfs:AirHandlingUnitAnnotationRule ;
+    sh:targetClass s223:AirHandlingUnit .
+
+hpfs:AirHeatExchangerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:AirHeatExchangerAnnotationRule ;
+    sh:targetClass s223:AirHeatExchanger .
+
+hpfs:AirToAirHeatPumpAnnotation a sh:NodeShape ;
+    sh:rule hpfs:AirToAirHeatPumpAnnotationRule ;
+    sh:targetClass s223:AirToAirHeatPump .
+
 hpfs:AreaAnnotation a sh:NodeShape ;
     sh:rule hpfs:AreaAnnotationRule ;
     sh:targetClass s223:Area .
@@ -21,81 +41,711 @@ hpfs:AzimuthAnnotation a sh:NodeShape ;
     sh:rule hpfs:AzimuthAnnotationRule ;
     sh:targetClass s223:Azimuth .
 
-hpfs:DeadbandAnnotation a sh:NodeShape ;
-    sh:rule hpfs:DeadbandAnnotationRule ;
-    sh:targetClass s223:Deadband .
+hpfs:BACnetExternalReferenceAnnotation a sh:NodeShape ;
+    sh:rule hpfs:BACnetExternalReferenceAnnotationRule ;
+    sh:targetClass s223:BACnetExternalReference .
+
+hpfs:BathtubAnnotation a sh:NodeShape ;
+    sh:rule hpfs:BathtubAnnotationRule ;
+    sh:targetClass s223:Bathtub .
+
+hpfs:BatteryAnnotation a sh:NodeShape ;
+    sh:rule hpfs:BatteryAnnotationRule ;
+    sh:targetClass s223:Battery .
+
+hpfs:BidirectionalConnectionPointAnnotation a sh:NodeShape ;
+    sh:rule hpfs:BidirectionalConnectionPointAnnotationRule ;
+    sh:targetClass s223:BidirectionalConnectionPoint .
+
+hpfs:BoilerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:BoilerAnnotationRule ;
+    sh:targetClass s223:Boiler .
+
+hpfs:Cat1Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat1AnnotationRule ;
+    sh:targetClass s223:Cat1 .
+
+hpfs:Cat2Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat2AnnotationRule ;
+    sh:targetClass s223:Cat2 .
+
+hpfs:Cat3Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat3AnnotationRule ;
+    sh:targetClass s223:Cat3 .
+
+hpfs:Cat4Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat4AnnotationRule ;
+    sh:targetClass s223:Cat4 .
+
+hpfs:Cat5Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat5AnnotationRule ;
+    sh:targetClass s223:Cat5 .
+
+hpfs:Cat5eAnnotation a sh:NodeShape ;
+    sh:rule hpfs:Cat5eAnnotationRule ;
+    sh:targetClass s223:Cat5e .
+
+hpfs:Cat6Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat6AnnotationRule ;
+    sh:targetClass s223:Cat6 .
+
+hpfs:Cat6aAnnotation a sh:NodeShape ;
+    sh:rule hpfs:Cat6aAnnotationRule ;
+    sh:targetClass s223:Cat6a .
+
+hpfs:Cat7Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat7AnnotationRule ;
+    sh:targetClass s223:Cat7 .
+
+hpfs:Cat7aAnnotation a sh:NodeShape ;
+    sh:rule hpfs:Cat7aAnnotationRule ;
+    sh:targetClass s223:Cat7a .
+
+hpfs:Cat8Annotation a sh:NodeShape ;
+    sh:rule hpfs:Cat8AnnotationRule ;
+    sh:targetClass s223:Cat8 .
+
+hpfs:ChilledBeamAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ChilledBeamAnnotationRule ;
+    sh:targetClass s223:ChilledBeam .
+
+hpfs:ChillerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ChillerAnnotationRule ;
+    sh:targetClass s223:Chiller .
+
+hpfs:ClothesWasherAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ClothesWasherAnnotationRule ;
+    sh:targetClass s223:ClothesWasher .
+
+hpfs:CoaxialCableAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CoaxialCableAnnotationRule ;
+    sh:targetClass s223:CoaxialCable .
+
+hpfs:CoffeeMakerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CoffeeMakerAnnotationRule ;
+    sh:targetClass s223:CoffeeMaker .
+
+hpfs:CoilAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CoilAnnotationRule ;
+    sh:targetClass s223:Coil .
+
+hpfs:CompressorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CompressorAnnotationRule ;
+    sh:targetClass s223:Compressor .
+
+hpfs:ComputerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ComputerAnnotationRule ;
+    sh:targetClass s223:Computer .
+
+hpfs:ComputerPrinterAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ComputerPrinterAnnotationRule ;
+    sh:targetClass s223:ComputerPrinter .
+
+hpfs:ConcentrationSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ConcentrationSensorAnnotationRule ;
+    sh:targetClass s223:ConcentrationSensor .
+
+hpfs:ConductorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ConductorAnnotationRule ;
+    sh:targetClass s223:Conductor .
+
+hpfs:ConnectionAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ConnectionAnnotationRule ;
+    sh:targetClass s223:Connection .
+
+hpfs:ControllerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ControllerAnnotationRule ;
+    sh:targetClass s223:Controller .
+
+hpfs:CoolingAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CoolingAnnotationRule ;
+    sh:targetClass s223:Cooling .
+
+hpfs:CoolingCoilAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CoolingCoilAnnotationRule ;
+    sh:targetClass s223:CoolingCoil .
+
+hpfs:CoolingTowerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CoolingTowerAnnotationRule ;
+    sh:targetClass s223:CoolingTower .
+
+hpfs:CopyMachineAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CopyMachineAnnotationRule ;
+    sh:targetClass s223:CopyMachine .
+
+hpfs:CorrelatedColorTemperatureSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:CorrelatedColorTemperatureSensorAnnotationRule ;
+    sh:targetClass s223:CorrelatedColorTemperatureSensor .
+
+hpfs:DamperAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DamperAnnotationRule ;
+    sh:targetClass s223:Damper .
+
+hpfs:DishwasherAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DishwasherAnnotationRule ;
+    sh:targetClass s223:Dishwasher .
+
+hpfs:DomainAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DomainAnnotationRule ;
+    sh:targetClass s223:Domain .
 
 hpfs:DomainSpaceAnnotation a sh:NodeShape ;
     sh:rule hpfs:DomainSpaceAnnotationRule ;
     sh:targetClass s223:DomainSpace .
 
+hpfs:DoorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DoorAnnotationRule ;
+    sh:targetClass s223:Door .
+
+hpfs:DrainAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DrainAnnotationRule ;
+    sh:targetClass s223:Drain .
+
+hpfs:DualDuctTerminalAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DualDuctTerminalAnnotationRule ;
+    sh:targetClass s223:DualDuctTerminal .
+
+hpfs:DuctAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DuctAnnotationRule ;
+    sh:targetClass s223:Duct .
+
+hpfs:DuvSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:DuvSensorAnnotationRule ;
+    sh:targetClass s223:DuvSensor .
+
+hpfs:EMAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EMAnnotationRule ;
+    sh:targetClass s223:EM .
+
+hpfs:ElectricClothesDryerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricClothesDryerAnnotationRule ;
+    sh:targetClass s223:ElectricClothesDryer .
+
+hpfs:ElectricCooktopAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricCooktopAnnotationRule ;
+    sh:targetClass s223:ElectricCooktop .
+
+hpfs:ElectricCurrentSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricCurrentSensorAnnotationRule ;
+    sh:targetClass s223:ElectricCurrentSensor .
+
+hpfs:ElectricEnergyConverterAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricEnergyConverterAnnotationRule ;
+    sh:targetClass s223:ElectricEnergyConverter .
+
+hpfs:ElectricEnergyDCDCConverterAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricEnergyDCDCConverterAnnotationRule ;
+    sh:targetClass s223:ElectricEnergyDCDCConverter .
+
+hpfs:ElectricEnergyInverterAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricEnergyInverterAnnotationRule ;
+    sh:targetClass s223:ElectricEnergyInverter .
+
+hpfs:ElectricEnergyTransformerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricEnergyTransformerAnnotationRule ;
+    sh:targetClass s223:ElectricEnergyTransformer .
+
+hpfs:ElectricOvenAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricOvenAnnotationRule ;
+    sh:targetClass s223:ElectricOven .
+
+hpfs:ElectricResistanceElementAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricResistanceElementAnnotationRule ;
+    sh:targetClass s223:ElectricResistanceElement .
+
+hpfs:ElectricWaterDispenserAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricWaterDispenserAnnotationRule ;
+    sh:targetClass s223:ElectricWaterDispenser .
+
+hpfs:ElectricityBreakerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricityBreakerAnnotationRule ;
+    sh:targetClass s223:ElectricityBreaker .
+
+hpfs:ElectricityMeterAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricityMeterAnnotationRule ;
+    sh:targetClass s223:ElectricityMeter .
+
+hpfs:ElectricityOutletAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectricityOutletAnnotationRule ;
+    sh:targetClass s223:ElectricityOutlet .
+
+hpfs:ElectronicDisplayAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElectronicDisplayAnnotationRule ;
+    sh:targetClass s223:ElectronicDisplay .
+
+hpfs:ElevatorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ElevatorAnnotationRule ;
+    sh:targetClass s223:Elevator .
+
+hpfs:EnumerablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EnumerablePropertyAnnotationRule ;
+    sh:targetClass s223:EnumerableProperty .
+
+hpfs:EnumeratedActuatablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EnumeratedActuatablePropertyAnnotationRule ;
+    sh:targetClass s223:EnumeratedActuatableProperty .
+
+hpfs:EnumeratedObservablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EnumeratedObservablePropertyAnnotationRule ;
+    sh:targetClass s223:EnumeratedObservableProperty .
+
 hpfs:EnumerationKindAnnotation a sh:NodeShape ;
     sh:rule hpfs:EnumerationKindAnnotationRule ;
     sh:targetClass s223:EnumerationKind .
 
-hpfs:ExternalReferenceAnnotation a sh:NodeShape ;
-    sh:rule hpfs:ExternalReferenceAnnotationRule ;
-    sh:targetClass s223:ExternalReference .
+hpfs:EquipmentAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EquipmentAnnotationRule ;
+    sh:targetClass s223:Equipment .
+
+hpfs:EscalatorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EscalatorAnnotationRule ;
+    sh:targetClass s223:Escalator .
+
+hpfs:EthernetCableAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EthernetCableAnnotationRule ;
+    sh:targetClass s223:EthernetCable .
+
+hpfs:EthernetPortAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EthernetPortAnnotationRule ;
+    sh:targetClass s223:EthernetPort .
+
+hpfs:EthernetSwitchAnnotation a sh:NodeShape ;
+    sh:rule hpfs:EthernetSwitchAnnotationRule ;
+    sh:targetClass s223:EthernetSwitch .
 
 hpfs:FT_2Annotation a sh:NodeShape ;
     sh:rule hpfs:FT_2AnnotationRule ;
     sh:targetClass unit:FT_2 .
 
-hpfs:NodeAnnotation a sh:NodeShape ;
-    sh:rule hpfs:NodeAnnotationRule ;
-    sh:targetClass s223:Node .
+hpfs:FanAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FanAnnotationRule ;
+    sh:targetClass s223:Fan .
+
+hpfs:FanCoilUnitAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FanCoilUnitAnnotationRule ;
+    sh:targetClass s223:FanCoilUnit .
+
+hpfs:FanPoweredTerminalAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FanPoweredTerminalAnnotationRule ;
+    sh:targetClass s223:FanPoweredTerminal .
+
+hpfs:FaucetAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FaucetAnnotationRule ;
+    sh:targetClass s223:Faucet .
+
+hpfs:FiberEthernetOutletAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FiberEthernetOutletAnnotationRule ;
+    sh:targetClass s223:FiberEthernetOutlet .
+
+hpfs:FiberOpticCableAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FiberOpticCableAnnotationRule ;
+    sh:targetClass s223:FiberOpticCable .
+
+hpfs:FilterAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FilterAnnotationRule ;
+    sh:targetClass s223:Filter .
+
+hpfs:FlowSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FlowSensorAnnotationRule ;
+    sh:targetClass s223:FlowSensor .
+
+hpfs:FlushToiletAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FlushToiletAnnotationRule ;
+    sh:targetClass s223:FlushToilet .
+
+hpfs:FreezerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FreezerAnnotationRule ;
+    sh:targetClass s223:Freezer .
+
+hpfs:FumeHoodAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FumeHoodAnnotationRule ;
+    sh:targetClass s223:FumeHood .
+
+hpfs:FunctionAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FunctionAnnotationRule ;
+    sh:targetClass s223:Function .
+
+hpfs:FurnaceAnnotation a sh:NodeShape ;
+    sh:rule hpfs:FurnaceAnnotationRule ;
+    sh:targetClass s223:Furnace .
+
+hpfs:GaugePressureSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:GaugePressureSensorAnnotationRule ;
+    sh:targetClass s223:GaugePressureSensor .
+
+hpfs:GeneratorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:GeneratorAnnotationRule ;
+    sh:targetClass s223:Generator .
+
+hpfs:GroundToAirHeatPumpAnnotation a sh:NodeShape ;
+    sh:rule hpfs:GroundToAirHeatPumpAnnotationRule ;
+    sh:targetClass s223:GroundToAirHeatPump .
+
+hpfs:HeatPumpAnnotation a sh:NodeShape ;
+    sh:rule hpfs:HeatPumpAnnotationRule ;
+    sh:targetClass s223:HeatPump .
+
+hpfs:HeatingAnnotation a sh:NodeShape ;
+    sh:rule hpfs:HeatingAnnotationRule ;
+    sh:targetClass s223:Heating .
+
+hpfs:HeatingCoilAnnotation a sh:NodeShape ;
+    sh:rule hpfs:HeatingCoilAnnotationRule ;
+    sh:targetClass s223:HeatingCoil .
+
+hpfs:HumidifierAnnotation a sh:NodeShape ;
+    sh:rule hpfs:HumidifierAnnotationRule ;
+    sh:targetClass s223:Humidifier .
+
+hpfs:HumidistatAnnotation a sh:NodeShape ;
+    sh:rule hpfs:HumidistatAnnotationRule ;
+    sh:targetClass s223:Humidistat .
+
+hpfs:HumiditySensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:HumiditySensorAnnotationRule ;
+    sh:targetClass s223:HumiditySensor .
+
+hpfs:HydronicHeatExchangerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:HydronicHeatExchangerAnnotationRule ;
+    sh:targetClass s223:HydronicHeatExchanger .
+
+hpfs:IceMakerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:IceMakerAnnotationRule ;
+    sh:targetClass s223:IceMaker .
+
+hpfs:IlluminanceSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:IlluminanceSensorAnnotationRule ;
+    sh:targetClass s223:IlluminanceSensor .
+
+hpfs:InletConnectionPointAnnotation a sh:NodeShape ;
+    sh:rule hpfs:InletConnectionPointAnnotationRule ;
+    sh:targetClass s223:InletConnectionPoint .
+
+hpfs:JunctionAnnotation a sh:NodeShape ;
+    sh:rule hpfs:JunctionAnnotationRule ;
+    sh:targetClass s223:Junction .
+
+hpfs:LightSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:LightSensorAnnotationRule ;
+    sh:targetClass s223:LightSensor .
+
+hpfs:LuminaireAnnotation a sh:NodeShape ;
+    sh:rule hpfs:LuminaireAnnotationRule ;
+    sh:targetClass s223:Luminaire .
+
+hpfs:MediumAnnotation a sh:NodeShape ;
+    sh:rule hpfs:MediumAnnotationRule ;
+    sh:targetClass s223:Medium .
+
+hpfs:MicrowaveOvenAnnotation a sh:NodeShape ;
+    sh:rule hpfs:MicrowaveOvenAnnotationRule ;
+    sh:targetClass s223:MicrowaveOven .
+
+hpfs:MonitorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:MonitorAnnotationRule ;
+    sh:targetClass s223:Monitor .
+
+hpfs:MotorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:MotorAnnotationRule ;
+    sh:targetClass s223:Motor .
+
+hpfs:OM1Annotation a sh:NodeShape ;
+    sh:rule hpfs:OM1AnnotationRule ;
+    sh:targetClass s223:OM1 .
+
+hpfs:OM2Annotation a sh:NodeShape ;
+    sh:rule hpfs:OM2AnnotationRule ;
+    sh:targetClass s223:OM2 .
+
+hpfs:OM3Annotation a sh:NodeShape ;
+    sh:rule hpfs:OM3AnnotationRule ;
+    sh:targetClass s223:OM3 .
+
+hpfs:OM4Annotation a sh:NodeShape ;
+    sh:rule hpfs:OM4AnnotationRule ;
+    sh:targetClass s223:OM4 .
+
+hpfs:OM5Annotation a sh:NodeShape ;
+    sh:rule hpfs:OM5AnnotationRule ;
+    sh:targetClass s223:OM5 .
+
+hpfs:OS1Annotation a sh:NodeShape ;
+    sh:rule hpfs:OS1AnnotationRule ;
+    sh:targetClass s223:OS1 .
+
+hpfs:OS2Annotation a sh:NodeShape ;
+    sh:rule hpfs:OS2AnnotationRule ;
+    sh:targetClass s223:OS2 .
+
+hpfs:ObservablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ObservablePropertyAnnotationRule ;
+    sh:targetClass s223:ObservableProperty .
 
 hpfs:OccupancyAnnotation a sh:NodeShape ;
     sh:rule hpfs:OccupancyAnnotationRule ;
     sh:targetClass s223:Occupancy .
 
+hpfs:OccupancySensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:OccupancySensorAnnotationRule ;
+    sh:targetClass s223:OccupancySensor .
+
+hpfs:OccupantCountSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:OccupantCountSensorAnnotationRule ;
+    sh:targetClass s223:OccupantCountSensor .
+
+hpfs:OccupantMotionSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:OccupantMotionSensorAnnotationRule ;
+    sh:targetClass s223:OccupantMotionSensor .
+
+hpfs:OccupantPresenceSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:OccupantPresenceSensorAnnotationRule ;
+    sh:targetClass s223:OccupantPresenceSensor .
+
+hpfs:OutdoorPhysicalSpaceAnnotation a sh:NodeShape ;
+    sh:rule hpfs:OutdoorPhysicalSpaceAnnotationRule ;
+    sh:targetClass s223:OutdoorPhysicalSpace .
+
+hpfs:OutletConnectionPointAnnotation a sh:NodeShape ;
+    sh:rule hpfs:OutletConnectionPointAnnotationRule ;
+    sh:targetClass s223:OutletConnectionPoint .
+
+hpfs:ParticulateSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ParticulateSensorAnnotationRule ;
+    sh:targetClass s223:ParticulateSensor .
+
+hpfs:PersonalComputerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PersonalComputerAnnotationRule ;
+    sh:targetClass s223:PersonalComputer .
+
+hpfs:PhotovoltaicModuleAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PhotovoltaicModuleAnnotationRule ;
+    sh:targetClass s223:PhotovoltaicModule .
+
 hpfs:PhysicalSpaceAnnotation a sh:NodeShape ;
     sh:rule hpfs:PhysicalSpaceAnnotationRule ;
     sh:targetClass s223:PhysicalSpace .
+
+hpfs:PipeAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PipeAnnotationRule ;
+    sh:targetClass s223:Pipe .
+
+hpfs:PowerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PowerAnnotationRule ;
+    sh:targetClass s223:Power .
+
+hpfs:PowerOverEthernetPortAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PowerOverEthernetPortAnnotationRule ;
+    sh:targetClass s223:PowerOverEthernetPort .
+
+hpfs:PowerOverEthernetSwitchAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PowerOverEthernetSwitchAnnotationRule ;
+    sh:targetClass s223:PowerOverEthernetSwitch .
+
+hpfs:PressureSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PressureSensorAnnotationRule ;
+    sh:targetClass s223:PressureSensor .
 
 hpfs:PropertyAnnotation a sh:NodeShape ;
     sh:rule hpfs:PropertyAnnotationRule ;
     sh:targetClass s223:Property .
 
+hpfs:PumpAnnotation a sh:NodeShape ;
+    sh:rule hpfs:PumpAnnotationRule ;
+    sh:targetClass s223:Pump .
+
+hpfs:QuantifiableActuatablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:QuantifiableActuatablePropertyAnnotationRule ;
+    sh:targetClass s223:QuantifiableActuatableProperty .
+
 hpfs:QuantifiableObservablePropertyAnnotation a sh:NodeShape ;
     sh:rule hpfs:QuantifiableObservablePropertyAnnotationRule ;
     sh:targetClass s223:QuantifiableObservableProperty .
+
+hpfs:QuantifiablePropertyAnnotation a sh:NodeShape ;
+    sh:rule hpfs:QuantifiablePropertyAnnotationRule ;
+    sh:targetClass s223:QuantifiableProperty .
 
 hpfs:QuantityKindAnnotation a sh:NodeShape ;
     sh:rule hpfs:QuantityKindAnnotationRule ;
     sh:targetClass quantitykind:QuantityKind .
 
+hpfs:RFOutletAnnotation a sh:NodeShape ;
+    sh:rule hpfs:RFOutletAnnotationRule ;
+    sh:targetClass s223:RFOutlet .
+
+hpfs:RadiantHeaterAnnotation a sh:NodeShape ;
+    sh:rule hpfs:RadiantHeaterAnnotationRule ;
+    sh:targetClass s223:RadiantHeater .
+
+hpfs:RadiatorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:RadiatorAnnotationRule ;
+    sh:targetClass s223:Radiator .
+
+hpfs:RefrigeratorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:RefrigeratorAnnotationRule ;
+    sh:targetClass s223:Refrigerator .
+
+hpfs:SensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SensorAnnotationRule ;
+    sh:targetClass s223:Sensor .
+
+hpfs:ServerComputerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ServerComputerAnnotationRule ;
+    sh:targetClass s223:ServerComputer .
+
 hpfs:SetpointAnnotation a sh:NodeShape ;
     sh:rule hpfs:SetpointAnnotationRule ;
     sh:targetClass s223:Setpoint .
 
-hpfs:SpaceAnnotation a sh:NodeShape ;
-    sh:rule hpfs:SpaceAnnotationRule ;
-    sh:targetClass s223:Space .
+hpfs:ShowerAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ShowerAnnotationRule ;
+    sh:targetClass s223:Shower .
 
-hpfs:SpaceWithWindowAnnotation a sh:NodeShape ;
-    sh:rule hpfs:SpaceWithWindowAnnotationRule ;
-    sh:targetClass s223:SpaceWithWindow .
+hpfs:SingleDuctTerminalAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SingleDuctTerminalAnnotationRule ;
+    sh:targetClass s223:SingleDuctTerminal .
 
-hpfs:SpaceWithWindowNoMainRelationAnnotation a sh:NodeShape ;
-    sh:rule hpfs:SpaceWithWindowNoMainRelationAnnotationRule ;
-    sh:targetClass s223:SpaceWithWindowNoMainRelation .
+hpfs:SinkAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SinkAnnotationRule ;
+    sh:targetClass s223:Sink .
 
-hpfs:Space_TwoAreaAnnotation a sh:NodeShape ;
-    sh:rule hpfs:Space_TwoAreaAnnotationRule ;
-    sh:targetClass s223:Space_TwoArea .
+hpfs:SolarThermalCollectorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SolarThermalCollectorAnnotationRule ;
+    sh:targetClass s223:SolarThermalCollector .
+
+hpfs:SteamInjectorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SteamInjectorAnnotationRule ;
+    sh:targetClass s223:SteamInjector .
+
+hpfs:SystemAnnotation a sh:NodeShape ;
+    sh:rule hpfs:SystemAnnotationRule ;
+    sh:targetClass s223:System .
+
+hpfs:TelevisionAnnotation a sh:NodeShape ;
+    sh:rule hpfs:TelevisionAnnotationRule ;
+    sh:targetClass s223:Television .
+
+hpfs:TemperatureSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:TemperatureSensorAnnotationRule ;
+    sh:targetClass s223:TemperatureSensor .
+
+hpfs:TerminalUnitAnnotation a sh:NodeShape ;
+    sh:rule hpfs:TerminalUnitAnnotationRule ;
+    sh:targetClass s223:TerminalUnit .
+
+hpfs:ThermalEnergyStorageUnitAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ThermalEnergyStorageUnitAnnotationRule ;
+    sh:targetClass s223:ThermalEnergyStorageUnit .
+
+hpfs:ThermostatAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ThermostatAnnotationRule ;
+    sh:targetClass s223:Thermostat .
+
+hpfs:ThreeWayValveAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ThreeWayValveAnnotationRule ;
+    sh:targetClass s223:ThreeWayValve .
+
+hpfs:ThresholdAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ThresholdAnnotationRule ;
+    sh:targetClass s223:Threshold .
 
 hpfs:TiltAnnotation a sh:NodeShape ;
     sh:rule hpfs:TiltAnnotationRule ;
     sh:targetClass s223:Tilt .
 
+hpfs:TurbineAnnotation a sh:NodeShape ;
+    sh:rule hpfs:TurbineAnnotationRule ;
+    sh:targetClass s223:Turbine .
+
+hpfs:TwoWayValveAnnotation a sh:NodeShape ;
+    sh:rule hpfs:TwoWayValveAnnotationRule ;
+    sh:targetClass s223:TwoWayValve .
+
+hpfs:USBCableAnnotation a sh:NodeShape ;
+    sh:rule hpfs:USBCableAnnotationRule ;
+    sh:targetClass s223:USBCable .
+
+hpfs:USBOutletAnnotation a sh:NodeShape ;
+    sh:rule hpfs:USBOutletAnnotationRule ;
+    sh:targetClass s223:USBOutlet .
+
 hpfs:UnitAnnotation a sh:NodeShape ;
     sh:rule hpfs:UnitAnnotationRule ;
     sh:targetClass unit:Unit .
 
+hpfs:ValveAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ValveAnnotationRule ;
+    sh:targetClass s223:Valve .
+
+hpfs:VariableFrequencyDriveAnnotation a sh:NodeShape ;
+    sh:rule hpfs:VariableFrequencyDriveAnnotationRule ;
+    sh:targetClass s223:VariableFrequencyDrive .
+
+hpfs:VoltageSensorAnnotation a sh:NodeShape ;
+    sh:rule hpfs:VoltageSensorAnnotationRule ;
+    sh:targetClass s223:VoltageSensor .
+
+hpfs:WaterOutletAnnotation a sh:NodeShape ;
+    sh:rule hpfs:WaterOutletAnnotationRule ;
+    sh:targetClass s223:WaterOutlet .
+
+hpfs:WaterToAirHeatPumpAnnotation a sh:NodeShape ;
+    sh:rule hpfs:WaterToAirHeatPumpAnnotationRule ;
+    sh:targetClass s223:WaterToAirHeatPump .
+
+hpfs:WaterToWaterHeatPumpAnnotation a sh:NodeShape ;
+    sh:rule hpfs:WaterToWaterHeatPumpAnnotationRule ;
+    sh:targetClass s223:WaterToWaterHeatPump .
+
+hpfs:WaveguideAnnotation a sh:NodeShape ;
+    sh:rule hpfs:WaveguideAnnotationRule ;
+    sh:targetClass s223:Waveguide .
+
 hpfs:WindowAnnotation a sh:NodeShape ;
     sh:rule hpfs:WindowAnnotationRule ;
     sh:targetClass s223:Window .
+
+hpfs:WindowShadeAnnotation a sh:NodeShape ;
+    sh:rule hpfs:WindowShadeAnnotationRule ;
+    sh:targetClass s223:WindowShade .
+
+hpfs:WiredEthernetOutletAnnotation a sh:NodeShape ;
+    sh:rule hpfs:WiredEthernetOutletAnnotationRule ;
+    sh:targetClass s223:WiredEthernetOutlet .
+
+hpfs:ZoneAnnotation a sh:NodeShape ;
+    sh:rule hpfs:ZoneAnnotationRule ;
+    sh:targetClass s223:Zone .
+
+hpfs:ActuatablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ActuatableProperty ;
+    sh:object s223:ActuatableProperty ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ActuatorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Actuator ;
+    sh:object s223:Actuator ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:AirHandlingUnitAnnotationRule a sh:TripleRule ;
+    sh:condition s223:AirHandlingUnit ;
+    sh:object s223:AirHandlingUnit ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:AirHeatExchangerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:AirHeatExchanger ;
+    sh:object s223:AirHeatExchanger ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:AirToAirHeatPumpAnnotationRule a sh:TripleRule ;
+    sh:condition s223:AirToAirHeatPump ;
+    sh:object s223:AirToAirHeatPump ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
 
 hpfs:AreaAnnotationRule a sh:TripleRule ;
     sh:condition s223:Area ;
@@ -121,9 +771,225 @@ hpfs:AzimuthAnnotationRule a sh:TripleRule ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
-hpfs:DeadbandAnnotationRule a sh:TripleRule ;
-    sh:condition s223:Aspect-Threshold ;
-    sh:object s223:Aspect-Threshold ;
+hpfs:BACnetExternalReferenceAnnotationRule a sh:TripleRule ;
+    sh:condition s223:BACnetExternalReference ;
+    sh:object s223:BACnetExternalReference ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:BathtubAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Bathtub ;
+    sh:object s223:Bathtub ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:BatteryAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Battery ;
+    sh:object s223:Battery ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:BidirectionalConnectionPointAnnotationRule a sh:TripleRule ;
+    sh:condition s223:BidirectionalConnectionPoint ;
+    sh:object s223:BidirectionalConnectionPoint ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:BoilerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Boiler ;
+    sh:object s223:Boiler ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat1AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat1 ;
+    sh:object s223:EthernetCable-Cat1 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat2AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat2 ;
+    sh:object s223:EthernetCable-Cat2 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat3AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat3 ;
+    sh:object s223:EthernetCable-Cat3 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat4AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat4 ;
+    sh:object s223:EthernetCable-Cat4 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat5AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat5 ;
+    sh:object s223:EthernetCable-Cat5 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat5eAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat5e ;
+    sh:object s223:EthernetCable-Cat5e ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat6AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat6 ;
+    sh:object s223:EthernetCable-Cat6 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat6aAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat6a ;
+    sh:object s223:EthernetCable-Cat6a ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat7AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat7 ;
+    sh:object s223:EthernetCable-Cat7 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat7aAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat7a ;
+    sh:object s223:EthernetCable-Cat7a ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:Cat8AnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable-Cat8 ;
+    sh:object s223:EthernetCable-Cat8 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ChilledBeamAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ChilledBeam ;
+    sh:object s223:ChilledBeam ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ChillerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Chiller ;
+    sh:object s223:Chiller ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ClothesWasherAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ClothesWasher ;
+    sh:object s223:ClothesWasher ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CoaxialCableAnnotationRule a sh:TripleRule ;
+    sh:condition s223:CoaxialCable ;
+    sh:object s223:CoaxialCable ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CoffeeMakerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:CoffeeMaker ;
+    sh:object s223:CoffeeMaker ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CoilAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Coil ;
+    sh:object s223:Coil ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CompressorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Compressor ;
+    sh:object s223:Compressor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ComputerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Computer ;
+    sh:object s223:Computer ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ComputerPrinterAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ComputerPrinter ;
+    sh:object s223:ComputerPrinter ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ConcentrationSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ConcentrationSensor ;
+    sh:object s223:ConcentrationSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ConductorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Conductor ;
+    sh:object s223:Conductor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ConnectionAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Connection ;
+    sh:object s223:Connection ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ControllerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Controller ;
+    sh:object s223:Controller ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CoolingAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Role-Cooling ;
+    sh:object s223:Role-Cooling ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CoolingCoilAnnotationRule a sh:TripleRule ;
+    sh:condition s223:CoolingCoil ;
+    sh:object s223:CoolingCoil ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CoolingTowerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:CoolingTower ;
+    sh:object s223:CoolingTower ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CopyMachineAnnotationRule a sh:TripleRule ;
+    sh:condition s223:CopyMachine ;
+    sh:object s223:CopyMachine ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:CorrelatedColorTemperatureSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:CorrelatedColorTemperatureSensor ;
+    sh:object s223:CorrelatedColorTemperatureSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DamperAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Damper ;
+    sh:object s223:Damper ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DishwasherAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Dishwasher ;
+    sh:object s223:Dishwasher ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DomainAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EnumerationKind-Domain ;
+    sh:object s223:EnumerationKind-Domain ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
@@ -133,15 +999,183 @@ hpfs:DomainSpaceAnnotationRule a sh:TripleRule ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
+hpfs:DoorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Door ;
+    sh:object s223:Door ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DrainAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Drain ;
+    sh:object s223:Drain ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DualDuctTerminalAnnotationRule a sh:TripleRule ;
+    sh:condition s223:DualDuctTerminal ;
+    sh:object s223:DualDuctTerminal ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DuctAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Duct ;
+    sh:object s223:Duct ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:DuvSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:DuvSensor ;
+    sh:object s223:DuvSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EMAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EM ;
+    sh:object s223:EM ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricClothesDryerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricClothesDryer ;
+    sh:object s223:ElectricClothesDryer ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricCooktopAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricCooktop ;
+    sh:object s223:ElectricCooktop ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricCurrentSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricCurrentSensor ;
+    sh:object s223:ElectricCurrentSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricEnergyConverterAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricEnergyConverter ;
+    sh:object s223:ElectricEnergyConverter ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricEnergyDCDCConverterAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricEnergyDCDCConverter ;
+    sh:object s223:ElectricEnergyDCDCConverter ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricEnergyInverterAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricEnergyInverter ;
+    sh:object s223:ElectricEnergyInverter ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricEnergyTransformerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricEnergyTransformer ;
+    sh:object s223:ElectricEnergyTransformer ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricOvenAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricOven ;
+    sh:object s223:ElectricOven ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricResistanceElementAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricResistanceElement ;
+    sh:object s223:ElectricResistanceElement ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricWaterDispenserAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricWaterDispenser ;
+    sh:object s223:ElectricWaterDispenser ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricityBreakerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricityBreaker ;
+    sh:object s223:ElectricityBreaker ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricityMeterAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricityMeter ;
+    sh:object s223:ElectricityMeter ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectricityOutletAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectricityOutlet ;
+    sh:object s223:ElectricityOutlet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElectronicDisplayAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ElectronicDisplay ;
+    sh:object s223:ElectronicDisplay ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ElevatorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Elevator ;
+    sh:object s223:Elevator ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EnumerablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EnumerableProperty ;
+    sh:object s223:EnumerableProperty ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EnumeratedActuatablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EnumeratedActuatableProperty ;
+    sh:object s223:EnumeratedActuatableProperty ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EnumeratedObservablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EnumeratedObservableProperty ;
+    sh:object s223:EnumeratedObservableProperty ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
 hpfs:EnumerationKindAnnotationRule a sh:TripleRule ;
     sh:condition s223:Class ;
     sh:object s223:Class ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
-hpfs:ExternalReferenceAnnotationRule a sh:TripleRule ;
-    sh:condition s223:ExternalReference ;
-    sh:object s223:ExternalReference ;
+hpfs:EquipmentAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Equipment ;
+    sh:object s223:Equipment ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EscalatorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Escalator ;
+    sh:object s223:Escalator ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EthernetCableAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetCable ;
+    sh:object s223:EthernetCable ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EthernetPortAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetPort ;
+    sh:object s223:EthernetPort ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:EthernetSwitchAnnotationRule a sh:TripleRule ;
+    sh:condition s223:EthernetSwitch ;
+    sh:object s223:EthernetSwitch ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
@@ -151,9 +1185,249 @@ hpfs:FT_2AnnotationRule a sh:TripleRule ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
-hpfs:NodeAnnotationRule a sh:TripleRule ;
-    sh:condition s223:Class ;
-    sh:object s223:Class ;
+hpfs:FanAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Fan ;
+    sh:object s223:Fan ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FanCoilUnitAnnotationRule a sh:TripleRule ;
+    sh:condition s223:FanCoilUnit ;
+    sh:object s223:FanCoilUnit ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FanPoweredTerminalAnnotationRule a sh:TripleRule ;
+    sh:condition s223:FanPoweredTerminal ;
+    sh:object s223:FanPoweredTerminal ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FaucetAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Faucet ;
+    sh:object s223:Faucet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FiberEthernetOutletAnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberEthernetOutlet ;
+    sh:object s223:FiberEthernetOutlet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FiberOpticCableAnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable ;
+    sh:object s223:FiberOpticCable ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FilterAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Filter ;
+    sh:object s223:Filter ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FlowSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:FlowSensor ;
+    sh:object s223:FlowSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FlushToiletAnnotationRule a sh:TripleRule ;
+    sh:condition s223:FlushToilet ;
+    sh:object s223:FlushToilet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FreezerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Freezer ;
+    sh:object s223:Freezer ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FumeHoodAnnotationRule a sh:TripleRule ;
+    sh:condition s223:FumeHood ;
+    sh:object s223:FumeHood ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FunctionAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Function ;
+    sh:object s223:Function ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:FurnaceAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Furnace ;
+    sh:object s223:Furnace ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:GaugePressureSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:GaugePressureSensor ;
+    sh:object s223:GaugePressureSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:GeneratorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Generator ;
+    sh:object s223:Generator ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:GroundToAirHeatPumpAnnotationRule a sh:TripleRule ;
+    sh:condition s223:GroundToAirHeatPump ;
+    sh:object s223:GroundToAirHeatPump ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:HeatPumpAnnotationRule a sh:TripleRule ;
+    sh:condition s223:HeatPump ;
+    sh:object s223:HeatPump ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:HeatingAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Role-Heating ;
+    sh:object s223:Role-Heating ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:HeatingCoilAnnotationRule a sh:TripleRule ;
+    sh:condition s223:HeatingCoil ;
+    sh:object s223:HeatingCoil ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:HumidifierAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Humidifier ;
+    sh:object s223:Humidifier ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:HumidistatAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Humidistat ;
+    sh:object s223:Humidistat ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:HumiditySensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:HumiditySensor ;
+    sh:object s223:HumiditySensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:HydronicHeatExchangerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:HydronicHeatExchanger ;
+    sh:object s223:HydronicHeatExchanger ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:IceMakerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:IceMaker ;
+    sh:object s223:IceMaker ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:IlluminanceSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:IlluminanceSensor ;
+    sh:object s223:IlluminanceSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:InletConnectionPointAnnotationRule a sh:TripleRule ;
+    sh:condition s223:InletConnectionPoint ;
+    sh:object s223:InletConnectionPoint ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:JunctionAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Junction ;
+    sh:object s223:Junction ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:LightSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:LightSensor ;
+    sh:object s223:LightSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:LuminaireAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Luminaire ;
+    sh:object s223:Luminaire ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:MediumAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Substance-Medium ;
+    sh:object s223:Substance-Medium ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:MicrowaveOvenAnnotationRule a sh:TripleRule ;
+    sh:condition s223:MicrowaveOven ;
+    sh:object s223:MicrowaveOven ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:MonitorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Monitor ;
+    sh:object s223:Monitor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:MotorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Motor ;
+    sh:object s223:Motor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OM1AnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable-OM1 ;
+    sh:object s223:FiberOpticCable-OM1 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OM2AnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable-OM2 ;
+    sh:object s223:FiberOpticCable-OM2 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OM3AnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable-OM3 ;
+    sh:object s223:FiberOpticCable-OM3 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OM4AnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable-OM4 ;
+    sh:object s223:FiberOpticCable-OM4 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OM5AnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable-OM5 ;
+    sh:object s223:FiberOpticCable-OM5 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OS1AnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable-OS1 ;
+    sh:object s223:FiberOpticCable-OS1 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OS2AnnotationRule a sh:TripleRule ;
+    sh:condition s223:FiberOpticCable-OS2 ;
+    sh:object s223:FiberOpticCable-OS2 ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ObservablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ObservableProperty ;
+    sh:object s223:ObservableProperty ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
@@ -163,9 +1437,93 @@ hpfs:OccupancyAnnotationRule a sh:TripleRule ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
+hpfs:OccupancySensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:OccupancySensor ;
+    sh:object s223:OccupancySensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OccupantCountSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:OccupantCountSensor ;
+    sh:object s223:OccupantCountSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OccupantMotionSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:OccupantMotionSensor ;
+    sh:object s223:OccupantMotionSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OccupantPresenceSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:OccupantPresenceSensor ;
+    sh:object s223:OccupantPresenceSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OutdoorPhysicalSpaceAnnotationRule a sh:TripleRule ;
+    sh:condition s223:OutdoorPhysicalSpace ;
+    sh:object s223:OutdoorPhysicalSpace ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:OutletConnectionPointAnnotationRule a sh:TripleRule ;
+    sh:condition s223:OutletConnectionPoint ;
+    sh:object s223:OutletConnectionPoint ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ParticulateSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ParticulateSensor ;
+    sh:object s223:ParticulateSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PersonalComputerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:PersonalComputer ;
+    sh:object s223:PersonalComputer ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PhotovoltaicModuleAnnotationRule a sh:TripleRule ;
+    sh:condition s223:PhotovoltaicModule ;
+    sh:object s223:PhotovoltaicModule ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
 hpfs:PhysicalSpaceAnnotationRule a sh:TripleRule ;
     sh:condition s223:PhysicalSpace ;
     sh:object s223:PhysicalSpace ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PipeAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Pipe ;
+    sh:object s223:Pipe ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PowerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Power ;
+    sh:object s223:Power ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PowerOverEthernetPortAnnotationRule a sh:TripleRule ;
+    sh:condition s223:PowerOverEthernetPort ;
+    sh:object s223:PowerOverEthernetPort ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PowerOverEthernetSwitchAnnotationRule a sh:TripleRule ;
+    sh:condition s223:PowerOverEthernetSwitch ;
+    sh:object s223:PowerOverEthernetSwitch ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:PressureSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:PressureSensor ;
+    sh:object s223:PressureSensor ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
@@ -175,9 +1533,27 @@ hpfs:PropertyAnnotationRule a sh:TripleRule ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
+hpfs:PumpAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Pump ;
+    sh:object s223:Pump ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:QuantifiableActuatablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:QuantifiableActuatableProperty ;
+    sh:object s223:QuantifiableActuatableProperty ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
 hpfs:QuantifiableObservablePropertyAnnotationRule a sh:TripleRule ;
     sh:condition s223:QuantifiableObservableProperty ;
     sh:object s223:QuantifiableObservableProperty ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:QuantifiablePropertyAnnotationRule a sh:TripleRule ;
+    sh:condition s223:QuantifiableProperty ;
+    sh:object s223:QuantifiableProperty ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
@@ -187,33 +1563,123 @@ hpfs:QuantityKindAnnotationRule a sh:TripleRule ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
+hpfs:RFOutletAnnotationRule a sh:TripleRule ;
+    sh:condition s223:RFOutlet ;
+    sh:object s223:RFOutlet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:RadiantHeaterAnnotationRule a sh:TripleRule ;
+    sh:condition s223:RadiantHeater ;
+    sh:object s223:RadiantHeater ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:RadiatorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Radiator ;
+    sh:object s223:Radiator ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:RefrigeratorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Refrigerator ;
+    sh:object s223:Refrigerator ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:SensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Sensor ;
+    sh:object s223:Sensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ServerComputerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ServerComputer ;
+    sh:object s223:ServerComputer ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
 hpfs:SetpointAnnotationRule a sh:TripleRule ;
     sh:condition s223:Aspect-Setpoint ;
     sh:object s223:Aspect-Setpoint ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
-hpfs:SpaceAnnotationRule a sh:TripleRule ;
-    sh:condition s223:Space ;
-    sh:object s223:Space ;
+hpfs:ShowerAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Shower ;
+    sh:object s223:Shower ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
-hpfs:SpaceWithWindowAnnotationRule a sh:TripleRule ;
-    sh:condition s223:SpaceWithWindow ;
-    sh:object s223:SpaceWithWindow ;
+hpfs:SingleDuctTerminalAnnotationRule a sh:TripleRule ;
+    sh:condition s223:SingleDuctTerminal ;
+    sh:object s223:SingleDuctTerminal ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
-hpfs:SpaceWithWindowNoMainRelationAnnotationRule a sh:TripleRule ;
-    sh:condition s223:SpaceWithWindowNoMainRelation ;
-    sh:object s223:SpaceWithWindowNoMainRelation ;
+hpfs:SinkAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Sink ;
+    sh:object s223:Sink ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
-hpfs:Space_TwoAreaAnnotationRule a sh:TripleRule ;
-    sh:condition s223:Space_TwoArea ;
-    sh:object s223:Space_TwoArea ;
+hpfs:SolarThermalCollectorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:SolarThermalCollector ;
+    sh:object s223:SolarThermalCollector ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:SteamInjectorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:SteamInjector ;
+    sh:object s223:SteamInjector ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:SystemAnnotationRule a sh:TripleRule ;
+    sh:condition s223:System ;
+    sh:object s223:System ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:TelevisionAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Television ;
+    sh:object s223:Television ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:TemperatureSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:TemperatureSensor ;
+    sh:object s223:TemperatureSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:TerminalUnitAnnotationRule a sh:TripleRule ;
+    sh:condition s223:TerminalUnit ;
+    sh:object s223:TerminalUnit ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ThermalEnergyStorageUnitAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ThermalEnergyStorageUnit ;
+    sh:object s223:ThermalEnergyStorageUnit ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ThermostatAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Thermostat ;
+    sh:object s223:Thermostat ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ThreeWayValveAnnotationRule a sh:TripleRule ;
+    sh:condition s223:ThreeWayValve ;
+    sh:object s223:ThreeWayValve ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ThresholdAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Aspect-Threshold ;
+    sh:object s223:Aspect-Threshold ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
@@ -223,15 +1689,99 @@ hpfs:TiltAnnotationRule a sh:TripleRule ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
+hpfs:TurbineAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Turbine ;
+    sh:object s223:Turbine ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:TwoWayValveAnnotationRule a sh:TripleRule ;
+    sh:condition s223:TwoWayValve ;
+    sh:object s223:TwoWayValve ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:USBCableAnnotationRule a sh:TripleRule ;
+    sh:condition s223:USBCable ;
+    sh:object s223:USBCable ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:USBOutletAnnotationRule a sh:TripleRule ;
+    sh:condition s223:USBOutlet ;
+    sh:object s223:USBOutlet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
 hpfs:UnitAnnotationRule a sh:TripleRule ;
     sh:condition unit: ;
     sh:object unit: ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 
+hpfs:ValveAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Valve ;
+    sh:object s223:Valve ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:VariableFrequencyDriveAnnotationRule a sh:TripleRule ;
+    sh:condition s223:VariableFrequencyDrive ;
+    sh:object s223:VariableFrequencyDrive ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:VoltageSensorAnnotationRule a sh:TripleRule ;
+    sh:condition s223:VoltageSensor ;
+    sh:object s223:VoltageSensor ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:WaterOutletAnnotationRule a sh:TripleRule ;
+    sh:condition s223:WaterOutlet ;
+    sh:object s223:WaterOutlet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:WaterToAirHeatPumpAnnotationRule a sh:TripleRule ;
+    sh:condition s223:WaterToAirHeatPump ;
+    sh:object s223:WaterToAirHeatPump ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:WaterToWaterHeatPumpAnnotationRule a sh:TripleRule ;
+    sh:condition s223:WaterToWaterHeatPump ;
+    sh:object s223:WaterToWaterHeatPump ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:WaveguideAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Waveguide ;
+    sh:object s223:Waveguide ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
 hpfs:WindowAnnotationRule a sh:TripleRule ;
     sh:condition s223:Window ;
     sh:object s223:Window ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:WindowShadeAnnotationRule a sh:TripleRule ;
+    sh:condition s223:WindowShade ;
+    sh:object s223:WindowShade ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:WiredEthernetOutletAnnotationRule a sh:TripleRule ;
+    sh:condition s223:WiredEthernetOutlet ;
+    sh:object s223:WiredEthernetOutlet ;
+    sh:predicate rdf:type ;
+    sh:subject sh:this .
+
+hpfs:ZoneAnnotationRule a sh:TripleRule ;
+    sh:condition s223:Zone ;
+    sh:object s223:Zone ;
     sh:predicate rdf:type ;
     sh:subject sh:this .
 

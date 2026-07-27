@@ -6,7 +6,7 @@ import os
 import sys
 sys.path.append('..')
 
-from src.semantic_objects.s223.properties import Area, QuantifiableObervableProperty
+from src.semantic_objects.s223.properties import Area, QuantifiableObservableProperty
 from src.semantic_objects.qudt import quantitykinds
 from dataclasses import fields
 
@@ -47,7 +47,7 @@ def test_parent_field_metadata_preserved():
     """Test that parent field metadata is preserved when overriding with a value"""
     
     # Get the parent class field
-    parent_fields = {f.name: f for f in fields(QuantifiableObervableProperty)}
+    parent_fields = {f.name: f for f in fields(QuantifiableObservableProperty)}
     parent_qk_field = parent_fields['qk']
     
     print(f"\nParent qk field metadata: {parent_qk_field.metadata}")

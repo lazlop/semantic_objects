@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Test script to verify relation inference functionality"""
 
-from src.semantic_objects.s223.entities import Space, Window, PhysicalSpace, Space_TwoArea, Area
+from src.semantic_objects.s223.entities import PhysicalSpace
+from src.semantic_objects.s223.properties import Area
+from examples.s223_framework_demo import Space, Window, Space_TwoArea
 
 def test_space_relation_inference():
     """Test that Space class correctly infers hasProperty relation for area field"""
