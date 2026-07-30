@@ -53,6 +53,12 @@ S223 = Namespace("http://data.ashrae.org/standard223#")
 # NAWI water treatment ontology (extends s223)
 WATR = Namespace("urn:nawi-water-ontology#")
 
+# CXF (Control eXchange Format) - LBNL Modelica Buildings library control
+# sequences (ASHRAE Guideline 36 etc.), vendored as JSON-LD under the S231
+# vocabulary. Unrelated to the S223 RDF ontology above despite the shared
+# "G36" naming - see tutorial/cxf-ingestion-tutorial.ipynb.
+S231 = Namespace("http://data.ashrae.org/S231#")
+
 A = RDF.type
 
 BNODE_BASE = "https://rdflib.github.io/.well-known/genid/rdflib/"

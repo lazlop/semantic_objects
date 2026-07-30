@@ -1,0 +1,1145 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231#",
+    "qudt": "http://qudt.org/schema/qudt#",
+    "unit": "http://qudt.org/vocab/unit#",
+    "q": "http://qudt.org/vocab/quantitykind#",
+    "ex": "http://example.org#"
+  },
+  "@graph": [
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow",
+      "@type": "S231:Block",
+      "S231:containsBlock": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooDowMod"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxAir"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinAir"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occMod"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setBacMod"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setUpMod"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.warUpMod"
+        }
+      ],
+      "S231:diagram": "coordinateSystem(extent={{-200,-220},{200,220}},preserveAspectRatio=false)",
+      "S231:documentation": "info=<html>\n<p>\nThis sequence sets the active cooling and heating maximum and minimum setpoints\nfor VAV reheat terminal unit. The implementation is according to the Section 5.6.4\nof ASHRAE Guideline 36, May 2020.\n</p>\n<p>The setpoints shall vary depending on the mode of the zone group.</p>\n<table summary=\\summary\\ border=\\1\\>\n<tr><th>Setpoint</th> <th>Occupied</th><th>Cooldown</th>\n<th>Setup</th><th>Warm-up</th><th>Setback</th><th>Unoccupied</th></tr>\n<tr><td>Cooling maximum (<code>VActCooMax_flow</code>)</td><td><code>VCooMax_flow</code></td>\n<td><code>VCooMax_flow</code></td><td><code>VCooMax_flow</code></td>\n<td>0</td><td>0</td><td>0</td></tr>\n<tr><td>Cooling minimum (<code>VActCooMin_flow</code>)</td><td><code>VOccMin_flow</code></td>\n<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>\n<tr><td>Minimum (<code>VActMin_flow</code>)</td><td><code>VOccMin_flow</code></td><td>0</td>\n<td>0</td><td>0</td><td>0</td><td>0</td></tr>\n<tr><td>Heating minimum (<code>VActHeaMin_flow</code>)</td><td>max(<code>VHeaMin_flow,VOccMin_flow</code>)</td>\n<td><code>VHeaMin_flow</code></td><td>0</td><td><code>VHeaMax_flow</code></td><td><code>VHeaMax_flow</code></td>\n<td>0</td></tr>\n<tr><td>Heating maximum (<code>VActHeaMax_flow</code>)</td><td>max(<code>VHeaMax_flow,VOccMin_flow</code>)</td>\n<td><code>VHeaMax_flow</code></td><td>0</td><td><code>VCooMax_flow</code></td><td><code>VCooMax_flow</code></td>\n<td>0</td></tr>\n</table>\n<br/>\n</html>,revisions=<html>\n<ul>\n<li>\nAugust 1, 2020, by Jianjun Hu:<br/>\nFirst implementation.\n</li>\n</ul>\n</html>",
+      "S231:hasInput": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.uOpeMod"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VOccMin_flow"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActCooMax_flow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActCooMin_flow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActHeaMax_flow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActHeaMin_flow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActMin_flow"
+        }
+      ],
+      "S231:hasParameter": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VCooMax_flow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VHeaMax_flow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VHeaMin_flow"
+        }
+      ],
+      "S231:icon": "coordinateSystem(extent={{-100,-100},{100,100}}),graphics={Rectangle(extent={{-100,100},{100,-100}},lineColor={0,0,0},fillColor={210,210,210},fillPattern=FillPattern.Solid),Text(textString=\"%name\",textColor={0,0,255},extent={{-100,140},{100,100}}),Text(textString=\"uOpeMod\",textColor={255,127,0},extent={{-96,68},{-54,52}},pattern=LinePattern.Dash),Text(textString=\"VActCooMax_flow\",textColor={0,0,127},extent={{34,90},{98,74}},pattern=LinePattern.Dash),Text(textString=\"VActCooMin_flow\",textColor={0,0,127},extent={{36,48},{98,34}},pattern=LinePattern.Dash),Text(textString=\"VActMin_flow\",textColor={0,0,127},extent={{50,6},{98,-4}},pattern=LinePattern.Dash),Text(textString=\"VActHeaMin_flow\",textColor={0,0,127},extent={{38,-32},{98,-46}},pattern=LinePattern.Dash),Text(textString=\"VActHeaMax_flow\",textColor={0,0,127},extent={{34,-70},{98,-86}},pattern=LinePattern.Dash),Text(textString=\"VOccMin_flow\",textColor={0,0,127},extent={{-98,-52},{-36,-68}},pattern=LinePattern.Dash)}",
+      "S231:label": "ActiveAirFlow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Conversions.BooleanToReal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Active cooling maximum flow",
+      "S231:graphics": "Placement(transformation(extent={{140,160},{160,180}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax.realTrue"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax.y"
+        }
+      ],
+      "S231:label": "actCooMax"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax.realTrue",
+      "S231:isFinal": true,
+      "S231:value": "VCooMax_flow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActCooMax_flow"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Add",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Active heating minimu flow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{160,10},{180,30}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1.y"
+        }
+      ],
+      "S231:label": "add1"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActHeaMin_flow"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Add",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Add up inputs",
+      "S231:graphics": "Placement(transformation(extent={{100,-30},{120,-10}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2.y"
+        }
+      ],
+      "S231:label": "add2"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Add",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Add up inputs",
+      "S231:graphics": "Placement(transformation(extent={{100,-170},{120,-150}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3.y"
+        }
+      ],
+      "S231:label": "add3"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Add",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Active heating maximum flow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{160,-130},{180,-110}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4.y"
+        }
+      ],
+      "S231:label": "add4"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActHeaMax_flow"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooDowMod",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Sources.Constant",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Cool down mode",
+      "S231:graphics": "Placement(transformation(extent={{-160,80},{-140,100}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooDowMod.k"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooDowMod.y"
+        }
+      ],
+      "S231:label": "cooDowMod"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooDowMod.k",
+      "S231:isFinal": true,
+      "S231:value": "Buildings.Controls.OBC.ASHRAE.G36.Types.OperationModes.coolDown"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooDowMod.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Conversions.BooleanToReal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Cooling maximum flow when input is true",
+      "S231:graphics": "Placement(transformation(extent={{40,-150},{60,-130}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo.realTrue"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo.y"
+        }
+      ],
+      "S231:label": "cooMaxFlo"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo.realTrue",
+      "S231:isFinal": true,
+      "S231:value": "VCooMax_flow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxAir",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Sources.Constant",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Heating maximum airflow",
+      "S231:graphics": "Placement(transformation(extent={{-100,-160},{-80,-140}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxAir.k"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxAir.y"
+        }
+      ],
+      "S231:label": "heaMaxAir"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxAir.k",
+      "S231:isFinal": true,
+      "S231:value": "VHeaMax_flow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxAir.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Conversions.BooleanToReal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Heating maximum flow when input is true",
+      "S231:graphics": "Placement(transformation(extent={{40,-50},{60,-30}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo.realTrue"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo.y"
+        }
+      ],
+      "S231:label": "heaMaxFlo"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo.realTrue",
+      "S231:isFinal": true,
+      "S231:value": "VHeaMax_flow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Conversions.BooleanToReal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Heating maximum flow when input is true",
+      "S231:graphics": "Placement(transformation(extent={{40,-190},{60,-170}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1.realTrue"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1.y"
+        }
+      ],
+      "S231:label": "heaMaxFlo1"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1.realTrue",
+      "S231:isFinal": true,
+      "S231:value": "VHeaMax_flow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add3.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinAir",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Sources.Constant",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Heating minimum airflow",
+      "S231:graphics": "Placement(transformation(extent={{-100,-40},{-80,-20}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinAir.k"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinAir.y"
+        }
+      ],
+      "S231:label": "heaMinAir"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinAir.k",
+      "S231:isFinal": true,
+      "S231:value": "VHeaMin_flow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinAir.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Conversions.BooleanToReal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Heating minimum flow when input is true",
+      "S231:graphics": "Placement(transformation(extent={{40,-10},{60,10}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo.realTrue"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo.y"
+        }
+      ],
+      "S231:label": "heaMinFlo"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo.realTrue",
+      "S231:isFinal": true,
+      "S231:value": "VHeaMin_flow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add2.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Equal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if current operation mode is cooldown mode",
+      "S231:graphics": "Placement(transformation(extent={{-120,80},{-100,100}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow.y"
+        }
+      ],
+      "S231:label": "ifCooDow"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow.y",
+      "S231:isConnectedTo": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo1.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMinFlo.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3.u2"
+        }
+      ]
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Equal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if current operation mode is occupied mode",
+      "S231:graphics": "Placement(transformation(extent={{-120,180},{-100,200}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc.y"
+        }
+      ],
+      "S231:label": "ifOcc"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc.y",
+      "S231:isConnectedTo": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3.u1"
+        }
+      ]
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Equal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if current operation mode is setback mode",
+      "S231:graphics": "Placement(transformation(extent={{-120,-200},{-100,-180}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac.y"
+        }
+      ],
+      "S231:label": "ifSetBac"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Equal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if current operation mode is setup mode",
+      "S231:graphics": "Placement(transformation(extent={{-120,0},{-100,20}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp.y"
+        }
+      ],
+      "S231:label": "ifSetUp"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Equal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if current operation mode is warm-up mode",
+      "S231:graphics": "Placement(transformation(extent={{-120,-90},{-100,-70}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp.y"
+        }
+      ],
+      "S231:label": "ifWarUp"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Max",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Maximum of inputs",
+      "S231:graphics": "Placement(transformation(extent={{-20,40},{0,60}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1.y"
+        }
+      ],
+      "S231:label": "max1"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Max",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Maximum of inputs",
+      "S231:graphics": "Placement(transformation(extent={{-20,-120},{0,-100}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2.y"
+        }
+      ],
+      "S231:label": "max2"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2.u2"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occMod",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Sources.Constant",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Occupied mode",
+      "S231:graphics": "Placement(transformation(extent={{-160,180},{-140,200}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occMod.k"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occMod.y"
+        }
+      ],
+      "S231:label": "occMod"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occMod.k",
+      "S231:isFinal": true,
+      "S231:value": "Buildings.Controls.OBC.ASHRAE.G36.Types.OperationModes.occupied"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occMod.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Conversions.BooleanToReal",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "If in occupied mode, output 1",
+      "S231:graphics": "Placement(transformation(extent={{-20,120},{0,140}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd.realTrue"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd.y"
+        }
+      ],
+      "S231:label": "occModInd"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd.realTrue",
+      "S231:isFinal": true,
+      "S231:value": 1
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.occModInd.y",
+      "S231:isConnectedTo": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2.u1"
+        }
+      ]
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if it is in occupied, cooldown, or setup mode",
+      "S231:graphics": "Placement(transformation(extent={{40,160},{60,180}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1.y"
+        }
+      ],
+      "S231:label": "or1"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.actCooMax.u"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if it is warm-up or setback",
+      "S231:graphics": "Placement(transformation(extent={{-20,-50},{0,-30}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2.y"
+        }
+      ],
+      "S231:label": "or2"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or2.y",
+      "S231:isConnectedTo": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.cooMaxFlo.u"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.heaMaxFlo.u"
+        }
+      ]
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Check if it is in occupied, cooldown, or setup mode",
+      "S231:graphics": "Placement(transformation(extent={{-20,160},{0,180}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3.y"
+        }
+      ],
+      "S231:label": "or3"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or3.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.or1.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Multiply",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Active cooling minimum, minimum airflow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{140,110},{160,130}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro.y"
+        }
+      ],
+      "S231:label": "pro"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro.y",
+      "S231:isConnectedTo": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActCooMin_flow"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActMin_flow"
+        }
+      ]
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Multiply",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Product of inputs",
+      "S231:graphics": "Placement(transformation(extent={{40,60},{60,80}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1.y"
+        }
+      ],
+      "S231:label": "pro1"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro1.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add1.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Reals.Multiply",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Product of inputs",
+      "S231:graphics": "Placement(transformation(extent={{40,-90},{60,-70}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2.y"
+        }
+      ],
+      "S231:label": "pro2"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro2.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.add4.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setBacMod",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Sources.Constant",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Setback mode",
+      "S231:graphics": "Placement(transformation(extent={{-160,-200},{-140,-180}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setBacMod.k"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setBacMod.y"
+        }
+      ],
+      "S231:label": "setBacMod"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setBacMod.k",
+      "S231:isFinal": true,
+      "S231:value": "Buildings.Controls.OBC.ASHRAE.G36.Types.OperationModes.setBack"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setBacMod.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setUpMod",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Sources.Constant",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Setup mode",
+      "S231:graphics": "Placement(transformation(extent={{-160,0},{-140,20}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setUpMod.k"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setUpMod.y"
+        }
+      ],
+      "S231:label": "setUpMod"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setUpMod.k",
+      "S231:isFinal": true,
+      "S231:value": "Buildings.Controls.OBC.ASHRAE.G36.Types.OperationModes.setUp"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.setUpMod.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp.u1"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.uOpeMod",
+      "@type": "S231:IntegerInput",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Zone operation mode",
+      "S231:graphics": "Placement(transformation(extent={{-240,130},{-200,170}})),iconTransformation(extent={{-140,40},{-100,80}})))",
+      "S231:isConnectedTo": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifCooDow.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifOcc.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetBac.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifSetUp.u2"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp.u2"
+        }
+      ],
+      "S231:label": "uOpeMod"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActCooMax_flow",
+      "@type": "S231:RealOutput",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Active cooling maximum airflow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{200,150},{240,190}})),iconTransformation(extent={{100,60},{140,100}})))",
+      "S231:label": "VActCooMax_flow",
+      "S231:min": 0,
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActCooMin_flow",
+      "@type": "S231:RealOutput",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Active cooling minimum airflow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{200,100},{240,140}})),iconTransformation(extent={{100,20},{140,60}})))",
+      "S231:label": "VActCooMin_flow",
+      "S231:min": 0,
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActHeaMax_flow",
+      "@type": "S231:RealOutput",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Active heating maximum airflow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{200,-140},{240,-100}})),iconTransformation(extent={{100,-100},{140,-60}})))",
+      "S231:label": "VActHeaMax_flow",
+      "S231:min": 0,
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActHeaMin_flow",
+      "@type": "S231:RealOutput",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Active heating minimum airflow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{200,0},{240,40}})),iconTransformation(extent={{100,-60},{140,-20}})))",
+      "S231:label": "VActHeaMin_flow",
+      "S231:min": 0,
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VActMin_flow",
+      "@type": "S231:RealOutput",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Active minimum airflow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{200,60},{240,100}})),iconTransformation(extent={{100,-20},{140,20}})))",
+      "S231:label": "VActMin_flow",
+      "S231:min": 0,
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VCooMax_flow",
+      "@type": "S231:Parameter",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Design zone cooling maximum airflow rate",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:label": "VCooMax_flow",
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VHeaMax_flow",
+      "@type": "S231:Parameter",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Design zone heating maximum airflow rate",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:label": "VHeaMax_flow",
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VHeaMin_flow",
+      "@type": "S231:Parameter",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Design zone heating minimum airflow rate, for the reheat box with water hot coil, it should be zero",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:label": "VHeaMin_flow",
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.VOccMin_flow",
+      "@type": "S231:RealInput",
+      "S231:accessSpecifier": "public",
+      "S231:description": "Occupied minimum airflow setpoint",
+      "S231:graphics": "Placement(transformation(extent={{-240,20},{-200,60}})),iconTransformation(extent={{-140,-80},{-100,-40}})))",
+      "S231:isConnectedTo": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max1.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.max2.u1"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.pro.u2"
+        }
+      ],
+      "S231:label": "VOccMin_flow",
+      "qudt:hasQuantityKind": {
+        "@id": "q:VolumeFlowRate"
+      },
+      "qudt:hasUnit": {
+        "@id": "unit:M3-PER-SEC"
+      }
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.warUpMod",
+      "@type": "ex:Buildings.Controls.OBC.CDL.Integers.Sources.Constant",
+      "S231:accessSpecifier": "protected",
+      "S231:description": "Warm up mode",
+      "S231:graphics": "Placement(transformation(extent={{-160,-90},{-140,-70}})))",
+      "S231:hasInstance": [
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.warUpMod.k"
+        },
+        {
+          "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.warUpMod.y"
+        }
+      ],
+      "S231:label": "warUpMod"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.warUpMod.k",
+      "S231:isFinal": true,
+      "S231:value": "Buildings.Controls.OBC.ASHRAE.G36.Types.OperationModes.warmUp"
+    },
+    {
+      "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.warUpMod.y",
+      "S231:isConnectedTo": {
+        "@id": "ex:Buildings.Controls.OBC.ASHRAE.G36.TerminalUnits.Reheat.Subsequences.ActiveAirFlow.ifWarUp.u1"
+      }
+    }
+  ]
+}
