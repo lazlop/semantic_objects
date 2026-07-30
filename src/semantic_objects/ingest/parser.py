@@ -43,7 +43,14 @@ class OntologyParser:
                 return set()
             _seen.add(subject)
             names = {local_name(subject)}
-            for parent in parent_map.get(subject, []):
+            # Parents not in parent_map (out-of-scope subjects, e.g. an s223 class an
+            # extension ontology subclasses) aren't pre-walked - query the graph
+            # directly so ancestry still reaches e.g. a literal `EnumerationKind`
+            # root through an external namespace's hierarchy.
+            parents = parent_map.get(subject)
+            if parents is None:
+                parents = [p for p in g.objects(subject, RDFS.subClassOf) if isinstance(p, URIRef)]
+            for parent in parents:
                 names |= ancestry_local_names(parent, _seen)
             return names
 
@@ -62,7 +69,8 @@ class OntologyParser:
             parent_local_names = []
             for p in parent_map.get(subject, []):
                 p_local = local_name(p)
-                if p in class_local_by_iri or p_local in scaffold_names:
+                if (p in class_local_by_iri or p_local in scaffold_names
+                        or self.adapter.external_class_ref(p_local) is not None):
                     parent_local_names.append(p_local)
                 # else: out-of-scope/meta parent (e.g. s223:Concept) - dropped, the
                 # emitter falls back to the class's bucket root.

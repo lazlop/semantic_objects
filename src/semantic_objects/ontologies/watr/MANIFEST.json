@@ -1,0 +1,6 @@
+{
+    "source_url": null,
+    "fetched_at": "2026-07-29T00:00:00Z",
+    "sha256": "21d71d40d0e15d5075f942261964e45278e03ee221b453e561d0fa1450372101",
+    "notes": "NAWI water treatment ontology (WATR), an extension of ASHRAE Standard 223P. Vendored copy provided directly (no fetch script yet) for reproducible/offline ontology ingestion."
+}

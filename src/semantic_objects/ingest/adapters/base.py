@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import List, Optional
 
 from rdflib import Graph, Namespace, URIRef
 
@@ -14,6 +14,10 @@ class OntologyAdapter(ABC):
     """
 
     namespace: Namespace
+    # Name this ontology's namespace is imported under from semantic_objects.namespaces
+    # (e.g. 'S223', 'WATR') - used to generate `from ...namespaces import {name}` and
+    # `_ns = {name}` in the generated relations module.
+    namespace_import_name: str = 'S223'
 
     @abstractmethod
     def in_scope(self, iri: URIRef) -> bool:
@@ -45,3 +49,22 @@ class OntologyAdapter(ABC):
         """Map of local_name -> True for classes already hand-defined in the domain's
         core.py scaffold (e.g. Node, EnumerationKind, ExternalReference) that the
         generator should reference but never redefine."""
+
+    def external_class_ref(self, local_name: str) -> Optional[str]:
+        """Python expression for a class defined by another, already-generated
+        ontology package (e.g. an extension ontology subclassing or referencing a
+        base ontology's class as a field/relation target), or None if `local_name`
+        isn't such a reference. Only needed by extension-ontology adapters."""
+        return None
+
+    def external_relation_ref(self, local_name: str) -> Optional[str]:
+        """Python expression for a Predicate defined by another, already-generated
+        ontology package (e.g. an extension ontology reusing a base ontology's
+        relation), or None if `local_name` isn't such a reference. Only needed by
+        extension-ontology adapters."""
+        return None
+
+    def external_import_lines(self) -> List[str]:
+        """Import statements needed to make external_class_ref/external_relation_ref
+        expressions resolve at module scope, added to every generated bucket file."""
+        return []

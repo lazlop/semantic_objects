@@ -19,7 +19,7 @@ def _generate_into(output_dir: Path):
     config = IngestConfig(ontology_name="s223", source_path=ONTOLOGY_PATH, output_dir=output_dir)
     adapter = S223Adapter()
     ir = OntologyParser(config, adapter).parse()
-    Emitter(ir, adapter.scaffold_parent_local_names(), ONTOLOGY_PATH, output_dir, "s223").emit()
+    Emitter(ir, adapter.scaffold_parent_local_names(), ONTOLOGY_PATH, output_dir, "s223", adapter=adapter).emit()
 
 
 def test_generation_is_idempotent():
