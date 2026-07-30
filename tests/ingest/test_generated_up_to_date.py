@@ -30,3 +30,20 @@ def test_watr_generated_meta_matches_vendored_ontology():
         REPO_ROOT / "src" / "semantic_objects" / "ontologies" / "watr" / "water.ttl",
         "semantic_objects.watr._generated._meta",
     )
+
+
+def test_cxf_generated_meta_matches_vendored_ontology():
+    # CXF is ~45 JSON-LD files, not one Turtle file - _meta.SOURCE_SHA256 is a
+    # hash over all of them concatenated (see ingest/cxf/emitter.py::_source_hash),
+    # so this doesn't fit _assert_up_to_date's single-file signature.
+    from semantic_objects.cxf._generated import _meta
+
+    cxf_dir = (REPO_ROOT / "src" / "semantic_objects" / "ontologies" / "cxf"
+               / "Buildings" / "Controls" / "OBC" / "ASHRAE" / "G36")
+    h = hashlib.sha256()
+    for path in sorted(cxf_dir.rglob("*.jsonld")):
+        h.update(path.read_bytes())
+    assert _meta.SOURCE_SHA256 == h.hexdigest(), (
+        "cxf/_generated/ is stale relative to the vendored CXF ontology - re-run "
+        "`python -m semantic_objects.ingest.cli --ontology cxf`"
+    )
