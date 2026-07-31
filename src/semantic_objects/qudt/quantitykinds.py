@@ -29,3 +29,23 @@ class Pressure(QuantityKind):
 @semantic_object
 class Temperature(QuantityKind):
     pass
+
+@semantic_object
+class ThermodynamicTemperature(QuantityKind):
+    pass
+
+@semantic_object
+class TemperatureDifference(QuantityKind):
+    pass
+
+@semantic_object
+class Time(QuantityKind):
+    pass
+
+@semantic_object
+class VolumeFlowRate(QuantityKind):
+    pass
+
+@semantic_object
+class SpecificEnergy(QuantityKind):
+    pass

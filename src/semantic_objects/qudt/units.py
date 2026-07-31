@@ -33,3 +33,27 @@ class PSI(Unit):
 @semantic_object
 class PA(Unit):
     _name = 'PA'
+
+@semantic_object
+class DEG_C(Unit):
+    _name = 'DEG_C'
+
+@semantic_object
+class K(Unit):
+    _name = 'K'
+
+@semantic_object
+class SEC(Unit):
+    _name = 'SEC'
+
+@semantic_object
+class M3_PER_SEC(Unit):
+    _name = 'M3-PER-SEC'
+
+@semantic_object
+class J_PER_KiloGM(Unit):
+    _name = 'J-PER-KiloGM'
+
+@semantic_object
+class UNITLESS(Unit):
+    _name = 'UNITLESS'

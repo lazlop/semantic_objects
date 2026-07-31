@@ -5,6 +5,7 @@ from pathlib import Path
 from pprint import pformat
 from typing import Dict, List, Optional, Tuple
 
+from ..adapters.base import OntologyAdapter
 from ..ir import ClassIR, ComplexConstraintIR, OntologyIR, PropertyShapeIR
 from .templates import GENERATED_HEADER
 
@@ -65,23 +66,33 @@ class Emitter:
     """OntologyIR -> deterministic, header-stamped .py source under s223/_generated/."""
 
     def __init__(self, ir: OntologyIR, scaffold_names: dict, source_path: Path, output_dir: Path,
-                 ontology_name: str, external_relations_module: Optional[str] = None):
+                 ontology_name: str, adapter: Optional[OntologyAdapter] = None):
         self.ir = ir
         self.scaffold_names = scaffold_names
         self.source_path = source_path
         self.output_dir = output_dir
         self.ontology_name = ontology_name
-        self.external_relations_module = external_relations_module
+        self.adapter = adapter
         self.unresolved_notes: Dict[str, List[dict]] = {}
         self.raw_shapes: Dict[str, List[dict]] = {}
         self._bucket_positions: Dict[str, Dict[str, int]] = {}
 
-    def _scaffold_ref(self, local_name: str) -> str:
-        """Python identifier a scaffold parent local_name renders as: the bare name
-        for domain core.py scaffolds, or an aliased import for an external ontology
-        run's class (avoids `class Fan(Fan):` shadowing ambiguity for e.g. g36:Fan
-        subclassing s223:Fan)."""
-        return local_name if self.scaffold_names[local_name] is True else f"_Ext{local_name}"
+    # -- cross-ontology reference helpers ------------------------------------------
+
+    def _relation_ref(self, path_local: str) -> Optional[str]:
+        """`relations.X` for a relation defined by this ontology, or an adapter-supplied
+        external expression (e.g. `s223.hasConnectionPoint`) for one reused from an
+        already-generated base ontology. None if path_local isn't a known relation."""
+        if path_local in self.ir.relations:
+            return f"relations.{path_local}"
+        if self.adapter is not None:
+            return self.adapter.external_relation_ref(path_local)
+        return None
+
+    def _external_class_ref(self, local: str) -> Optional[str]:
+        if self.adapter is None:
+            return None
+        return self.adapter.external_class_ref(local)
 
     # -- type/relation resolution -------------------------------------------------
 
@@ -95,7 +106,7 @@ class Emitter:
         if target == current_local:
             return 'Self', True  # resolved at use-time by _infer_relation_for_field, not import-time
         if target in self.scaffold_names:
-            return self._scaffold_ref(target), True
+            return target, True
         if target in self.ir.classes:
             cls = self.ir.classes[target]
             if cls.bucket == current_bucket:
@@ -108,7 +119,48 @@ class Emitter:
             return None  # forward reference to a not-yet-loaded bucket
         if target in QUDT_KNOWN:
             return QUDT_KNOWN[target], True
+        ext = self._external_class_ref(target)
+        if ext is not None:
+            return ext, True
         return None
+
+    def _transitive_ancestor_locals(self, local: str, _seen: Optional[set] = None) -> set:
+        """Ancestor local names reachable by walking parent_local_names within this
+        ontology's own IR. External/base-ontology parents are leaves here (we don't
+        have their hierarchy loaded) - that's fine, this only needs to detect
+        same-ontology redundant multi-parent declarations, e.g. `Thickener`
+        subclassing both `s223:Equipment` and `watr:UnitProcess` directly even
+        though `UnitProcess` already subclasses `Equipment`."""
+        if _seen is None:
+            _seen = set()
+        cls = self.ir.classes.get(local)
+        if cls is None or local in _seen:
+            return set()
+        _seen.add(local)
+        ancestors = set(cls.parent_local_names)
+        for p in cls.parent_local_names:
+            ancestors |= self._transitive_ancestor_locals(p, _seen)
+        return ancestors
+
+    def _ordered_parent_locals(self, cls: ClassIR) -> List[str]:
+        """Direct parents, most-derived first. A class can declare a parent *and*
+        one of that parent's own ancestors directly (redundant but valid RDFS,
+        e.g. `Thickener rdfs:subClassOf s223:Equipment, watr:UnitProcess` where
+        UnitProcess already subclasses Equipment) - Python's C3 linearization
+        rejects that ordering unless the more-derived parent is listed first."""
+        remaining = list(dict.fromkeys(cls.parent_local_names))
+        ancestors_of = {p: self._transitive_ancestor_locals(p) for p in remaining}
+        ordered = []
+        while remaining:
+            for p in remaining:
+                if not any(p in ancestors_of[q] for q in remaining if q != p):
+                    ordered.append(p)
+                    remaining.remove(p)
+                    break
+            else:
+                ordered.extend(remaining)  # cycle - shouldn't happen for a DAG
+                break
+        return ordered
 
     def _note_unresolved(self, class_name: str, shape_or_cc, reason: str):
         self.unresolved_notes.setdefault(class_name, []).append({
@@ -122,15 +174,25 @@ class Emitter:
 
     def _render_class(self, cls: ClassIR, prior_buckets: List[str]) -> str:
         parents = []
-        for p_local in cls.parent_local_names:
-            if p_local in self.ir.classes:
+        for p_local in self._ordered_parent_locals(cls):
+            # A parent local_name identical to cls's own local_name is never a
+            # genuine self-inheritance edge - it's a same-named external class an
+            # extension ontology reuses (e.g. watr's own "Valve" taxonomy leaf
+            # subclassing s223:Valve). Route it to the external adapter instead of
+            # the ir.classes lookup below, which would otherwise resolve back to
+            # cls itself since ir.classes is keyed by local_name, not IRI.
+            if p_local != cls.local_name and p_local in self.scaffold_names:
+                parents.append(p_local)
+            elif p_local != cls.local_name and p_local in self.ir.classes:
                 p_cls = self.ir.classes[p_local]
                 if p_cls.bucket == cls.bucket:
                     parents.append(p_cls.class_name)
                 elif p_cls.bucket in prior_buckets:
                     parents.append(f"{p_cls.bucket}.{p_cls.class_name}")
-        for p_local in cls.external_parent_local_names:
-            parents.append(self._scaffold_ref(p_local))
+            else:
+                ext = self._external_class_ref(p_local)
+                if ext is not None:
+                    parents.append(ext)
         if not parents:
             parents = [BUCKET_ROOT[cls.bucket]]
 
@@ -142,9 +204,7 @@ class Emitter:
             body_lines.append(f"    comment = {cls.comment!r}")
         if cls.is_abstract:
             body_lines.append("    abstract = True")
-        if cls.asserted_type_local is not None:
-            body_lines.append(f"    _name = {cls.asserted_type_local!r}")
-        elif cls.local_name != cls.class_name:
+        if cls.local_name != cls.class_name:
             body_lines.append(f"    _name = {cls.local_name!r}")
 
         field_shapes: List[PropertyShapeIR] = []
@@ -152,8 +212,8 @@ class Emitter:
         raw_entries: List[dict] = []
 
         for shape in cls.property_shapes:
-            relation_available = (shape.path_local in self.ir.relations
-                                   or shape.path_local in self.ir.external_relations)
+            relation_ref = self._relation_ref(shape.path_local)
+            relation_available = relation_ref is not None
             ref = (self._resolve_type_ref(shape, cls.bucket, cls.local_name, prior_buckets)
                    if relation_available else None)
             if ref is None:
@@ -172,7 +232,7 @@ class Emitter:
                 field_shapes.append(shape)
             else:
                 type_str, _ = ref
-                valid_relation_entries.append(f"(relations.{shape.path_local}, {type_str})")
+                valid_relation_entries.append(f"({relation_ref}, {type_str})")
 
             for note in shape.supplementary_notes:
                 raw_entries.append({
@@ -195,11 +255,12 @@ class Emitter:
 
         for shape in field_shapes:
             type_str, _ = self._resolve_type_ref(shape, cls.bucket, cls.local_name, prior_buckets)
+            relation_ref = self._relation_ref(shape.path_local)
             min_ = shape.min_count if shape.min_count is not None else 0
             max_repr = repr(shape.max_count)
             body_lines.append(
                 f"    {shape.field_name}: {type_str} = required_field("
-                f"relation=relations.{shape.path_local}, min={min_}, max={max_repr}, "
+                f"relation={relation_ref}, min={min_}, max={max_repr}, "
                 f"qualified={shape.qualified!r})"
             )
 
@@ -234,29 +295,18 @@ class Emitter:
                     if tb in prior_buckets:
                         needed_imports.add(tb)
 
-        core_scaffold_names = [n for n in ('Node', 'EnumerationKind', 'ExternalReference')
-                                if self.scaffold_names.get(n) is True]
-        external_scaffold_used = set()
-        for c in classes:
-            external_scaffold_used.update(c.external_parent_local_names)
-            for shape in c.property_shapes:
-                t = shape.target_class_local
-                if t and t in self.scaffold_names and self.scaffold_names[t] is not True:
-                    external_scaffold_used.add(t)
-
         parts = [self._header()]
         parts.append("from typing import Self")
         parts.append("from ...core import *")
-        if core_scaffold_names:
-            parts.append(f"from ..core import {', '.join(core_scaffold_names)}")
-        for name in sorted(external_scaffold_used):
-            parts.append(f"from {self.scaffold_names[name]} import {name} as _Ext{name}")
+        parts.append("from ..core import Node, EnumerationKind, ExternalReference")
         parts.append("from . import relations")
         for b in prior_buckets:
             if b in needed_imports:
                 parts.append(f"from . import {b}")
         if bucket == 'properties':
             parts.append("from ...qudt import Unit, QuantityKind")
+        if self.adapter is not None:
+            parts.extend(self.adapter.external_import_lines())
         # Restrict `from X import *` to the classes actually defined here - without
         # this, the cross-bucket `from . import {b}` lines above (needed so field
         # types can reference e.g. properties.SomeClass) would themselves leak into
@@ -271,16 +321,14 @@ class Emitter:
         return "\n".join(parts)
 
     def _render_relations(self) -> str:
-        ns_const = self.ontology_name.upper()
+        ns_name = getattr(self.adapter, 'namespace_import_name', None) or 'S223'
         parts = [self._header()]
-        if self.external_relations_module:
-            parts.append(f"from {self.external_relations_module} import *")
         parts.append("from ...core import semantic_object, Predicate as _CorePredicate")
-        parts.append(f"from ...namespaces import {ns_const}")
+        parts.append(f"from ...namespaces import {ns_name}")
         parts.append("__all__ = " + repr(['Predicate'] + sorted(r.class_name for r in self.ir.relations.values())))
         parts.append("\n@semantic_object")
         parts.append("class Predicate(_CorePredicate):")
-        parts.append(f"    _ns = {ns_const}\n")
+        parts.append(f"    _ns = {ns_name}\n")
 
         for local in sorted(self.ir.relations.keys()):
             rel = self.ir.relations[local]
@@ -292,7 +340,7 @@ class Emitter:
             if rel.comment:
                 body.append(f"    comment = {rel.comment!r}")
             if rel.inverse_of_local:
-                body.append(f"    # inverse of s223:{rel.inverse_of_local}")
+                body.append(f"    # inverse of {self.ontology_name}:{rel.inverse_of_local}")
             if not body:
                 body.append("    pass")
             parts.append("\n".join(body) + "\n")

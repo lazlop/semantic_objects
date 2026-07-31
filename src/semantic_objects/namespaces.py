@@ -51,6 +51,15 @@ BM = Namespace("https://nrel.gov/BuildingMOTIF#")
 CONSTRAINT = Namespace("https://nrel.gov/BuildingMOTIF/constraints#")
 S223 = Namespace("http://data.ashrae.org/standard223#")
 
+# NAWI water treatment ontology (extends s223)
+WATR = Namespace("urn:nawi-water-ontology#")
+
+# CXF (Control eXchange Format) - LBNL Modelica Buildings library control
+# sequences (ASHRAE Guideline 36 etc.), vendored as JSON-LD under the S231
+# vocabulary. Unrelated to the S223 RDF ontology above despite the shared
+# "G36" naming - see tutorial/cxf-ingestion-tutorial.ipynb.
+S231 = Namespace("http://data.ashrae.org/S231#")
+
 A = RDF.type
 
 BNODE_BASE = "https://rdflib.github.io/.well-known/genid/rdflib/"
@@ -81,6 +90,7 @@ def bind_prefixes(graph):
     graph.bind("hpflex", HPF)
     graph.bind("hpfs", HPFS)
     graph.bind("s223", S223)
+    graph.bind("watr", WATR)
     graph.bind("ex", EX)
     graph.bind("bs", BS)
     graph.bind("bob", BOB)
@@ -109,6 +119,7 @@ namespace_dict = {
     "hpflex": HPF,
     "hpfs": HPFS,
     "s223": S223,
+    "watr": WATR,
     "ex1": "http://data.ashrae.org/standard223/data/scb-vrf#",
     "ex":EX,
     "bs":BS,
