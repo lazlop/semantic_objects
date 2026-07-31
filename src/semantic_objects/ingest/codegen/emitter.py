@@ -65,15 +65,23 @@ class Emitter:
     """OntologyIR -> deterministic, header-stamped .py source under s223/_generated/."""
 
     def __init__(self, ir: OntologyIR, scaffold_names: dict, source_path: Path, output_dir: Path,
-                 ontology_name: str):
+                 ontology_name: str, external_relations_module: Optional[str] = None):
         self.ir = ir
         self.scaffold_names = scaffold_names
         self.source_path = source_path
         self.output_dir = output_dir
         self.ontology_name = ontology_name
+        self.external_relations_module = external_relations_module
         self.unresolved_notes: Dict[str, List[dict]] = {}
         self.raw_shapes: Dict[str, List[dict]] = {}
         self._bucket_positions: Dict[str, Dict[str, int]] = {}
+
+    def _scaffold_ref(self, local_name: str) -> str:
+        """Python identifier a scaffold parent local_name renders as: the bare name
+        for domain core.py scaffolds, or an aliased import for an external ontology
+        run's class (avoids `class Fan(Fan):` shadowing ambiguity for e.g. g36:Fan
+        subclassing s223:Fan)."""
+        return local_name if self.scaffold_names[local_name] is True else f"_Ext{local_name}"
 
     # -- type/relation resolution -------------------------------------------------
 
@@ -87,7 +95,7 @@ class Emitter:
         if target == current_local:
             return 'Self', True  # resolved at use-time by _infer_relation_for_field, not import-time
         if target in self.scaffold_names:
-            return target, True
+            return self._scaffold_ref(target), True
         if target in self.ir.classes:
             cls = self.ir.classes[target]
             if cls.bucket == current_bucket:
@@ -115,14 +123,14 @@ class Emitter:
     def _render_class(self, cls: ClassIR, prior_buckets: List[str]) -> str:
         parents = []
         for p_local in cls.parent_local_names:
-            if p_local in self.scaffold_names:
-                parents.append(p_local)
-            elif p_local in self.ir.classes:
+            if p_local in self.ir.classes:
                 p_cls = self.ir.classes[p_local]
                 if p_cls.bucket == cls.bucket:
                     parents.append(p_cls.class_name)
                 elif p_cls.bucket in prior_buckets:
                     parents.append(f"{p_cls.bucket}.{p_cls.class_name}")
+        for p_local in cls.external_parent_local_names:
+            parents.append(self._scaffold_ref(p_local))
         if not parents:
             parents = [BUCKET_ROOT[cls.bucket]]
 
@@ -134,7 +142,9 @@ class Emitter:
             body_lines.append(f"    comment = {cls.comment!r}")
         if cls.is_abstract:
             body_lines.append("    abstract = True")
-        if cls.local_name != cls.class_name:
+        if cls.asserted_type_local is not None:
+            body_lines.append(f"    _name = {cls.asserted_type_local!r}")
+        elif cls.local_name != cls.class_name:
             body_lines.append(f"    _name = {cls.local_name!r}")
 
         field_shapes: List[PropertyShapeIR] = []
@@ -142,7 +152,8 @@ class Emitter:
         raw_entries: List[dict] = []
 
         for shape in cls.property_shapes:
-            relation_available = shape.path_local in self.ir.relations
+            relation_available = (shape.path_local in self.ir.relations
+                                   or shape.path_local in self.ir.external_relations)
             ref = (self._resolve_type_ref(shape, cls.bucket, cls.local_name, prior_buckets)
                    if relation_available else None)
             if ref is None:
@@ -223,10 +234,23 @@ class Emitter:
                     if tb in prior_buckets:
                         needed_imports.add(tb)
 
+        core_scaffold_names = [n for n in ('Node', 'EnumerationKind', 'ExternalReference')
+                                if self.scaffold_names.get(n) is True]
+        external_scaffold_used = set()
+        for c in classes:
+            external_scaffold_used.update(c.external_parent_local_names)
+            for shape in c.property_shapes:
+                t = shape.target_class_local
+                if t and t in self.scaffold_names and self.scaffold_names[t] is not True:
+                    external_scaffold_used.add(t)
+
         parts = [self._header()]
         parts.append("from typing import Self")
         parts.append("from ...core import *")
-        parts.append("from ..core import Node, EnumerationKind, ExternalReference")
+        if core_scaffold_names:
+            parts.append(f"from ..core import {', '.join(core_scaffold_names)}")
+        for name in sorted(external_scaffold_used):
+            parts.append(f"from {self.scaffold_names[name]} import {name} as _Ext{name}")
         parts.append("from . import relations")
         for b in prior_buckets:
             if b in needed_imports:
@@ -247,13 +271,16 @@ class Emitter:
         return "\n".join(parts)
 
     def _render_relations(self) -> str:
+        ns_const = self.ontology_name.upper()
         parts = [self._header()]
+        if self.external_relations_module:
+            parts.append(f"from {self.external_relations_module} import *")
         parts.append("from ...core import semantic_object, Predicate as _CorePredicate")
-        parts.append("from ...namespaces import S223")
+        parts.append(f"from ...namespaces import {ns_const}")
         parts.append("__all__ = " + repr(['Predicate'] + sorted(r.class_name for r in self.ir.relations.values())))
         parts.append("\n@semantic_object")
         parts.append("class Predicate(_CorePredicate):")
-        parts.append("    _ns = S223\n")
+        parts.append(f"    _ns = {ns_const}\n")
 
         for local in sorted(self.ir.relations.keys()):
             rel = self.ir.relations[local]

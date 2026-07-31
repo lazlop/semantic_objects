@@ -45,6 +45,7 @@ UNIT = Namespace("http://qudt.org/vocab/unit/")
 # ASHRAE namespaces
 BACNET = Namespace("http://data.ashrae.org/bacnet/2020#")
 S223 = Namespace("http://data.ashrae.org/standard223#")
+G36 = Namespace("http://data.ashrae.org/standard223/1.0/extensions/g36#")
 
 BM = Namespace("https://nrel.gov/BuildingMOTIF#")
 CONSTRAINT = Namespace("https://nrel.gov/BuildingMOTIF/constraints#")

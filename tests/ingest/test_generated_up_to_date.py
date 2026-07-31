@@ -15,3 +15,14 @@ def test_generated_meta_matches_vendored_ontology():
         "s223/_generated/ is stale relative to the vendored ontology - re-run "
         "`python -m semantic_objects.ingest.cli --ontology s223`"
     )
+
+
+def test_g36_generated_meta_matches_vendored_ontology():
+    # g36 is vendored in the same 223p.ttl file, under the g36: prefix.
+    from semantic_objects.g36._generated import _meta
+
+    actual_sha256 = hashlib.sha256(ONTOLOGY_PATH.read_bytes()).hexdigest()
+    assert _meta.SOURCE_SHA256 == actual_sha256, (
+        "g36/_generated/ is stale relative to the vendored ontology - re-run "
+        "`python -m semantic_objects.ingest.cli --ontology g36`"
+    )

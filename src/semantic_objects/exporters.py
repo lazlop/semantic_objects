@@ -1,6 +1,6 @@
 from typing import get_origin, get_args, List, Type
 from dataclasses import _MISSING_TYPE
-from .namespaces import PARAM, RDF, RDFS, SH, bind_prefixes
+from .namespaces import PARAM, RDF, RDFS, SH, XSD, bind_prefixes
 import yaml
 from pathlib import Path
 from rdflib import Graph, Literal, BNode, URIRef
@@ -150,23 +150,33 @@ class YamlExporter:
 
 class RdfExporter:
     """Handles all RDF export functionality for Resource classes"""
-    
+
+    # sh:datatype has no Resource-class representation to call `_get_iri()` on -
+    # map the bare Python primitive a field's type annotation unwraps to instead.
+    DATATYPE_MAP = {str: XSD.string, int: XSD.integer, float: XSD.decimal, bool: XSD.boolean}
+
     @staticmethod
-    def _create_qualified_value_shape(cls, g, prop_node, field_obj, field_name, class_iri):
-        """Create a qualified value shape for a field"""
-        qual_val_shape = BNode()
-        
-        # Determine target type
+    def _unwrap_field_type(cls, field_obj):
+        """A field's type annotation, stripped of Optional/generic wrapping and
+        with a self-referential type resolved to `cls` - the same unwrapping
+        `_create_qualified_value_shape` already did, now shared with the main
+        property-shape pass so both branches handle `Optional[...]`/`Self`
+        consistently instead of only one of them."""
         target_type = field_obj.type
         origin = get_origin(target_type)
         if origin is not None:
             args = get_args(target_type)
             if args:
                 target_type = args[0]
-        
-        # Handle Self reference
         if target_type == cls or str(target_type) == 'Self':
             target_type = cls
+        return target_type
+
+    @staticmethod
+    def _create_qualified_value_shape(cls, g, prop_node, field_obj, field_name, class_iri):
+        """Create a qualified value shape for a field"""
+        qual_val_shape = BNode()
+        target_type = RdfExporter._unwrap_field_type(cls, field_obj)
         
         add_qual_val_shape = True
 
@@ -202,8 +212,8 @@ class RdfExporter:
         
         class_iri = cls._get_iri()
         g.add((class_iri, RDF.type, cls._ns['Class']))
-        for type in cls._other_types:
-            g.add((class_iri, RDF.type, type))
+        for other_type in cls._other_types:
+            g.add((class_iri, RDF.type, other_type))
         
         if hasattr(cls, 'comment'):
             g.add((class_iri, RDFS.comment, Literal(cls.comment)))
@@ -243,64 +253,88 @@ class RdfExporter:
             for field_name, field_obj in fields_to_process:
                 if field_obj.metadata.get('value') is not None:
                     continue
-                
+
                 relation = cls._infer_relation_for_field(field_name, field_obj)
                 if relation is None:
                     continue
-                
+
                 relation_iri = relation._get_iri()
-                
+
+                # `exact_values` (e.g. ThresholdAlarm.aspects, Area_SP.aspects) means
+                # "this relation must additionally hold each of these individuals" -
+                # not a single class/value constraint on the relation's one main
+                # value, so it gets its own sh:hasValue-per-value property shapes,
+                # independent of the qualified/minCount bookkeeping below (which
+                # assumes one property shape per path).
+                exact_values = field_obj.metadata.get('exact_values')
+                if exact_values:
+                    for value in exact_values:
+                        prop_node = BNode()
+                        g.add((class_iri, SH.property, prop_node))
+                        g.add((prop_node, RDF.type, SH.PropertyShape))
+                        g.add((prop_node, SH.path, relation_iri))
+                        g.add((prop_node, SH.hasValue, value._get_iri()))
+                        message = (f"If the relation `{relation._name}` is present it must "
+                                   f"include the value `{value.__name__}`.")
+                        g.add((prop_node, SH.message, Literal(message)))
+                    continue
+
                 if relation_iri in prop_counts:
                     prop_counts[relation_iri] += 1
                 else:
                     prop_counts[relation_iri] = 1
-                
+
                 if relation_iri in shape_path_name_dct:
                     continue
-                
+
                 relation_key = relation._name
                 if relation_key in processed_relations:
                     continue
                 processed_relations.add(relation_key)
-                
+
                 prop_node = BNode()
                 g.add((class_iri, SH.property, prop_node))
                 g.add((prop_node, RDF.type, SH.PropertyShape))
                 g.add((prop_node, SH.path, relation_iri))
-                
+
                 shape_path_name_dct[relation_iri] = prop_node
-                
+
+                fixed_value = cls._resolve_fixed_default(field_obj)
+                has_fixed_value = not isinstance(fixed_value, _MISSING_TYPE) and fixed_value is not None
+                target_type = RdfExporter._unwrap_field_type(cls, field_obj)
+
                 field_comment = field_obj.metadata.get('comment')
-                target_class_name = None
-                
-                if hasattr(field_obj, 'default'):
-                    type_str = str(field_obj.default)
-                elif hasattr(field_obj, 'type'):
-                    type_str = str(field_obj.type)
-                
-                if type_str:
-                    if field_obj.type == cls or type_str == 'Self' or 'Self' in type_str:
-                        target_class_name = cls.__name__
-                    elif hasattr(field_obj.type, '__name__'):
-                        target_class_name = field_obj.type.__name__
-                    else:
-                        target_class_name = str(field_obj.type)
-                
-                if not field_comment and target_class_name:
-                    field_comment = f"If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
-                
-                if field_comment:
-                    g.add((prop_node, RDFS.comment, Literal(field_comment)))
-                
-                if hasattr(field_obj, 'default'):
-                    target_class = field_obj.type._get_iri()
-                    g.add((prop_node, SH['value'], target_class))
-                elif hasattr(field_obj, 'type'):
-                    target_class = field_obj.type._get_iri()
-                    g.add((prop_node, SH['class'], target_class))
-                    
-                    message = f"s223: If the relation `{relation._name}` is present it must associate the `{cls.__name__}` with a `{target_class_name}`."
+                if has_fixed_value:
+                    # A pinned field may be fixed to either a class itself (e.g.
+                    # `qk = quantitykinds.Area`) or an instance (e.g.
+                    # `domain = enumerationkinds.HVAC()`) - name the value, not
+                    # its metaclass, either way.
+                    name_source = fixed_value if isinstance(fixed_value, type) else fixed_value.__class__
+                    target_class_name = getattr(name_source, '__name__', str(fixed_value))
+                elif hasattr(target_type, '__name__'):
+                    target_class_name = target_type.__name__
+                else:
+                    target_class_name = str(target_type)
+
+                if not field_comment:
+                    field_comment = (f"If the relation `{relation._name}` is present it must "
+                                      f"associate the `{cls.__name__}` with a `{target_class_name}`.")
+                g.add((prop_node, RDFS.comment, Literal(field_comment)))
+
+                if has_fixed_value and hasattr(fixed_value, '_get_iri'):
+                    # A fixed pin to one real ontology individual (e.g.
+                    # `domain = enumerationkinds.HVAC()`, `qk = quantitykinds.Area`)
+                    # - constrain to that exact value, not its general type.
+                    g.add((prop_node, SH['value'], fixed_value._get_iri()))
+                elif has_fixed_value:
+                    g.add((prop_node, SH.hasValue, Literal(fixed_value)))
+                elif hasattr(target_type, '_get_iri'):
+                    g.add((prop_node, SH['class'], target_type._get_iri()))
+                    message = (f"s223: If the relation `{relation._name}` is present it must "
+                               f"associate the `{cls.__name__}` with a `{target_class_name}`.")
                     g.add((prop_node, SH.message, Literal(message)))
+                elif target_type in RdfExporter.DATATYPE_MAP:
+                    g.add((prop_node, SH.datatype, RdfExporter.DATATYPE_MAP[target_type]))
             
             # Second pass: create qualified value shapes
             for field_name, field_obj in fields_to_process:

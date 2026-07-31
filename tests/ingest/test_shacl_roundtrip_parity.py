@@ -1,4 +1,4 @@
-"""Verify field-generating shapes round-trip through the existing (unmodified)
+"""Verify field-generating shapes round-trip through
 RdfExporter.generate_rdf_class_definition() with fidelity matching the vendored
 ontology. Full round-trip of non-field constraints (sh:sparql, sh:or) is out of
 scope - see _generated/_raw_shapes.py for those.
@@ -18,13 +18,13 @@ def _shacl_graph(cls) -> Graph:
 
 def test_domain_space_roundtrip():
     g = _shacl_graph(entities.DomainSpace)
-    # The existing (unmodified) RdfExporter emits sh:value rather than sh:class
-    # for a plain Resource-typed field - this asserts against its actual behavior,
-    # not an idealized shape, since exporters.py is intentionally untouched.
+    # DomainSpace.domain is a plain (unpinned) Resource-typed field - it should
+    # constrain to the *type* (sh:class), not one specific fixed individual
+    # (sh:value, reserved for fields actually pinned to a fixed value/instance).
     query = """
     ASK {
         ?shape sh:path s223:hasDomain ;
-               sh:value s223:EnumerationKind-Domain ;
+               sh:class s223:EnumerationKind-Domain ;
                sh:minCount 1 .
     }
     """
@@ -59,3 +59,51 @@ def test_qualifiable_observable_property_subclassof_roundtrip():
         ASK { s223:QuantifiableObservableProperty rdfs:subClassOf ?p .
               FILTER(?p = s223:ObservableProperty || ?p = s223:QuantifiableProperty) }
     """))
+
+
+def test_hand_written_qualifiable_observable_property_roundtrip():
+    # s223.properties.QuantifiableObservableProperty (hand-written, adds
+    # qk/value/unit) used to crash generate_rdf_class_definition() outright:
+    # `value: float`'s bare builtin type has no `_get_iri()`, which the exporter
+    # called unconditionally. Plain-datatype fields should emit sh:datatype.
+    from semantic_objects.s223 import properties as hand_properties
+    g = Graph()
+    bind_prefixes(g)
+    g.parse(data=hand_properties.QuantifiableObservableProperty.generate_rdf_class_definition(),
+            format='turtle')
+    assert bool(g.query("""
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        ASK { ?shape sh:path s223:hasValue ; sh:datatype xsd:decimal . }
+    """))
+
+
+def test_pinned_field_emits_the_actual_value_not_its_type():
+    # Area.qk is pinned to `quantitykinds.Area` - the exporter used to read
+    # `field_obj.type._get_iri()` (the *type annotation*, QuantityKind) instead of
+    # the actually-pinned value, silently emitting the wrong sh:value.
+    from semantic_objects.s223 import properties as hand_properties
+    g = Graph()
+    bind_prefixes(g)
+    g.parse(data=hand_properties.Area.generate_rdf_class_definition(), format='turtle')
+    assert bool(g.query("""
+        PREFIX quantitykind: <http://qudt.org/vocab/quantitykind/>
+        ASK { ?shape sh:path s223:hasQuantityKind ; sh:value quantitykind:Area . }
+    """))
+    assert not bool(g.query("""
+        PREFIX quantitykind: <http://qudt.org/vocab/quantitykind/>
+        ASK { ?shape sh:path s223:hasQuantityKind ; sh:value quantitykind:QuantityKind . }
+    """))
+
+
+def test_exact_values_field_roundtrip():
+    # ThresholdAlarm-style `exact_values` fields (e.g. Area_SP.aspects) used to
+    # crash outright (Optional[list] has no _get_iri()). Each value should surface
+    # as its own sh:hasValue property shape sharing the field's relation path.
+    from semantic_objects.s223 import properties as hand_properties
+    g = Graph()
+    bind_prefixes(g)
+    g.parse(data=hand_properties.Area_SP.generate_rdf_class_definition(), format='turtle')
+    for value in ('Aspect-Setpoint', 'Aspect-Threshold', 'Domain-Occupancy'):
+        assert bool(g.query(f"""
+            ASK {{ ?shape sh:path s223:hasAspect ; sh:hasValue s223:{value} . }}
+        """)), f"missing sh:hasValue for {value}"
