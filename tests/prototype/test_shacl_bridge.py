@@ -16,11 +16,12 @@ representative classes, per the success criteria in
     bare `float` - AttributeError).
 """
 import pytest
-from rdflib import Graph
+from rdflib import Graph, Namespace, RDF
 from rdflib.plugins.sparql import prepareQuery
 
-from semantic_objects.namespaces import bind_prefixes
-from semantic_objects.s223 import entities, properties
+from semantic_objects.namespaces import bind_prefixes, S223
+from semantic_objects.core import semantic_object
+from semantic_objects.s223 import entities, properties, enumerationkinds
 from semantic_objects import shacl_bridge as sb
 
 
@@ -136,3 +137,82 @@ def test_quantifiable_observable_property_works_via_shacl_bridge():
     query = sb.sparql_query_for(properties.QuantifiableObservableProperty)
     prepareQuery(query)
     assert "qudt:hasQuantityKind" in query
+
+
+# -- Round-trip against real data: not just "does it parse" ------------------
+#
+# The tests above only proved the generated SPARQL is syntactically valid.
+# Running it against real (hand-built, since BuildingMOTIF materialization has
+# a separate pre-existing bug - see below) RDF data caught two real bugs that
+# parsing alone couldn't: `sh:class` naively translated to `?var a <class>`
+# fails against real instance data (which typically asserts only the most
+# specific rdf:type, no reasoner-added supertypes) and, separately, against
+# this ontology's EnumerationKind values (e.g. `s223:Fluid-Water`), which are
+# used directly as individuals with *no* rdf:type triple at all - the class
+# IRI doubles as the instance. Both are now handled by
+# `_Prefixer.type_triple()`'s `rdf:type?/rdfs:subClassOf*` path.
+
+def _build_pump_graph() -> Graph:
+    TEST = Namespace("urn:test#")
+    g = Graph()
+    bind_prefixes(g)
+    pump, outlet, inlet = TEST["pump1"], TEST["outlet1"], TEST["inlet1"]
+    g.add((pump, RDF.type, S223["Pump"]))
+    g.add((pump, S223["hasConnectionPoint"], outlet))
+    g.add((pump, S223["hasConnectionPoint"], inlet))
+    g.add((outlet, RDF.type, S223["OutletConnectionPoint"]))
+    g.add((outlet, S223["hasMedium"], S223["Fluid-Water"]))  # no separate rdf:type triple - see above
+    g.add((inlet, RDF.type, S223["InletConnectionPoint"]))
+    g.add((inlet, S223["hasMedium"], S223["Fluid-Oil"]))
+    return g, pump, outlet, inlet
+
+
+def test_pump_query_round_trips_against_real_data():
+    g, pump, outlet, inlet = _build_pump_graph()
+    res = g.query(sb.sparql_query_for(entities.Pump))
+    rows = list(res)
+    assert len(rows) == 1
+    bound = {str(v): rows[0][v] for v in res.vars if rows[0][v] is not None}
+    assert bound["name"] == pump
+    assert bound["hasConnectionPoint_OutletConnectionPoint"] == outlet
+    assert bound["hasConnectionPoint_InletConnectionPoint"] == inlet
+
+
+def test_pump_query_matches_old_query_on_same_data():
+    """The old (unmodified) query.py path and the new bridge must agree on
+    which instance - and which of its connection points - a real graph
+    contains, even though they're generated completely differently."""
+    g, pump, outlet, inlet = _build_pump_graph()
+    old_rows = list(g.query(entities.Pump.get_sparql_query()))
+    assert len(old_rows) == 1
+    assert old_rows[0].asdict() == {
+        "name": pump, "outlet_connection_point": outlet, "inlet_connection_point": inlet,
+    }
+
+    new_res = g.query(sb.sparql_query_for(entities.Pump))
+    new_rows = list(new_res)
+    new_bound = {str(v): new_rows[0][v] for v in new_res.vars if new_rows[0][v] is not None}
+    assert new_bound["hasConnectionPoint_OutletConnectionPoint"] == outlet
+    assert new_bound["hasConnectionPoint_InletConnectionPoint"] == inlet
+
+
+# -- Extension classes: a hand-written subclass pinning a field --------------
+
+def test_extension_subclass_resolves_shape_via_semantic_type():
+    """The `_semantic_type` escape hatch (already used by e.g. properties.Area)
+    is how a hand-written "extension" class - one that pins a field to a fixed
+    value purely as a Python convenience, not a new real ontology class -
+    tells shacl_bridge which real ontology class's shape to use instead of its
+    own (usually nonexistent) IRI."""
+
+    @semantic_object
+    class hvac_zone(entities.DomainSpace):
+        domain = enumerationkinds.HVAC()
+        _semantic_type = entities.DomainSpace
+
+    assert sb.shape_iri(hvac_zone) == entities.DomainSpace._get_iri()
+    definition = sb.shacl_definition_for(hvac_zone)
+    assert "DomainSpace" in definition
+    query = sb.sparql_query_for(hvac_zone)
+    prepareQuery(query)
+    assert "s223:hasDomain" in query

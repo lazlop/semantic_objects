@@ -46,7 +46,14 @@ def get_shape_graph(source_path: Path) -> Graph:
 
 
 def source_path_for_class(cls) -> Path:
-    top_package = cls.__module__.split(".")[1]
+    # Respect the same _semantic_type escape hatch shape_iri() does: an
+    # extension class (e.g. a test-local or notebook-local subclass) may not
+    # live under a registered ontology package's module path at all - resolve
+    # the source ontology from whichever class actually owns the shape.
+    semantic_type = getattr(cls, "_semantic_type", None)
+    source = semantic_type if semantic_type is not None else cls
+    module_parts = source.__module__.split(".")
+    top_package = module_parts[1] if len(module_parts) > 1 else None
     if top_package not in ONTOLOGY_SOURCES:
         raise ValueError(
             f"No vendored ontology source registered for package {top_package!r} "
@@ -175,6 +182,25 @@ class _Prefixer:
                 lines.append(f"PREFIX {prefix}: <{ns}>")
         return "\n".join(lines)
 
+    def type_triple(self, var: str, class_term: RDFNode) -> str:
+        """`sh:class`/`sh:or` alternatives describe "is-a", which real (non-
+        reasoned) RDF data satisfies two different ways depending on the kind
+        of value: a genuine instance has a separate `rdf:type` triple to a
+        (possibly more specific) class, e.g. an `OutletConnectionPoint` has no
+        separate `a s223:ConnectionPoint` triple unless a reasoner added one -
+        so matching a superclass needs `rdf:type/rdfs:subClassOf*`. But this
+        ontology's EnumerationKind values (e.g. `s223:Fluid-Water`) are used
+        directly as individuals with *no* rdf:type triple at all - the class
+        IRI doubles as the instance (confirmed against real vendored data, not
+        just the ontology's own text) - so matching those needs
+        `rdfs:subClassOf*` applied to the value itself, skipping rdf:type.
+        `rdf:type?/rdfs:subClassOf*` (optional rdf:type hop, then zero-or-more
+        subClassOf hops) covers both in one path, without a UNION."""
+        self.used.add(RDFS)
+        self.used.add(RDF)
+        target = class_term if class_term.startswith("?") else self(class_term)
+        return f"{var} rdf:type?/rdfs:subClassOf* {target} ."
+
 
 def _is_mandatory(g: Graph, bn, count_predicate) -> bool:
     count = g.value(bn, count_predicate)
@@ -221,7 +247,7 @@ def _emit_nested_property(g: Graph, prefixed, subject_var: str, nested_bn, minte
             var = minter.mint(subject_var.lstrip("?"), _local_name(path))
             type_var = f"{var}_type"
             return (
-                [f"{subject_var} {ppath} {var} .", f"{var} a {type_var} ."],
+                [f"{subject_var} {ppath} {var} .", prefixed.type_triple(var, type_var)],
                 [f"FILTER({type_var} IN ({', '.join(alt_classes)}))"],
             )
         return [], []
@@ -229,7 +255,7 @@ def _emit_nested_property(g: Graph, prefixed, subject_var: str, nested_bn, minte
     direct_class = g.value(nested_bn, SH["class"])
     if direct_class is not None:
         var = minter.mint(subject_var.lstrip("?"), _local_name(path))
-        return [f"{subject_var} {ppath} {var} .", f"{var} a {prefixed(direct_class)} ."], []
+        return [f"{subject_var} {ppath} {var} .", prefixed.type_triple(var, direct_class)], []
 
     return [], []
 
@@ -245,7 +271,7 @@ def _emit_qualified_shape(g: Graph, prefixed, path: URIRef, bn, minter: _VarMint
 
     var = minter.mint(_local_name(path), _local_name(qvs_class))
     triples.append(f"?name {prefixed(path)} {var} .")
-    triples.append(f"{var} a {prefixed(qvs_class)} .")
+    triples.append(prefixed.type_triple(var, qvs_class))
 
     # Some qualifiedValueShapes put nested sh:property directly on the shape
     # (watr:Tank/Reactor); others wrap it in sh:node (s223:Pump) - handle both.
@@ -275,7 +301,7 @@ def _emit_plain_shape(g: Graph, prefixed, path: URIRef, bn, minter: _VarMinter) 
     triples = [f"?name {prefixed(path)} {var} ."]
     direct_class = g.value(bn, SH["class"])
     if direct_class is not None:
-        triples.append(f"{var} a {prefixed(direct_class)} .")
+        triples.append(prefixed.type_triple(var, direct_class))
     fragment = "\n".join(triples)
     return fragment if _is_mandatory(g, bn, SH.minCount) else f"OPTIONAL {{ {fragment} }}"
 
