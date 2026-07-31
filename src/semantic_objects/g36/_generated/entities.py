@@ -11,59 +11,50 @@ this one - never edit this file directly, changes will be overwritten.
 
 from typing import Self
 from ...core import *
-from semantic_objects.s223.entities import CoolingCoil as _ExtCoolingCoil
-from semantic_objects.s223.entities import Damper as _ExtDamper
-from semantic_objects.s223.entities import ElectricResistanceElement as _ExtElectricResistanceElement
-from semantic_objects.s223.properties import EnumeratedActuatableProperty as _ExtEnumeratedActuatableProperty
-from semantic_objects.s223.properties import EnumeratedObservableProperty as _ExtEnumeratedObservableProperty
-from semantic_objects.s223.entities import Fan as _ExtFan
-from semantic_objects.s223.entities import HeatingCoil as _ExtHeatingCoil
-from semantic_objects.s223.properties import QuantifiableActuatableProperty as _ExtQuantifiableActuatableProperty
-from semantic_objects.s223.properties import QuantifiableObservableProperty as _ExtQuantifiableObservableProperty
-from semantic_objects.s223.entities import Valve as _ExtValve
-from semantic_objects.s223.entities import Zone as _ExtZone
+from ..core import Node, EnumerationKind, ExternalReference
 from . import relations
+from ... import s223
 __all__ = ['ChilledWaterValve', 'ChilledWaterCoil', 'Damper', 'ElectricHeatingCoil', 'Fan', 'FanWithVFD', 'HotWaterValve', 'HotWaterCoil', 'TwoPositionDamper', 'Zone', 'ZoneGroup']
 
 
 @semantic_object
-class ChilledWaterValve(_ExtValve):
+class ChilledWaterValve(s223.Valve):
     label = 'Chilled Water Valve'
     comment = 'A valve that controls the flow of chilled water through a chilled water coil.'
     _name = 'Valve'
 
 
 @semantic_object
-class ChilledWaterCoil(_ExtCoolingCoil):
+class ChilledWaterCoil(s223.CoolingCoil):
     label = 'ChilledWaterCoil'
     comment = 'A cooling coil with a connected chilled water valve.'
     _name = 'CoolingCoil'
-    chilled_water_valve: ChilledWaterValve = required_field(relation=relations.connectedTo, min=1, max=None, qualified=True)
+    chilled_water_valve: ChilledWaterValve = required_field(relation=s223.connectedTo, min=1, max=None, qualified=True)
 
 
 @semantic_object
-class Damper(_ExtDamper):
+class Damper(s223.Damper):
     label = 'Damper'
     comment = 'A damper with an analog or two binary position command properties.'
     _name = 'Damper'
 
 
 @semantic_object
-class ElectricHeatingCoil(_ExtElectricResistanceElement):
+class ElectricHeatingCoil(s223.ElectricResistanceElement):
     label = 'Electric Heating Coil'
     comment = 'An electrical heating element with an analog heating command.'
     _name = 'ElectricResistanceElement'
     # 1 SHACL constraint(s) not represented above - see _raw_shapes.RAW_SHAPES['ElectricHeatingCoil']
-    quantifiable_actuatable_property: _ExtQuantifiableActuatableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
+    quantifiable_actuatable_property: s223.QuantifiableActuatableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
 
 
 @semantic_object
-class Fan(_ExtFan):
+class Fan(s223.Fan):
     label = 'Fan'
     comment = 'A fan with a start/stop command.'
     _name = 'Fan'
     # 1 SHACL constraint(s) not represented above - see _raw_shapes.RAW_SHAPES['Fan']
-    enumerated_actuatable_property: _ExtEnumeratedActuatableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
+    enumerated_actuatable_property: s223.EnumeratedActuatableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
 
 
 @semantic_object
@@ -72,50 +63,50 @@ class FanWithVFD(Fan):
     comment = 'A fan controlled by a VFD.'
     _name = 'Fan'
     # 1 SHACL constraint(s) not represented above - see _raw_shapes.RAW_SHAPES['FanWithVFD']
-    quantifiable_actuatable_property: _ExtQuantifiableActuatableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
+    quantifiable_actuatable_property: s223.QuantifiableActuatableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
 
 
 @semantic_object
-class HotWaterValve(_ExtValve):
+class HotWaterValve(s223.Valve):
     label = 'Hot Water Valve'
     comment = 'A valve that controls the flow of hot water through a hot water coil.'
     _name = 'Valve'
 
 
 @semantic_object
-class HotWaterCoil(_ExtHeatingCoil):
+class HotWaterCoil(s223.HeatingCoil):
     label = 'HotWater/ReheatCoil'
     comment = 'A hot water coil connected to a control valve.'
     _name = 'HeatingCoil'
-    hot_water_valve: HotWaterValve = required_field(relation=relations.connectedTo, min=1, max=None, qualified=True)
+    hot_water_valve: HotWaterValve = required_field(relation=s223.connectedTo, min=1, max=None, qualified=True)
 
 
 @semantic_object
-class TwoPositionDamper(_ExtDamper):
+class TwoPositionDamper(Damper):
     label = 'Two Position Damper'
     comment = 'A damper that can take two positions: fully open and fully closed.'
     _name = 'Damper'
     # 1 SHACL constraint(s) not represented above - see _raw_shapes.RAW_SHAPES['TwoPositionDamper']
-    enumerated_actuatable_property: _ExtEnumeratedActuatableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
+    enumerated_actuatable_property: s223.EnumeratedActuatableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
 
 
 @semantic_object
-class Zone(_ExtZone):
+class Zone(s223.Zone):
     label = 'Zone'
     comment = 'A thermal zone with the points required for Guideline 36 control sequences. It is a collection of s223:DomainSpace instances.'
     _name = 'Zone'
     # 5 SHACL constraint(s) not represented above - see _raw_shapes.RAW_SHAPES['Zone']
-    quantifiable_observable_property: _ExtQuantifiableObservableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
-    quantifiable_observable_property_2: _ExtQuantifiableObservableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
-    enumerated_observable_property: _ExtEnumeratedObservableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
-    enumerated_observable_property_2: _ExtEnumeratedObservableProperty = required_field(relation=relations.hasProperty, min=1, max=None, qualified=True)
+    quantifiable_observable_property: s223.QuantifiableObservableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
+    quantifiable_observable_property_2: s223.QuantifiableObservableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
+    enumerated_observable_property: s223.EnumeratedObservableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
+    enumerated_observable_property_2: s223.EnumeratedObservableProperty = required_field(relation=s223.hasProperty, min=1, max=None, qualified=True)
 
 
 @semantic_object
-class ZoneGroup(_ExtZone):
+class ZoneGroup(Zone):
     label = 'Zone Group'
     comment = 'A ZoneGroup is a grouping of zones that may be scheduled together. Zone groupings must be assigned based on rules in Clause 3.1.3 of Guideline 36.'
     _name = 'Zone'
     # 1 SHACL constraint(s) not represented above - see _raw_shapes.RAW_SHAPES['ZoneGroup']
-    contains: _ExtZone = required_field(relation=relations.contains, min=1, max=None, qualified=False)
+    contains: Zone = required_field(relation=s223.contains, min=1, max=None, qualified=False)
 

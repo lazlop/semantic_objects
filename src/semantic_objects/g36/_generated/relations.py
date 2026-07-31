@@ -9,7 +9,6 @@ Hand customizations belong in the sibling non-generated module, which imports fr
 this one - never edit this file directly, changes will be overwritten.
 """
 
-from semantic_objects.s223.relations import *
 from ...core import semantic_object, Predicate as _CorePredicate
 from ...namespaces import G36
 __all__ = ['Predicate']

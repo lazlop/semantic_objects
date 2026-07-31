@@ -204,7 +204,10 @@ class Emitter:
             body_lines.append(f"    comment = {cls.comment!r}")
         if cls.is_abstract:
             body_lines.append("    abstract = True")
-        if cls.local_name != cls.class_name:
+        override = self.adapter.asserted_type_local(cls, self.ir) if self.adapter is not None else None
+        if override is not None:
+            body_lines.append(f"    _name = {override!r}")
+        elif cls.local_name != cls.class_name:
             body_lines.append(f"    _name = {cls.local_name!r}")
 
         field_shapes: List[PropertyShapeIR] = []

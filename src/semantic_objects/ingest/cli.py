@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from .adapters.g36 import G36Adapter
 from .adapters.s223 import S223Adapter
 from .adapters.watr import WatrAdapter
 from .codegen.emitter import Emitter
@@ -16,6 +17,9 @@ ADAPTERS = {
              REPO_ROOT / 'src' / 'semantic_objects' / 's223' / '_generated'),
     'watr': (WatrAdapter, REPO_ROOT / 'src' / 'semantic_objects' / 'ontologies' / 'watr' / 'water.ttl',
              REPO_ROOT / 'src' / 'semantic_objects' / 'watr' / '_generated'),
+    # g36 is vendored in the same 223p.ttl file as s223, under the g36: prefix.
+    'g36': (G36Adapter, REPO_ROOT / 'src' / 'semantic_objects' / 'ontologies' / 's223' / '223p.ttl',
+            REPO_ROOT / 'src' / 'semantic_objects' / 'g36' / '_generated'),
 }
 
 # CXF isn't a SHACL/RDF ontology (no rdfs:subClassOf hierarchy, no sh:property

@@ -12,7 +12,6 @@ from semantic_objects.ingest.parser import OntologyParser
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ONTOLOGY_PATH = REPO_ROOT / "src" / "semantic_objects" / "ontologies" / "s223" / "223p.ttl"
 GENERATED_DIR = REPO_ROOT / "src" / "semantic_objects" / "g36" / "_generated"
-EXTERNAL_RELATIONS_MODULE = "semantic_objects.s223.relations"
 
 
 def _generate_into(output_dir: Path):
@@ -20,7 +19,7 @@ def _generate_into(output_dir: Path):
     adapter = G36Adapter()
     ir = OntologyParser(config, adapter).parse()
     Emitter(ir, adapter.scaffold_parent_local_names(), ONTOLOGY_PATH, output_dir, "g36",
-            external_relations_module=EXTERNAL_RELATIONS_MODULE).emit()
+            adapter=adapter).emit()
 
 
 def test_generation_is_idempotent():
@@ -84,8 +83,9 @@ def test_asserted_type_is_the_real_s223_ancestor_not_the_g36_name(generated):
 
 
 def test_g36_fields_reuse_the_real_s223_relation_objects(generated):
-    entities, relations, _, s223_relations = generated
-    assert relations.hasProperty is s223_relations.hasProperty
+    # g36 defines no relations of its own - fields reference s223's Predicate
+    # objects directly (e.g. `relation=s223.hasProperty`), not a g36-local copy.
+    entities, _, _, s223_relations = generated
     fan_field = entities.Fan.__dataclass_fields__['enumerated_actuatable_property']
     assert fan_field.metadata['relation'] is s223_relations.hasProperty
     coil_field = entities.ChilledWaterCoil.__dataclass_fields__['chilled_water_valve']

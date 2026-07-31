@@ -11,6 +11,8 @@ this one - never edit this file directly, changes will be overwritten.
 
 from typing import Self
 from ...core import *
+from ..core import Node, EnumerationKind, ExternalReference
 from . import relations
+from ... import s223
 __all__ = []
 

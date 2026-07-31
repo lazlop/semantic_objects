@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from rdflib import Graph, Namespace, URIRef
 
+from ..ir import ClassIR, OntologyIR
+
 
 class OntologyAdapter(ABC):
     """Ontology-specific categorization rules for the generic ingestion walker.
@@ -68,3 +70,14 @@ class OntologyAdapter(ABC):
         """Import statements needed to make external_class_ref/external_relation_ref
         expressions resolve at module scope, added to every generated bucket file."""
         return []
+
+    def asserted_type_local(self, cls: ClassIR, ir: OntologyIR) -> Optional[str]:
+        """local_name to render as the generated class's `_name` (the RDF term
+        instances are actually asserted against), overriding the default
+        local_name-vs-class_name check. Return None for standard behavior.
+
+        Only needed by adapters whose classes are pure specializations never
+        themselves asserted as their own RDF type - e.g. g36, which relies on
+        SHACL annotation-property inference to apply its extra constraints to
+        plain s223 instances rather than instances typed as the g36 class."""
+        return None
