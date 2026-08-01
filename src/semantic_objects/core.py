@@ -82,6 +82,12 @@ def semantic_object(cls):
 @semantic_object
 class Resource:
     templatize = True
+    # Extra rdf:type values to assert alongside the class's own type in
+    # generate_rdf_class_definition() (e.g. sh:NodeShape, rdfs:Class). Ontology
+    # packages set this on their own shared base (see s223/core.py, watr/core.py);
+    # default to none so hand-authored subclasses of Resource/Node work out of
+    # the box instead of hitting an AttributeError in RdfExporter.
+    _other_types = []
 
     def __post_init__(self):
         """
