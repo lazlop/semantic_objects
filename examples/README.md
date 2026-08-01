@@ -34,6 +34,17 @@ python examples/basic_usage.py
 python examples/advanced_patterns.py
 ```
 
+### [hand_authored_resource.py](hand_authored_resource.py)
+**Defining Resource classes without ontology ingestion:**
+- A small vocabulary defined from scratch, no S223/WATR/CXF involved
+- Inheritance extending a base template (`StagedThermostat(Thermostat)`)
+- BuildingMOTIF template + SHACL generation working unmodified
+
+**Run it:**
+```bash
+python examples/hand_authored_resource.py
+```
+
 ## 🎯 What Each Example Demonstrates
 
 ### Basic Usage Examples
