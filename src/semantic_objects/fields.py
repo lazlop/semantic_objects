@@ -1,13 +1,26 @@
 
 from dataclasses import field
 
+# core.py/exporters.py treat a 'relation' key that's present-but-None as
+# "explicitly no relation" (skip generating one - used for fields that are
+# only reachable via an inter-field relation, e.g. a window field targeted by
+# a space->window inter_field_relation shouldn't ALSO get a direct
+# main-entity->window relation). An absent key means "infer it from
+# _valid_relations" instead. relation=None can't just default to "infer",
+# because "no relation" is itself a real, intentional state - so inference
+# is opt-in via infer_relation=True.
+def _relation_metadata(relation, infer_relation):
+    return {} if infer_relation else {'relation': relation}
+
 # a relation that is optional, and will be templatized (optional in bmotif template, used to query semantic data into objects)
-def optional_field(relation= None, label=None, comment=None):
+def optional_field(relation=None, label=None, comment=None, infer_relation=False):
+    # infer_relation=True infers the relation from _valid_relations at
+    # generation time instead of requiring (or explicitly omitting) one here.
     return field(
         default=None,
         init=False,
         metadata={
-            'relation': relation,
+            **_relation_metadata(relation, infer_relation),
             'label': label,
             'comment': comment
         }
@@ -15,13 +28,14 @@ def optional_field(relation= None, label=None, comment=None):
 
 # a field that is required (A SHACL qualified value shape requirement)
 # TODO: Consider how to handle qualified vs nonqualified constraints
-def required_field(relation = None, min = 1, max = None, qualified = True, label=None, comment=None, value=None, exact_values=None):
-    # If the relation is none, it will use a default relation from the types of each thing.
+def required_field(relation=None, min=1, max=None, qualified=True, label=None, comment=None, value=None, exact_values=None, infer_relation=False):
+    # infer_relation=True infers the relation from _valid_relations at
+    # generation time instead of requiring (or explicitly omitting) one here.
     # The 'value' parameter allows specifying a target field name for inter-field relations
     # The 'exact_values' parameter specifies that the semantic model must have exactly these values (not at least)
     return field(
         metadata={
-            'relation': relation,
+            **_relation_metadata(relation, infer_relation),
             'min': min,
             'max': max,
             'qualified': qualified,
@@ -32,12 +46,13 @@ def required_field(relation = None, min = 1, max = None, qualified = True, label
         }
     )
 
-# TODO: consider an alternative way of defining the maximum and minimum 
-def exclusive_field(relation = None, min = 1, max = 1, qualified = True, label=None, comment=None):
-    # If the relation is none, it will use a default relation from the types of each thing.
+# TODO: consider an alternative way of defining the maximum and minimum
+def exclusive_field(relation=None, min=1, max=1, qualified=True, label=None, comment=None, infer_relation=False):
+    # infer_relation=True infers the relation from _valid_relations at
+    # generation time instead of requiring (or explicitly omitting) one here.
     return field(
         metadata={
-            'relation': relation,
+            **_relation_metadata(relation, infer_relation),
             'min': min,
             'max': max,
             'qualified': qualified,
